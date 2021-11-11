@@ -34,7 +34,7 @@ public class InputOutput {
 
 //    @JsonManagedReference(value = "documents")
     @ManyToMany(mappedBy = "inputOutputs")
-    @JsonView(Views.InputOutputDocuments.class)
+    @JsonView(Views.Minimal.class)
     private List<Document> documents = new ArrayList<>();
 
     public InputOutput(String name, String state){

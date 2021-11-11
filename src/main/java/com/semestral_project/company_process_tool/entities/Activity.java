@@ -45,7 +45,7 @@ public class Activity {
     private List<Rasci> rasciList = new ArrayList<>();
 
 //    @JsonManagedReference(value = "inputs")
-    @JsonView(Views.ActivityGeneral.class)
+    @JsonView(Views.ActivityInputs.class)
     @ManyToMany
     @JoinTable(name = "activity_input",
     joinColumns = {@JoinColumn(name = "activity_id")},
@@ -53,7 +53,7 @@ public class Activity {
     private List<InputOutput> inputs = new ArrayList<>();
 
 //    @JsonManagedReference(value = "outputs")
-    @JsonView(Views.ActivityGeneral.class)
+    @JsonView(Views.ActivityOutputs.class)
     @ManyToMany
     @JoinTable(name = "activity_output",
             joinColumns = {@JoinColumn(name = "activity_id")},
@@ -62,7 +62,7 @@ public class Activity {
 
 //    @JsonManagedReference(value = "documents")
     @ManyToMany(mappedBy = "activities")
-    @JsonView(Views.ActivityGeneral.class)
+    @JsonView(Views.ActivityDocuments.class)
     private List<Document> documents = new ArrayList<>();
 
     public Activity() { }
