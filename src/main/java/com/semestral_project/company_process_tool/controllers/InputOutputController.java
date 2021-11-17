@@ -1,8 +1,11 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.entities.Activity;
+import com.semestral_project.company_process_tool.entities.Document;
 import com.semestral_project.company_process_tool.entities.InputOutput;
 import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.repositories.DocumentRepository;
 import com.semestral_project.company_process_tool.repositories.InputOutputRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
@@ -18,9 +21,11 @@ import java.util.Optional;
 public class InputOutputController {
 
     private final InputOutputRepository inputOutputRepository;
+    private final DocumentRepository documentRepository;
 
-    public InputOutputController(InputOutputRepository inputOutputRepository) {
+    public InputOutputController(InputOutputRepository inputOutputRepository, DocumentRepository documentRepository) {
         this.inputOutputRepository = inputOutputRepository;
+        this.documentRepository = documentRepository;
     }
 
     @JsonView(Views.Minimal.class)
@@ -49,7 +54,7 @@ public class InputOutputController {
     }
 
     @DeleteMapping("/inputsoutputs/{id}")
-    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id) {
+    public ResponseEntity<ResponseMessage> removeInputOutput(@PathVariable Long id) {
         try {
             inputOutputRepository.deleteById(id);
             return ResponseEntity.ok(new ResponseMessage("InputOutput id: " + id + " is deleted"));
@@ -107,5 +112,63 @@ public class InputOutputController {
         {
             return ResponseEntity.badRequest().body(new ResponseMessage("InputOutput id: " + id + " does not exist"));
         }
+    }
+
+    @PutMapping("/inputsoutputs/{id}/addDocument")
+    public ResponseEntity<ResponseMessage> addDocument(@PathVariable Long id, @RequestBody Document document) {
+        Optional<InputOutput> inputOutputData = inputOutputRepository.findById(id);
+        if(inputOutputData.isPresent()){
+            InputOutput inputOutput_ = inputOutputData.get();
+            List<Document> documents = inputOutput_.getDocuments();
+            for(Document doc : documents)
+            {
+                if(doc.getId() == document.getId())
+                {
+                    return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() +  " already added."));
+                }
+            }
+            Optional<Document> documentData = documentRepository.findById(document.getId());
+            if(documentData.isPresent())
+            {
+                Document document_ = documentData.get();
+                inputOutput_.addDocument(document_);
+                inputOutputRepository.save(inputOutput_);
+                documentRepository.save(document_);
+                return ResponseEntity.ok(new ResponseMessage("Document id: " + document.getId() +  " added"));
+            }
+            else
+            {
+                return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() + " does not exist."));
+            }
+        }
+        else
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Input/output id: " + id + " does not exist"));
+        }
+    }
+
+    @DeleteMapping("/inputsoutputs/{id}/removeDocument")
+    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id, @RequestBody Document document) {
+        Optional<InputOutput> inputOutputData = inputOutputRepository.findById(id);
+        if (inputOutputData.isPresent()) {
+            InputOutput inputOutput_ = inputOutputData.get();
+            List<Document> documents = inputOutput_.getDocuments();
+            for (Document doc : documents) {
+                if (doc.getId() == document.getId()) {
+                    Optional<Document> documentData = documentRepository.findById(document.getId());
+                    if (documentData.isPresent()) {
+                        Document document_ = documentData.get();
+                        inputOutput_.removeDocument(document_);
+                        inputOutputRepository.save(inputOutput_);
+                        documentRepository.save(document_);
+                        return ResponseEntity.ok(new ResponseMessage("Document id: " + document.getId() + " was removed"));
+                    } else {
+                        return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() + " does not exist."));
+                    }
+                }
+            }
+            return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() + " not in documents of Input/output: " + id + "."));
+        }
+        return ResponseEntity.badRequest().body(new ResponseMessage("Input/output id: " + id + " does not exist"));
     }
 }

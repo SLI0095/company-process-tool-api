@@ -93,7 +93,9 @@ public class Document {
 
     public void addInputOutput(InputOutput inputOutput){
         this.inputOutputs.add(inputOutput);
-        inputOutput.addDocument(this);
+    }
+    public void removeInputOutput(InputOutput inputOutput) {
+        this.inputOutputs.remove(inputOutput);
     }
 
 }

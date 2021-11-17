@@ -74,6 +74,7 @@ public class InputOutput {
 
     public void addDocument(Document document) {
         this.documents.add(document);
+        document.addInputOutput(this);
     }
 
     public void setInputsActivities(List<Activity> inputsActivities) {
@@ -106,5 +107,10 @@ public class InputOutput {
 
     public void removeOutputActivity(Activity activity) {
         this.outputsActivities.remove(activity);
+    }
+
+    public void removeDocument(Document document){
+        this.documents.remove(document);
+        document.removeInputOutput(this);
     }
 }
