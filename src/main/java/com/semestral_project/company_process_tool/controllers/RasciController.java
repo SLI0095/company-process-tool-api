@@ -1,9 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Activity;
-import com.semestral_project.company_process_tool.entities.Rasci;
-import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.RasciOld;
 import com.semestral_project.company_process_tool.repositories.RasciRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
@@ -25,9 +23,9 @@ public class RasciController {
 
     @JsonView(Views.RasciGeneral.class)
     @GetMapping("/rasci")
-    public ResponseEntity<List<Rasci>> getRasci() {
+    public ResponseEntity<List<RasciOld>> getRasci() {
         try {
-            return ResponseEntity.ok((List<Rasci>) rasciRepository.findAll());
+            return ResponseEntity.ok((List<RasciOld>) rasciRepository.findAll());
         } catch (Exception e) {
             return ResponseEntity.badRequest().header(e.getMessage()).body(null);
         }
@@ -35,7 +33,7 @@ public class RasciController {
     }
 
     @PostMapping("/rasci")
-    public ResponseEntity<ResponseMessage> addRasci(@RequestBody Rasci rasci) {
+    public ResponseEntity<ResponseMessage> addRasci(@RequestBody RasciOld rasci) {
         try {
             rasciRepository.save(rasci);
             return ResponseEntity.ok(new ResponseMessage("Rasci added"));
@@ -56,8 +54,8 @@ public class RasciController {
 
     @JsonView(Views.RasciGeneral.class)
     @GetMapping("/rasci/{id}")
-    public ResponseEntity<Rasci> rasciById(@PathVariable Long id) {
-        Optional<Rasci> rasciData = rasciRepository.findById(id);
+    public ResponseEntity<RasciOld> rasciById(@PathVariable Long id) {
+        Optional<RasciOld> rasciData = rasciRepository.findById(id);
         if(rasciData.isPresent()){
             return ResponseEntity.ok(rasciData.get());
         }
@@ -65,10 +63,10 @@ public class RasciController {
     }
 
     @PutMapping("/rasci/{id}")
-    public ResponseEntity<ResponseMessage> updateRasci(@PathVariable Long id, @RequestBody Rasci rasci) {
-        Optional<Rasci> rasciData = rasciRepository.findById(id);
+    public ResponseEntity<ResponseMessage> updateRasci(@PathVariable Long id, @RequestBody RasciOld rasci) {
+        Optional<RasciOld> rasciData = rasciRepository.findById(id);
         if(rasciData.isPresent()){
-            Rasci rasci_ = rasciData.get();
+            RasciOld rasci_ = rasciData.get();
             rasci_.setRole_type(rasci.getRole_type());
             rasci_.setUser(rasci.getUser());
             rasci_.setActivity(rasci.getActivity());

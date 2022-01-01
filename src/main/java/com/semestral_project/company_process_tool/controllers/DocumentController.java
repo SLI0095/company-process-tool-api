@@ -1,8 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Document;
-import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.DocumentOld;
 import com.semestral_project.company_process_tool.repositories.DocumentRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
@@ -24,9 +23,9 @@ public class DocumentController {
 
     @JsonView(Views.Minimal.class)
     @GetMapping("/documents")
-    public ResponseEntity<List<Document>> getDocuments(){
+    public ResponseEntity<List<DocumentOld>> getDocuments(){
         try {
-            return ResponseEntity.ok((List<Document>) documentRepository.findAll());
+            return ResponseEntity.ok((List<DocumentOld>) documentRepository.findAll());
         }
         catch (Exception e)
         {
@@ -36,7 +35,7 @@ public class DocumentController {
     }
 
     @PostMapping("/documents")
-    public ResponseEntity<ResponseMessage> addDocument(@RequestBody Document document){
+    public ResponseEntity<ResponseMessage> addDocument(@RequestBody DocumentOld document){
         try {
             documentRepository.save(document);
             return ResponseEntity.ok(new ResponseMessage("Document added"));
@@ -60,11 +59,11 @@ public class DocumentController {
     }
 
     @PutMapping("/documents/{id}")
-    public ResponseEntity<ResponseMessage> updateDocument(@PathVariable Long id, @RequestBody Document document) {
-        Optional<Document> documentData = documentRepository.findById(id);
+    public ResponseEntity<ResponseMessage> updateDocument(@PathVariable Long id, @RequestBody DocumentOld document) {
+        Optional<DocumentOld> documentData = documentRepository.findById(id);
 
         if(documentData.isPresent()){
-            Document document_ = documentData.get();
+            DocumentOld document_ = documentData.get();
             document_.setName(document.getName());
             document_.setSource(document.getSource());
 
@@ -79,8 +78,8 @@ public class DocumentController {
 
     @JsonView(Views.Minimal.class)
     @GetMapping("/documents/{id}")
-    public ResponseEntity<Document> documentById(@PathVariable Long id) {
-        Optional<Document> documentData = documentRepository.findById(id);
+    public ResponseEntity<DocumentOld> documentById(@PathVariable Long id) {
+        Optional<DocumentOld> documentData = documentRepository.findById(id);
 
         if(documentData.isPresent()) {
             return ResponseEntity.ok(documentData.get());

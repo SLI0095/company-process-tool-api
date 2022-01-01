@@ -1,10 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
@@ -34,7 +31,7 @@ public class User {
 //    @JsonManagedReference(value = "rasciList")
     @JsonView(Views.UserRasci.class)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Rasci> rasciList = new ArrayList<>();
+    private List<RasciOld> rasciList = new ArrayList<>();
 
     public User(String name, String surname) {
         this.name = name;
@@ -77,15 +74,15 @@ public class User {
         return position;
     }
 
-    public void setRasciList(List<Rasci> rasciList) {
+    public void setRasciList(List<RasciOld> rasciList) {
         this.rasciList = rasciList;
     }
 
-    public List<Rasci> getRasciList() {
+    public List<RasciOld> getRasciList() {
         return rasciList;
     }
 
-    public void addRasci(Rasci rasci)
+    public void addRasci(RasciOld rasci)
     {
         rasciList.add(rasci);
         rasci.setUser(this);

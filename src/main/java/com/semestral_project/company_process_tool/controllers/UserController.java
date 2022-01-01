@@ -1,14 +1,10 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Activity;
-import com.semestral_project.company_process_tool.entities.Position;
 import com.semestral_project.company_process_tool.entities.User;
-import com.semestral_project.company_process_tool.repositories.PositionRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

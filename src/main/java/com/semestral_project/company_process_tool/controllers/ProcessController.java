@@ -1,9 +1,8 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Activity;
-import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.ActivityOld;
+import com.semestral_project.company_process_tool.entities.ProcessOld;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
@@ -26,9 +25,9 @@ public class ProcessController {
 
     @JsonView(Views.ProcessGeneral.class)
     @GetMapping("/processes")
-    public ResponseEntity<List<Process>> getProcesses() {
+    public ResponseEntity<List<ProcessOld>> getProcesses() {
         try {
-            return ResponseEntity.ok((List<Process>)processRepository.findAll());
+            return ResponseEntity.ok((List<ProcessOld>)processRepository.findAll());
         } catch (Exception e) {
             return ResponseEntity.badRequest().header(e.getMessage()).body(null);
         }
@@ -36,7 +35,7 @@ public class ProcessController {
     }
 
     @PostMapping("/processes")
-    public ResponseEntity<ResponseMessage> addProcess(@RequestBody Process process){
+    public ResponseEntity<ResponseMessage> addProcess(@RequestBody ProcessOld process){
         try {
             processRepository.save(process);
             return ResponseEntity.ok(new ResponseMessage("Process added"));
@@ -57,8 +56,8 @@ public class ProcessController {
 
     @JsonView(Views.ProcessGeneral.class)
     @GetMapping("/processes/{id}")
-    public ResponseEntity<Process> processById(@PathVariable Long id) {
-        Optional<Process> processData = processRepository.findById(id);
+    public ResponseEntity<ProcessOld> processById(@PathVariable Long id) {
+        Optional<ProcessOld> processData = processRepository.findById(id);
         if(processData.isPresent()){
             return ResponseEntity.ok(processData.get());
         }
@@ -67,13 +66,13 @@ public class ProcessController {
 
     @JsonView(Views.ProcessRender.class)
     @GetMapping("/processes/{id}/firstActivities")
-    public ResponseEntity<List<Activity>> processFirstActivities(@PathVariable Long id) {
-        Optional<Process> processData = processRepository.findById(id);
+    public ResponseEntity<List<ActivityOld>> processFirstActivities(@PathVariable Long id) {
+        Optional<ProcessOld> processData = processRepository.findById(id);
         if(processData.isPresent()){
-            Process process_ = processData.get();
-            List<Activity> activities = process_.getActivities();
-            List<Activity> returnValue = new ArrayList<>();
-            for(Activity act : activities)
+            ProcessOld process_ = processData.get();
+            List<ActivityOld> activities = process_.getActivities();
+            List<ActivityOld> returnValue = new ArrayList<>();
+            for(ActivityOld act : activities)
             {
                 if(act.getPreviousActivity() == null)
                 {
@@ -86,10 +85,10 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}")
-    public ResponseEntity<ResponseMessage> updateProcess(@PathVariable Long id, @RequestBody Process process) {
-        Optional<Process> processData = processRepository.findById(id);
+    public ResponseEntity<ResponseMessage> updateProcess(@PathVariable Long id, @RequestBody ProcessOld process) {
+        Optional<ProcessOld> processData = processRepository.findById(id);
         if(processData.isPresent()){
-            Process process_ = processData.get();
+            ProcessOld process_ = processData.get();
             process_.setName(process.getName());
             processRepository.save(process_);
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));

@@ -1,10 +1,8 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Activity;
-import com.semestral_project.company_process_tool.entities.Document;
+import com.semestral_project.company_process_tool.entities.DocumentOld;
 import com.semestral_project.company_process_tool.entities.InputOutput;
-import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.repositories.DocumentRepository;
 import com.semestral_project.company_process_tool.repositories.InputOutputRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -12,7 +10,6 @@ import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Optional;
 
@@ -115,22 +112,22 @@ public class InputOutputController {
     }
 
     @PutMapping("/inputsoutputs/{id}/addDocument")
-    public ResponseEntity<ResponseMessage> addDocument(@PathVariable Long id, @RequestBody Document document) {
+    public ResponseEntity<ResponseMessage> addDocument(@PathVariable Long id, @RequestBody DocumentOld document) {
         Optional<InputOutput> inputOutputData = inputOutputRepository.findById(id);
         if(inputOutputData.isPresent()){
             InputOutput inputOutput_ = inputOutputData.get();
-            List<Document> documents = inputOutput_.getDocuments();
-            for(Document doc : documents)
+            List<DocumentOld> documents = inputOutput_.getDocuments();
+            for(DocumentOld doc : documents)
             {
                 if(doc.getId() == document.getId())
                 {
                     return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() +  " already added."));
                 }
             }
-            Optional<Document> documentData = documentRepository.findById(document.getId());
+            Optional<DocumentOld> documentData = documentRepository.findById(document.getId());
             if(documentData.isPresent())
             {
-                Document document_ = documentData.get();
+                DocumentOld document_ = documentData.get();
                 inputOutput_.addDocument(document_);
                 inputOutputRepository.save(inputOutput_);
                 documentRepository.save(document_);
@@ -148,16 +145,16 @@ public class InputOutputController {
     }
 
     @DeleteMapping("/inputsoutputs/{id}/removeDocument")
-    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id, @RequestBody Document document) {
+    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id, @RequestBody DocumentOld document) {
         Optional<InputOutput> inputOutputData = inputOutputRepository.findById(id);
         if (inputOutputData.isPresent()) {
             InputOutput inputOutput_ = inputOutputData.get();
-            List<Document> documents = inputOutput_.getDocuments();
-            for (Document doc : documents) {
+            List<DocumentOld> documents = inputOutput_.getDocuments();
+            for (DocumentOld doc : documents) {
                 if (doc.getId() == document.getId()) {
-                    Optional<Document> documentData = documentRepository.findById(document.getId());
+                    Optional<DocumentOld> documentData = documentRepository.findById(document.getId());
                     if (documentData.isPresent()) {
-                        Document document_ = documentData.get();
+                        DocumentOld document_ = documentData.get();
                         inputOutput_.removeDocument(document_);
                         inputOutputRepository.save(inputOutput_);
                         documentRepository.save(document_);

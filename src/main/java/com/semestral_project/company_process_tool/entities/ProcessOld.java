@@ -1,9 +1,6 @@
 package com.semestral_project.company_process_tool.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
@@ -12,7 +9,7 @@ import java.util.List;
 
 //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
-public class Process {
+public class ProcessOld {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -25,10 +22,10 @@ public class Process {
 //    @JsonManagedReference(value = "activities")
     @JsonView(Views.ProcessGeneral.class)
     @OneToMany(mappedBy ="process", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Activity> activities = new ArrayList<>();
+    private List<ActivityOld> activities = new ArrayList<>();
 
-    public Process() {};
-    public Process(String name){
+    public ProcessOld() {};
+    public ProcessOld(String name){
         this.name = name;
     }
 
@@ -44,16 +41,16 @@ public class Process {
         return name;
     }
 
-    public void addActivity(Activity activity){
+    public void addActivity(ActivityOld activity){
         activities.add(activity);
         activity.setProcess(this);
     }
 
-    public void setActivities(List<Activity> activities) {
+    public void setActivities(List<ActivityOld> activities) {
         this.activities = activities;
     }
 
-    public List<Activity> getActivities() {
+    public List<ActivityOld> getActivities() {
         return activities;
     }
 }

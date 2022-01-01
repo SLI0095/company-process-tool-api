@@ -6,9 +6,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Activity extends Element{
+public class Role extends Item{
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long activityId;
+    private long roleId;
+
+    private String skills;
+    private String assignmentApproaches;
+
 }

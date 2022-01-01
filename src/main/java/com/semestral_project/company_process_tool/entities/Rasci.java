@@ -1,69 +1,25 @@
 package com.semestral_project.company_process_tool.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.semestral_project.company_process_tool.utils.Views;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-import javax.persistence.*;
-
-//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 public class Rasci {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(Views.Minimal.class)
-    private long id;
+    public long rasciId;
 
-    @JsonView(Views.Minimal.class)
-    private String roleType;
+    public Role role;
 
-//    @JsonBackReference(value = "user")
-    @JsonView(Views.Minimal.class)
-    @ManyToOne
-    private User user;
+    public char type;
 
-//    @JsonBackReference(value = "activity")
-    @JsonView(Views.RasciGeneral.class)
-    @ManyToOne
-    private Activity activity;
+    public boolean responsible;
+    public boolean accountable;
+    public boolean support;
+    public boolean consulted;
+    public boolean informed;
 
-    public Rasci() { }
-
-    public Rasci(User user, Activity activity, String role_type)
-    {
-        this.user = user;
-        this.activity = activity;
-        this.roleType = role_type;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setRole_type(String roleType) {
-        this.roleType = roleType;
-    }
-
-    public String getRole_type() {
-        return roleType;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public Activity getActivity() {
-        return activity;
-    }
 }

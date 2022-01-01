@@ -1,8 +1,8 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.semestral_project.company_process_tool.entities.Activity;
-import com.semestral_project.company_process_tool.entities.Document;
+import com.semestral_project.company_process_tool.entities.ActivityOld;
+import com.semestral_project.company_process_tool.entities.DocumentOld;
 import com.semestral_project.company_process_tool.entities.InputOutput;
 import com.semestral_project.company_process_tool.repositories.ActivityRepository;
 import com.semestral_project.company_process_tool.repositories.DocumentRepository;
@@ -31,9 +31,9 @@ public class ActivityController {
 
     @JsonView(Views.Minimal.class)
     @GetMapping("/activities")
-    public  ResponseEntity<List<Activity>> getActivities(){
+    public  ResponseEntity<List<ActivityOld>> getActivities(){
         try {
-            return ResponseEntity.ok((List<Activity>) activityRepository.findAll());
+            return ResponseEntity.ok((List<ActivityOld>) activityRepository.findAll());
         }
         catch (Exception e)
         {
@@ -43,7 +43,7 @@ public class ActivityController {
     }
 
     @PostMapping("/activities")
-    public ResponseEntity<ResponseMessage> addActivity(@RequestBody Activity activity){
+    public ResponseEntity<ResponseMessage> addActivity(@RequestBody ActivityOld activity){
         try {
             activityRepository.save(activity);
             return ResponseEntity.ok(new ResponseMessage("Activity added"));
@@ -69,8 +69,8 @@ public class ActivityController {
 
     @JsonView(Views.ActivityGeneral.class)
     @GetMapping("/activities/{id}")
-    public ResponseEntity<Activity> activityById(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ActivityOld> activityById(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if(activityData.isPresent()){
             return ResponseEntity.ok(activityData.get());
         }
@@ -79,8 +79,8 @@ public class ActivityController {
 
     @JsonView(Views.ActivityDocuments.class)
     @GetMapping("/activities/{id}/documents")
-    public ResponseEntity<Activity> activityDocuments(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ActivityOld> activityDocuments(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
             return ResponseEntity.ok(activityData.get());
@@ -90,8 +90,8 @@ public class ActivityController {
 
     @JsonView(Views.ActivityInputs.class)
     @GetMapping("/activities/{id}/inputs")
-    public ResponseEntity<Activity> activityInputs(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ActivityOld> activityInputs(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
             return ResponseEntity.ok(activityData.get());
@@ -101,8 +101,8 @@ public class ActivityController {
 
     @JsonView(Views.ActivityOutputs.class)
     @GetMapping("/activities/{id}/outputs")
-    public ResponseEntity<Activity> activityOutputs(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ActivityOld> activityOutputs(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
             return ResponseEntity.ok(activityData.get());
@@ -112,8 +112,8 @@ public class ActivityController {
 
     @JsonView(Views.ActivityRasci.class)
     @GetMapping("/activities/{id}/rasci")
-    public ResponseEntity<Activity> activityRasci(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ActivityOld> activityRasci(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
             return ResponseEntity.ok(activityData.get());
@@ -123,22 +123,22 @@ public class ActivityController {
 
     @JsonView(Views.Minimal.class)
     @GetMapping("/activities/{id}/nextActivities")
-    public ResponseEntity<List<Activity>> activityNextActivities(@PathVariable Long id) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<List<ActivityOld>> activityNextActivities(@PathVariable Long id) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
             return ResponseEntity.ok(activity_.getNextActivities());
         }
         else return ResponseEntity.badRequest().body(null);
     }
 
     @PutMapping("/activities/{id}")
-    public ResponseEntity<ResponseMessage> updateActivity(@PathVariable Long id, @RequestBody Activity activity) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ResponseMessage> updateActivity(@PathVariable Long id, @RequestBody ActivityOld activity) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
 
         if(activityData.isPresent()){
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
 
             activity_.setName(activity.getName());
             activity_.setDescription(activity.getDescription());
@@ -157,22 +157,22 @@ public class ActivityController {
     }
 
     @PutMapping("/activities/{id}/addDocument")
-    public ResponseEntity<ResponseMessage> addDocument(@PathVariable Long id, @RequestBody Document document) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ResponseMessage> addDocument(@PathVariable Long id, @RequestBody DocumentOld document) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if(activityData.isPresent()){
-            Activity activity_ = activityData.get();
-            List<Document> documents = activity_.getDocuments();
-            for(Document doc : documents)
+            ActivityOld activity_ = activityData.get();
+            List<DocumentOld> documents = activity_.getDocuments();
+            for(DocumentOld doc : documents)
             {
                 if(doc.getId() == document.getId())
                 {
                     return ResponseEntity.badRequest().body(new ResponseMessage("Document id: " + document.getId() +  " already added."));
                 }
             }
-            Optional<Document> documentData = documentRepository.findById(document.getId());
+            Optional<DocumentOld> documentData = documentRepository.findById(document.getId());
             if(documentData.isPresent())
             {
-                Document document_ = documentData.get();
+                DocumentOld document_ = documentData.get();
                 activity_.addDocument(document_);
                 activityRepository.save(activity_);
                 documentRepository.save(document_);
@@ -190,16 +190,16 @@ public class ActivityController {
     }
 
     @DeleteMapping("/activities/{id}/removeDocument")
-    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id, @RequestBody Document document) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+    public ResponseEntity<ResponseMessage> removeDocument(@PathVariable Long id, @RequestBody DocumentOld document) {
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if (activityData.isPresent()) {
-            Activity activity_ = activityData.get();
-            List<Document> documents = activity_.getDocuments();
-            for (Document doc : documents) {
+            ActivityOld activity_ = activityData.get();
+            List<DocumentOld> documents = activity_.getDocuments();
+            for (DocumentOld doc : documents) {
                 if (doc.getId() == document.getId()) {
-                    Optional<Document> documentData = documentRepository.findById(document.getId());
+                    Optional<DocumentOld> documentData = documentRepository.findById(document.getId());
                     if (documentData.isPresent()) {
-                        Document document_ = documentData.get();
+                        DocumentOld document_ = documentData.get();
                         activity_.removeDocument(document_);
                         activityRepository.save(activity_);
                         documentRepository.save(document_);
@@ -216,9 +216,9 @@ public class ActivityController {
 
     @PutMapping("/activities/{id}/addInput")
     public ResponseEntity<ResponseMessage> addInput(@PathVariable Long id, @RequestBody InputOutput input) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if(activityData.isPresent()){
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
             List<InputOutput> inputs = activity_.getInputs();
             for(InputOutput inp : inputs)
             {
@@ -249,9 +249,9 @@ public class ActivityController {
 
     @DeleteMapping("/activities/{id}/removeInput")
     public ResponseEntity<ResponseMessage> removeInput(@PathVariable Long id, @RequestBody InputOutput input) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if (activityData.isPresent()) {
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
             List<InputOutput> inputs = activity_.getInputs();
             for (InputOutput inp : inputs) {
                 if (inp.getId() == input.getId()) {
@@ -274,9 +274,9 @@ public class ActivityController {
 
     @PutMapping("/activities/{id}/addOutput")
     public ResponseEntity<ResponseMessage> addOutput(@PathVariable Long id, @RequestBody InputOutput output) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if(activityData.isPresent()){
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
             List<InputOutput> outputs = activity_.getOutputs();
             for(InputOutput out : outputs)
             {
@@ -307,9 +307,9 @@ public class ActivityController {
 
     @DeleteMapping("/activities/{id}/removeOutput")
     public ResponseEntity<ResponseMessage> removeOutput(@PathVariable Long id, @RequestBody InputOutput output) {
-        Optional<Activity> activityData = activityRepository.findById(id);
+        Optional<ActivityOld> activityData = activityRepository.findById(id);
         if (activityData.isPresent()) {
-            Activity activity_ = activityData.get();
+            ActivityOld activity_ = activityData.get();
             List<InputOutput> outputs = activity_.getOutputs();
             for (InputOutput out : outputs) {
                 if (out.getId() == output.getId()) {

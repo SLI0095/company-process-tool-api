@@ -6,9 +6,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Activity extends Element{
+public class State {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long activityId;
+    public long stateId;
+
+    public String stateName;
+    public String stateDescription;
 }

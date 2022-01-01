@@ -25,17 +25,17 @@ public class InputOutput {
 //    @JsonBackReference(value = "inputsActivities")
     @ManyToMany(mappedBy = "inputs")
     @JsonView(Views.InputActivites.class)
-    private List<Activity> inputsActivities = new ArrayList<>();
+    private List<ActivityOld> inputsActivities = new ArrayList<>();
 
 //    @JsonBackReference(value = "outputsActivities")
     @ManyToMany(mappedBy = "outputs")
     @JsonView(Views.OutputActivites.class)
-    private List<Activity> outputsActivities = new ArrayList<>();
+    private List<ActivityOld> outputsActivities = new ArrayList<>();
 
 //    @JsonManagedReference(value = "documents")
     @ManyToMany(mappedBy = "inputOutputs")
     @JsonView(Views.Minimal.class)
-    private List<Document> documents = new ArrayList<>();
+    private List<DocumentOld> documents = new ArrayList<>();
 
     public InputOutput(String name, String state){
         this.name = name;
@@ -64,52 +64,52 @@ public class InputOutput {
         return state;
     }
 
-    public void setDocuments(List<Document> documents) {
+    public void setDocuments(List<DocumentOld> documents) {
         this.documents = documents;
     }
 
-    public List<Document> getDocuments() {
+    public List<DocumentOld> getDocuments() {
         return documents;
     }
 
-    public void addDocument(Document document) {
+    public void addDocument(DocumentOld document) {
         this.documents.add(document);
         document.addInputOutput(this);
     }
 
-    public void setInputsActivities(List<Activity> inputsActivities) {
+    public void setInputsActivities(List<ActivityOld> inputsActivities) {
         this.inputsActivities = inputsActivities;
     }
 
-    public List<Activity> getInputsActivities() {
+    public List<ActivityOld> getInputsActivities() {
         return inputsActivities;
     }
 
-    public void addInputActivity(Activity activity) {
+    public void addInputActivity(ActivityOld activity) {
         this.inputsActivities.add(activity);
     }
 
-    public void removeInputActivity(Activity activity) {
+    public void removeInputActivity(ActivityOld activity) {
         this.inputsActivities.remove(activity);
     }
 
-    public void setOutputsActivities(List<Activity> outputsActivities) {
+    public void setOutputsActivities(List<ActivityOld> outputsActivities) {
         this.outputsActivities = outputsActivities;
     }
 
-    public List<Activity> getOutputsActivities() {
+    public List<ActivityOld> getOutputsActivities() {
         return outputsActivities;
     }
 
-    public void addOutputActivity(Activity activity) {
+    public void addOutputActivity(ActivityOld activity) {
         this.outputsActivities.add(activity);
     }
 
-    public void removeOutputActivity(Activity activity) {
+    public void removeOutputActivity(ActivityOld activity) {
         this.outputsActivities.remove(activity);
     }
 
-    public void removeDocument(Document document){
+    public void removeDocument(DocumentOld document){
         this.documents.remove(document);
         document.removeInputOutput(this);
     }

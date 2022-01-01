@@ -6,9 +6,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Activity extends Element{
+public class TaskStep {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long activityId;
+    private long taskStepId;
 }
