@@ -6,7 +6,7 @@ import com.semestral_project.company_process_tool.utils.Views;
 import javax.persistence.*;
 
 //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@Entity
+//@Entity
 public class RasciOld {
 
     @Id

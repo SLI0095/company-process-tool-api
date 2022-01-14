@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@Entity
+//@Entity
 public class Position {
 
     @Id

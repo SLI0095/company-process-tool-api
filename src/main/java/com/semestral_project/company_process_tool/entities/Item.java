@@ -1,15 +1,23 @@
 package com.semestral_project.company_process_tool.entities;
 
-import java.sql.Blob;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 import java.time.LocalDate;
 
+@MappedSuperclass
 public class Item {
 
     private String name;
+    @Column(columnDefinition="LONGTEXT")
     private String briefDescription;
+    @Column(columnDefinition="LONGTEXT")
     private String mainDescription;
     private String version;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate changeDate;
+    @Column(columnDefinition="LONGTEXT")
     private String changeDescription;
 
     public Item() {

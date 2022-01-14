@@ -6,8 +6,8 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface LoginCredentialsRepository extends CrudRepository<LoginCredentials,Long> {
-
-    @Query("SELECT login FROM LoginCredentials login WHERE login.username = ?1")
-    Optional<LoginCredentials> findByUsername(String username);
-}
+//public interface LoginCredentialsRepository extends CrudRepository<LoginCredentials,Long> {
+//
+//    @Query("SELECT login FROM LoginCredentials login WHERE login.username = ?1")
+//    Optional<LoginCredentials> findByUsername(String username);
+//}
