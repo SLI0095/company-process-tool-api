@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,9 +11,12 @@ public class TaskStep {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonIgnore
     @ManyToOne
     private Task task;
+
     private String name;
+
     @Column(columnDefinition="LONGTEXT")
     private String description;
 

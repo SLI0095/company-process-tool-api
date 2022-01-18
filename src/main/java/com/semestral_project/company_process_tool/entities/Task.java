@@ -7,17 +7,17 @@ import java.util.List;
 @DiscriminatorValue("task")
 public class Task extends Element{
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<TaskStep> steps;
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
-    @ManyToMany(mappedBy = "asPrimaryPerformer")
-    private List<Role> primaryPerformers;
-    @ManyToMany(mappedBy = "asAdditionalPerformer")
-    private List<Role> additionalPerformers;
+//    @ManyToMany(mappedBy = "asPrimaryPerformer")
+//    private List<Role> primaryPerformers;
+//    @ManyToMany(mappedBy = "asAdditionalPerformer")
+//    private List<Role> additionalPerformers;
 
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<WorkItem> mandatoryInputs;
@@ -27,6 +27,12 @@ public class Task extends Element{
 
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs;
+
+    @OneToMany(mappedBy = "element")
+    private List<Rasci> rasciList;
+
+    @ManyToMany(mappedBy = "asGuidanceWorkItem")
+    private List<WorkItem> guidanceWorkItems;
 
     public Task() {
     }
@@ -55,21 +61,37 @@ public class Task extends Element{
         this.keyConsiderations = keyConsiderations;
     }
 
-    public List<Role> getPrimaryPerformers() {
-        return primaryPerformers;
+    public List<Rasci> getRasciList() {
+        return rasciList;
     }
 
-    public void setPrimaryPerformers(List<Role> primaryPerformers) {
-        this.primaryPerformers = primaryPerformers;
+    public void setRasciList(List<Rasci> rasciList) {
+        this.rasciList = rasciList;
     }
 
-    public List<Role> getAdditionalPerformers() {
-        return additionalPerformers;
+    public List<WorkItem> getGuidanceWorkItems() {
+        return guidanceWorkItems;
     }
 
-    public void setAdditionalPerformers(List<Role> additionalPerformers) {
-        this.additionalPerformers = additionalPerformers;
+    public void setGuidanceWorkItems(List<WorkItem> guidanceWorkItems) {
+        this.guidanceWorkItems = guidanceWorkItems;
     }
+
+    //    public List<Role> getPrimaryPerformers() {
+//        return primaryPerformers;
+//    }
+//
+//    public void setPrimaryPerformers(List<Role> primaryPerformers) {
+//        this.primaryPerformers = primaryPerformers;
+//    }
+//
+//    public List<Role> getAdditionalPerformers() {
+//        return additionalPerformers;
+//    }
+//
+//    public void setAdditionalPerformers(List<Role> additionalPerformers) {
+//        this.additionalPerformers = additionalPerformers;
+//    }
 
     public List<WorkItem> getMandatoryInputs() {
         return mandatoryInputs;

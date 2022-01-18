@@ -1,9 +1,6 @@
 package com.semestral_project.company_process_tool.entities;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -25,6 +22,11 @@ public class Process extends Element{
 
     @ManyToMany(mappedBy = "partOfProcess")
     private List<Element> elements;
+
+    @OneToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "bpmnId")
+    private BPMNfile workflow;
+
 
     public Process() {
     }
@@ -63,6 +65,14 @@ public class Process extends Element{
 
     public String getHowToStaff() {
         return howToStaff;
+    }
+
+    public BPMNfile getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(BPMNfile workflow) {
+        this.workflow = workflow;
     }
 
     public void setHowToStaff(String howToStaff) {

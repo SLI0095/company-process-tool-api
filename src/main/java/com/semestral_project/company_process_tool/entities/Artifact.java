@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class Artifact extends WorkItem {
     @ManyToOne
     private State artifactState;
 
+    @JsonIgnore
     @OneToMany(mappedBy ="baseArtifact", cascade = CascadeType.REMOVE)
     private List<ArtifactRelation> asBase;
 

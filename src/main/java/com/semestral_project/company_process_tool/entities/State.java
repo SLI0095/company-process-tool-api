@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class State {
     @Column(columnDefinition="LONGTEXT")
     public String stateDescription;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "artifactState")
     public List<Artifact> artifacts;
 

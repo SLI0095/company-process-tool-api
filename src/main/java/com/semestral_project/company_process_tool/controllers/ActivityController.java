@@ -83,54 +83,54 @@ public class ActivityController {
     }
 
 
-    @PutMapping("/activities/{id}/addGuidance")
-    public ResponseEntity<ResponseMessage> addGuidance(@PathVariable Long id, @RequestBody WorkItem workItem){
-        Optional<Activity> activityData = activityRepository.findById(id);
-        if(activityData.isPresent()) {
-            Activity activity_ = activityData.get();
-            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
-            var guidanceList = activity_.getGuidanceWorkItems();
-            if(guidanceList.contains(item_))
-            {
-                return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item already added"));
-            }
-            guidanceList.add(item_);
-            activity_.setGuidanceWorkItems(guidanceList);
-
-            activityRepository.save(activity_);
-            return ResponseEntity.ok(new ResponseMessage("Activity id: " + id + " is updated. Guidance work item added."));
-        }
-        else
-        {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Activity id: " + id + " does not exist"));
-        }
-    }
-
-
-    @PutMapping("/activities/{id}/removeGuidance")
-    public ResponseEntity<ResponseMessage> removeGuidance(@PathVariable Long id, @RequestBody WorkItem item){
-        Optional<Activity> activityData = activityRepository.findById(id);
-        if(activityData.isPresent()) {
-            Activity activity_ = activityData.get();
-            WorkItem item_ = workItemRepository.findById(item.getId()).get();
-            var guidanceList = activity_.getGuidanceWorkItems();
-            if(guidanceList.contains(item_)) {
-                guidanceList.remove(item_);
-                activity_.setGuidanceWorkItems(guidanceList);
-                activityRepository.save(activity_);
-                return ResponseEntity.ok(new ResponseMessage("Activity id: " + id + " is updated. Guidance work item removed."));
-
-            }
-            else {
-                return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item not in activity id: " + id));
-            }
-
-        }
-        else
-        {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Activity id: " + id + " does not exist"));
-        }
-    }
+//    @PutMapping("/activities/{id}/addGuidance")
+//    public ResponseEntity<ResponseMessage> addGuidance(@PathVariable Long id, @RequestBody WorkItem workItem){
+//        Optional<Activity> activityData = activityRepository.findById(id);
+//        if(activityData.isPresent()) {
+//            Activity activity_ = activityData.get();
+//            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+//            var guidanceList = activity_.getGuidanceWorkItems();
+//            if(guidanceList.contains(item_))
+//            {
+//                return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item already added"));
+//            }
+//            guidanceList.add(item_);
+//            activity_.setGuidanceWorkItems(guidanceList);
+//
+//            activityRepository.save(activity_);
+//            return ResponseEntity.ok(new ResponseMessage("Activity id: " + id + " is updated. Guidance work item added."));
+//        }
+//        else
+//        {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Activity id: " + id + " does not exist"));
+//        }
+//    }
+//
+//
+//    @PutMapping("/activities/{id}/removeGuidance")
+//    public ResponseEntity<ResponseMessage> removeGuidance(@PathVariable Long id, @RequestBody WorkItem item){
+//        Optional<Activity> activityData = activityRepository.findById(id);
+//        if(activityData.isPresent()) {
+//            Activity activity_ = activityData.get();
+//            WorkItem item_ = workItemRepository.findById(item.getId()).get();
+//            var guidanceList = activity_.getGuidanceWorkItems();
+//            if(guidanceList.contains(item_)) {
+//                guidanceList.remove(item_);
+//                activity_.setGuidanceWorkItems(guidanceList);
+//                activityRepository.save(activity_);
+//                return ResponseEntity.ok(new ResponseMessage("Activity id: " + id + " is updated. Guidance work item removed."));
+//
+//            }
+//            else {
+//                return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item not in activity id: " + id));
+//            }
+//
+//        }
+//        else
+//        {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Activity id: " + id + " does not exist"));
+//        }
+//    }
 
 
     @PutMapping("/activities/{id}/addElement")

@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -15,29 +17,33 @@ public class WorkItem extends Item{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "work_item_task_mandatory_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asMandatoryInput;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "work_item_task_optional_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asOptionalInput;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "work_item_task_output",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asOutput;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "work_item_activity_guidance",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Activity> asGuidanceWorkItem;
+    private List<Task> asGuidanceWorkItem;
 
     public WorkItem() {
     }
@@ -74,11 +80,11 @@ public class WorkItem extends Item{
         this.asOutput = asOutput;
     }
 
-    public List<Activity> getAsGuidanceWorkItem() {
+    public List<Task> getAsGuidanceWorkItem() {
         return asGuidanceWorkItem;
     }
 
-    public void setAsGuidanceWorkItem(List<Activity> asGuidanceWorkItem) {
+    public void setAsGuidanceWorkItem(List<Task> asGuidanceWorkItem) {
         this.asGuidanceWorkItem = asGuidanceWorkItem;
     }
 }

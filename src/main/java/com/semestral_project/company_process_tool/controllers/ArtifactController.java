@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.controllers;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.ArtifactRelationRepository;
 import com.semestral_project.company_process_tool.repositories.ArtifactRepository;
+import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
@@ -22,6 +23,9 @@ public class ArtifactController {
 
     @Autowired
     ArtifactRelationRepository artifactRelationRepository;
+
+    @Autowired
+    StateRepository stateRepository;
 
     @GetMapping("/artifacts")
     public ResponseEntity<List<Artifact>> getArtifacts() {
@@ -89,8 +93,20 @@ public class ArtifactController {
 
         if(artifactData.isPresent()){
             Artifact artifact_ = artifactData.get();
-            artifact_.setArtifactState(state);
-
+            if(state.getId() == -1 && artifact_.getArtifactState() != null)
+            {
+                State state_ = artifact_.getArtifactState();
+                List<Artifact> artifactList = state_.getArtifacts();
+                artifactList.remove(artifact_);
+                state_.setArtifacts(artifactList);
+                stateRepository.save(state_);
+                artifact_.setArtifactState(null);
+            } else if (state.getId() == -1 && artifact_.getArtifactState() == null){
+                return ResponseEntity.badRequest().body(new ResponseMessage("Artifact id: " + id + " does not have state."));
+            }
+            else {
+                artifact_.setArtifactState(state);
+            }
             artifactRepository.save(artifact_);
             return ResponseEntity.ok(new ResponseMessage("Artifact id: " + id + " is updated"));
         }

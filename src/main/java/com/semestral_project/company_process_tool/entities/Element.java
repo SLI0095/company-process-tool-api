@@ -25,6 +25,7 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "activity_id")})
     private List<Activity> partOfActivity;
 
+
     public Element() {
     }
 
@@ -51,4 +52,5 @@ public class Element extends Item{
     public void setPartOfActivity(List<Activity> partOfActivity) {
         this.partOfActivity = partOfActivity;
     }
+
 }
