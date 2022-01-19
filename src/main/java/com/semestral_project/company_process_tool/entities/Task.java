@@ -28,7 +28,7 @@ public class Task extends Element{
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs;
 
-    @OneToMany(mappedBy = "element")
+    @OneToMany(mappedBy = "element", cascade = CascadeType.REMOVE)
     private List<Rasci> rasciList;
 
     @ManyToMany(mappedBy = "asGuidanceWorkItem")

@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,7 +18,8 @@ public class Role extends Item{
     @Column(columnDefinition="LONGTEXT")
     private String assignmentApproaches;
 
-    @OneToMany(mappedBy = "role")
+    @JsonIgnore
+    @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE)
     private List<Rasci> rasciList;
 
     @ManyToMany

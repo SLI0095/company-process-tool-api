@@ -1,10 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.*;
-import com.semestral_project.company_process_tool.repositories.RoleRepository;
-import com.semestral_project.company_process_tool.repositories.TaskRepository;
-import com.semestral_project.company_process_tool.repositories.TaskStepRepository;
-import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
+import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +23,8 @@ public class TaskController {
     RoleRepository roleRepository;
     @Autowired
     WorkItemRepository workItemRepository;
+    @Autowired
+    RasciRepository rasciRepository;
 
     @GetMapping("/tasks")
     public ResponseEntity<List<Task>> getTasks() {
@@ -108,6 +107,42 @@ public class TaskController {
                 return ResponseEntity.badRequest().body(new ResponseMessage("Step not in task id: " + id));
             }
 
+        }
+        else
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/tasks/{id}/addRasci")
+    public ResponseEntity<ResponseMessage> addTaskRasci(@PathVariable Long id, @RequestBody Rasci rasci){
+        Optional<Task> taskData = taskRepository.findById(id);
+        if(taskData.isPresent()) {
+            Task task_ = taskData.get();
+            var rasciList = task_.getRasciList();
+            for(Rasci r : rasciList){
+                if(r.getRole().getId() == rasci.getRole().getId())
+                    return ResponseEntity.badRequest().body(new ResponseMessage("Role already in Task id: " + id));
+            }
+            rasci.setElement(task_);
+            rasciRepository.save(rasci);
+
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated"));
+        }
+        else
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/tasks/{id}/removeRasci")
+    public ResponseEntity<ResponseMessage> removeTaskRasci(@PathVariable Long id, @RequestBody Rasci rasci){
+        Optional<Task> taskData = taskRepository.findById(id);
+        if(taskData.isPresent()) {
+
+            rasciRepository.delete(rasci);
+
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated"));
         }
         else
         {
