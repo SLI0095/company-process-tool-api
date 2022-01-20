@@ -1,8 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
-import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.WorkItem;
-import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
+import com.semestral_project.company_process_tool.services.WorkItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,14 +15,16 @@ import java.util.List;
 public class WorkItemController {
 
     @Autowired
-    WorkItemRepository workItemRepository;
+    WorkItemService workItemService;
+
 
     @GetMapping("/workItems")
-    public ResponseEntity<List<WorkItem>> getTasks() {
-        try {
-            return org.springframework.http.ResponseEntity.ok((List<WorkItem>) workItemRepository.findAll());
-        } catch (Exception e) {
-            return org.springframework.http.ResponseEntity.badRequest().header(e.getMessage()).body(null);
+    public ResponseEntity<List<WorkItem>> getWorkItems() {
+        List<WorkItem> workItems = workItemService.getAllWorkItems();
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
