@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.semestral_project.company_process_tool.entities.BPMNfile;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
@@ -86,6 +87,18 @@ public class ProcessController {
     @PutMapping("/processes/{id}/removeElement")
     public ResponseEntity<ResponseMessage> removeElement(@PathVariable Long id, @RequestBody Element element){
         int ret = processService.removeElementFromProcess(id, element);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
+        }
+    }
+
+    @PutMapping("/processes/{id}/saveBPMN")
+    public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn){
+        int ret = processService.saveWorkflow(id, bpmn);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
         } else if(ret == 2){

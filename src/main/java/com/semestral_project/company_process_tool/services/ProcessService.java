@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.services;
 
+import com.semestral_project.company_process_tool.entities.BPMNfile;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class ProcessService {
     ProcessRepository processRepository;
     @Autowired
     ElementRepository elementRepository;
+    @Autowired
+    BPMNfileRepository BPMNrepository;
 
     private Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -130,6 +134,27 @@ public class ProcessService {
                 return 3;
             }
 
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
+    public int saveWorkflow(long id, BPMNfile bpmn){
+        Optional<Process> processData = processRepository.findById(id);
+        if(processData.isPresent()) {
+            Process process_ = processData.get();
+            var bpmn_to_delete = process_.getWorkflow();
+            bpmn.setProcess(process_);
+            bpmn = BPMNrepository.save(bpmn);
+            process_.setWorkflow(bpmn);
+            processRepository.save(process_);
+            if(bpmn_to_delete != null){
+                BPMNrepository.delete(bpmn_to_delete);
+            }
+            var elementList = process_.getElements();
+            return 1;
         }
         else
         {

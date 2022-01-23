@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.utils.Views;
 
@@ -15,6 +16,7 @@ public class BPMNfile {
     @Lob
     private String bpmnContent;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "workflow")
     private Process process;
 
