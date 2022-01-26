@@ -22,6 +22,9 @@ public class ProcessService {
     @Autowired
     BPMNfileRepository BPMNrepository;
 
+    @Autowired
+    BPMNparser bpmnParser;
+
     private Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
         oldProcess.setBriefDescription(updatedProcess.getBriefDescription());
@@ -147,6 +150,8 @@ public class ProcessService {
             Process process_ = processData.get();
             var bpmn_to_delete = process_.getWorkflow();
             bpmn.setProcess(process_);
+            String bpmnContent = bpmnParser.saveBPMN(bpmn.getBpmnContent(), process_);
+            bpmn.setBpmnContent(bpmnContent);
             bpmn = BPMNrepository.save(bpmn);
             process_.setWorkflow(bpmn);
             processRepository.save(process_);
