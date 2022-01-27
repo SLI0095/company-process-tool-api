@@ -14,6 +14,8 @@ public class Task extends Element{
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    private String taskType = "task";
+
 //    @ManyToMany(mappedBy = "asPrimaryPerformer")
 //    private List<Role> primaryPerformers;
 //    @ManyToMany(mappedBy = "asAdditionalPerformer")
@@ -115,5 +117,13 @@ public class Task extends Element{
 
     public void setOutputs(List<WorkItem> outputs) {
         this.outputs = outputs;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 }

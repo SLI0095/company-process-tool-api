@@ -9,7 +9,7 @@ import java.util.List;
 @DiscriminatorValue("document")
 public class Document extends WorkItem{
 
-    private String documentType;
+    private String documentType = "";
     private String urlAddress;
 
 //    @OneToOne

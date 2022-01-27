@@ -22,6 +22,8 @@ public class TaskService {
     WorkItemRepository workItemRepository;
     @Autowired
     RasciRepository rasciRepository;
+    @Autowired
+    BPMNparser bpmNparser;
 
     private Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
@@ -67,8 +69,8 @@ public class TaskService {
         if(taskData.isPresent()) {
             Task task_ = taskData.get();
             task_ = fillTask(task_, task);
-
             taskRepository.save(task_);
+            bpmNparser.updateTaskInAllWorkflows(task_, true,false, task_.getTaskType(),null);
             return 1;
         }
         else

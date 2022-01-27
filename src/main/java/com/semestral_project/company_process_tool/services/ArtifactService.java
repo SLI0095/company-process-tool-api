@@ -22,6 +22,8 @@ public class ArtifactService {
     ArtifactRelationRepository artifactRelationRepository;
     @Autowired
     StateRepository stateRepository;
+    @Autowired
+    BPMNparser bpmNparser;
 
     private Artifact fillArtifact(Artifact oldArtifact, Artifact updatedArtifact){
         oldArtifact.setName(updatedArtifact.getName());
@@ -84,8 +86,8 @@ public class ArtifactService {
         if (artifactData.isPresent()) {
             Artifact artifact_ = artifactData.get();
             artifact_ = fillArtifact(artifact_, artifact);
-
             artifactRepository.save(artifact_);
+            bpmNparser.updateWorkItemInAllWorkflows(artifact_,true,null);
             return 1;
         } else return 2;
     }

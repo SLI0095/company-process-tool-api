@@ -88,8 +88,8 @@ public class ProcessService {
         if(processData.isPresent()){
             Process process_ = processData.get();
             process_ = fillProcess(process_, process);
-
             processRepository.save(process_);
+            bpmnParser.updateProcessInAllWorkflows(process_, true, null);
             return 1;
         }
         else
@@ -148,17 +148,18 @@ public class ProcessService {
         Optional<Process> processData = processRepository.findById(id);
         if(processData.isPresent()) {
             Process process_ = processData.get();
-            var bpmn_to_delete = process_.getWorkflow();
-            bpmn.setProcess(process_);
-            String bpmnContent = bpmnParser.saveBPMN(bpmn.getBpmnContent(), process_);
-            bpmn.setBpmnContent(bpmnContent);
-            bpmn = BPMNrepository.save(bpmn);
-            process_.setWorkflow(bpmn);
-            processRepository.save(process_);
-            if(bpmn_to_delete != null){
-                BPMNrepository.delete(bpmn_to_delete);
-            }
-            var elementList = process_.getElements();
+            bpmnParser.saveBPMN(bpmn, process_);
+//            var bpmn_to_delete = process_.getWorkflow();
+//            bpmn.setProcess(process_);
+//            String bpmnContent = bpmnParser.saveBPMN(bpmn, process_);
+//            bpmn.setBpmnContent(bpmnContent);
+//            bpmn = BPMNrepository.save(bpmn);
+//            process_.setWorkflow(bpmn);
+//            processRepository.save(process_);
+//            if(bpmn_to_delete != null){
+//                BPMNrepository.delete(bpmn_to_delete);
+//            }
+//            var elementList = process_.getElements();
             return 1;
         }
         else

@@ -18,6 +18,8 @@ public class DocumentService {
     DocumentRepository documentRepository;
     @Autowired
     DocumentRelationRepository documentRelationRepository;
+    @Autowired
+    BPMNparser bpmNparser;
 
     private Document fillDocument(Document oldDocument, Document updatedDocument){
         oldDocument.setName(updatedDocument.getName());
@@ -78,8 +80,8 @@ public class DocumentService {
         if(documentData.isPresent()){
             Document document_ = documentData.get();
             document_ = fillDocument(document_, document);
-
             documentRepository.save(document_);
+            bpmNparser.updateWorkItemInAllWorkflows(document_,true,null);
             return 1;
         }
         else
