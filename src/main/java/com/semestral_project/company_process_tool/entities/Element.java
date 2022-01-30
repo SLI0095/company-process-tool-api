@@ -16,7 +16,7 @@ public class Element extends Item{
     private long id;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "element_process",
             joinColumns = {@JoinColumn(name = "element_id")},
             inverseJoinColumns = {@JoinColumn(name = "process_id")})

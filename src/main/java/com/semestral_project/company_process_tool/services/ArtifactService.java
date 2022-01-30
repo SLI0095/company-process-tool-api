@@ -71,7 +71,10 @@ public class ArtifactService {
 
     public boolean deleteArtifact(long id){
         try {
-            artifactRepository.deleteById(id);
+            if(bpmNparser.removeWorkItemFromAllWorkflows(artifactRepository.findById(id).get()))
+            {
+                artifactRepository.deleteById(id);
+            }
             return true;
         }
         catch (Exception e) {
@@ -85,6 +88,7 @@ public class ArtifactService {
 
         if (artifactData.isPresent()) {
             Artifact artifact_ = artifactData.get();
+            String oldName = artifact_.getName();
             artifact_ = fillArtifact(artifact_, artifact);
             artifactRepository.save(artifact_);
             bpmNparser.updateWorkItemInAllWorkflows(artifact_,true,null);

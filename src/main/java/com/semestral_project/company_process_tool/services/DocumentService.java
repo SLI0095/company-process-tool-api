@@ -65,7 +65,10 @@ public class DocumentService {
 
     public boolean deleteDocumentById(long id){
         try {
-            documentRepository.deleteById(id);
+            if(bpmNparser.removeWorkItemFromAllWorkflows(documentRepository.findById(id).get()))
+            {
+                documentRepository.deleteById(id);
+            }
             return true;
         }
         catch (Exception e)
@@ -79,9 +82,10 @@ public class DocumentService {
         Optional<Document> documentData = documentRepository.findById(id);
         if(documentData.isPresent()){
             Document document_ = documentData.get();
+            String oldName = document_.getName();
             document_ = fillDocument(document_, document);
             documentRepository.save(document_);
-            bpmNparser.updateWorkItemInAllWorkflows(document_,true,null);
+            bpmNparser.updateWorkItemInAllWorkflows(document_,true, null);
             return 1;
         }
         else

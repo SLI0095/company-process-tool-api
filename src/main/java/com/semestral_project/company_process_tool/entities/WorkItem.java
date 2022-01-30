@@ -18,28 +18,28 @@ public class WorkItem extends Item{
     private long id;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_mandatory_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asMandatoryInput;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_optional_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asOptionalInput;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_output",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asOutput;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_activity_guidance",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})

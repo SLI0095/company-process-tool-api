@@ -20,9 +20,6 @@ public class ProcessService {
     @Autowired
     ElementRepository elementRepository;
     @Autowired
-    BPMNfileRepository BPMNrepository;
-
-    @Autowired
     BPMNparser bpmnParser;
 
     private Process fillProcess(Process oldProcess, Process updatedProcess){
@@ -72,7 +69,10 @@ public class ProcessService {
 
     public boolean deleteProcessById(long id){
         try {
-            processRepository.deleteById(id);
+            if(bpmnParser.removeProcessFromAllWorkflows(processRepository.findById(id).get()))
+            {
+                processRepository.deleteById(id);
+            }
             return true;
         }
         catch (Exception e)
