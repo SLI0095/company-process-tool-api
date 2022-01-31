@@ -72,8 +72,9 @@ public class ProcessService {
             if(bpmnParser.removeProcessFromAllWorkflows(processRepository.findById(id).get()))
             {
                 processRepository.deleteById(id);
+                return true;
             }
-            return true;
+            return false;
         }
         catch (Exception e)
         {

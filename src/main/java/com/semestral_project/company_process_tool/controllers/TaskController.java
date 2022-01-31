@@ -204,7 +204,7 @@ public class TaskController {
 
     @PutMapping("/tasks/{id}/removeOutput")
     public ResponseEntity<ResponseMessage> removeOutput(@PathVariable Long id, @RequestBody WorkItem workItem){
-        int ret = taskService.removeOptionalInput(id, workItem);
+        int ret = taskService.removeOutput(id, workItem);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Output removed."));
         } else if(ret == 2){

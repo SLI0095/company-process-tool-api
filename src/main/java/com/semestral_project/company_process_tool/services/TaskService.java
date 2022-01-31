@@ -81,8 +81,40 @@ public class TaskService {
 
     public boolean removeTaskById(long id){
         try {
-            taskRepository.deleteById(id);
-            return true;
+            Task task = taskRepository.findById(id).get();
+            if(bpmNparser.removeTaskFromAllWorkflows(task)){
+                var list = task.getMandatoryInputs();
+                for(WorkItem w : list){
+                    var list2 = w.getAsMandatoryInput();
+                    list2.remove(task);
+                    w.setAsMandatoryInput(list2);
+                    workItemRepository.save(w);
+                }
+                list = task.getOptionalInputs();
+                for(WorkItem w : list){
+                    var list2 = w.getAsOptionalInput();
+                    list2.remove(task);
+                    w.setAsOptionalInput(list2);
+                    workItemRepository.save(w);
+                }
+                list = task.getOutputs();
+                for(WorkItem w : list){
+                    var list2 = w.getAsOutput();
+                    list2.remove(task);
+                    w.setAsOutput(list2);
+                    workItemRepository.save(w);
+                }
+                list = task.getGuidanceWorkItems();
+                for(WorkItem w : list){
+                    var list2 = w.getAsGuidanceWorkItem();
+                    list2.remove(task);
+                    w.setAsGuidanceWorkItem(list2);
+                    workItemRepository.save(w);
+                }
+                taskRepository.deleteById(id);
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
@@ -188,6 +220,8 @@ public class TaskService {
             WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
             List<WorkItem> guidanceList = task_.getGuidanceWorkItems();
             if(guidanceList.contains(item_)) {
+                guidanceList.remove(item_);
+
                 List<Task> tasksList = item_.getAsGuidanceWorkItem();
                 tasksList.remove(task_);
                 item_.setAsGuidanceWorkItem(tasksList);
@@ -231,6 +265,7 @@ public class TaskService {
             WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
             List<WorkItem> inputList = task_.getMandatoryInputs();
             if(inputList.contains(item_)) {
+                bpmNparser.removeInputConnectionFromAllWorkflows(task_,item_);
                 List<Task> tasksList = item_.getAsMandatoryInput();
                 tasksList.remove(task_);
                 item_.setAsMandatoryInput(tasksList);
@@ -326,6 +361,7 @@ public class TaskService {
             WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
             List<WorkItem> outputList = task_.getOutputs();
             if(outputList.contains(item_)) {
+                bpmNparser.removeOutputConnectionFromAllWorkflows(task_,item_);
                 List<Task> tasksList = item_.getAsOutput();
                 tasksList.remove(task_);
                 item_.setAsOutput(tasksList);

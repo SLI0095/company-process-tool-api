@@ -74,8 +74,9 @@ public class ArtifactService {
             if(bpmNparser.removeWorkItemFromAllWorkflows(artifactRepository.findById(id).get()))
             {
                 artifactRepository.deleteById(id);
+                return true;
             }
-            return true;
+            return false;
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

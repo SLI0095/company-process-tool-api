@@ -68,8 +68,9 @@ public class DocumentService {
             if(bpmNparser.removeWorkItemFromAllWorkflows(documentRepository.findById(id).get()))
             {
                 documentRepository.deleteById(id);
+                return true;
             }
-            return true;
+            return false;
         }
         catch (Exception e)
         {

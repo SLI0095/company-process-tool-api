@@ -20,11 +20,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +50,7 @@ public class BPMNparser {
 
     @Transactional
     public boolean saveBPMN(BPMNfile file, Process process) {
-        inXML = new ArrayList<Element>();
+        inXML = new ArrayList<>();
 
         var bpmn_to_delete = process.getWorkflow();
         file.setProcess(process);
@@ -546,7 +544,6 @@ public class BPMNparser {
             String XMLFile = workflow.getBpmnContent();
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            //dbf.setNamespaceAware(false);
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
@@ -589,9 +586,6 @@ public class BPMNparser {
                         }
                     }
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -736,14 +730,16 @@ public class BPMNparser {
             }
             String XMLFile = workflow.getBpmnContent();
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            boolean save = false;
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
 
                 //Check previous type of task
+                int deletedElements = 0;
                 NodeList list = doc.getElementsByTagName("bpmn:callActivity");
-                for (int temp = 0; temp < list.getLength(); temp++) {
-                    Node node = list.item(temp);
+                for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
+                    Node node = list.item(temp - deletedElements);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         org.w3c.dom.Element element = (org.w3c.dom.Element) node;
                         String callActivityId = element.getAttribute("id");
@@ -755,6 +751,128 @@ public class BPMNparser {
                                 long foundId = Long.parseLong(m.group(1));
                                 if (foundId == processToDelete.getId()) {
                                     List<String> allFlowsId = new ArrayList<>();
+
+
+                                    NodeList flows = element.getElementsByTagName("bpmn:incoming"); // all incoming flows
+                                    for (int i = 0; i < flows.getLength(); i++) {
+
+                                        Node flowNode = flows.item(i);
+                                        if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
+                                            allFlowsId.add(flowNode.getTextContent());
+                                        }
+                                    }
+                                    flows = element.getElementsByTagName("bpmn:outgoing"); // all outgoing flows
+                                    for (int i = 0; i < flows.getLength(); i++) {
+
+                                        Node flowNode = flows.item( i);
+                                        if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
+                                            allFlowsId.add(flowNode.getTextContent());
+                                        }
+                                    }
+                                    int deleteCount = 0;
+                                    flows = doc.getElementsByTagName("bpmn:sequenceFlow");
+                                    for (int i = 0; i - deleteCount < flows.getLength(); i++) {
+
+                                        Node flowNode = flows.item(i - deleteCount);
+                                        if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
+                                            String actualFlowId = flowElement.getAttribute("id");
+                                            if(allFlowsId.stream().anyMatch(id -> id.equals(actualFlowId))) {
+                                                Node parentNode = flowElement.getParentNode();
+                                                parentNode.removeChild(flowElement);
+                                                deleteCount++;
+                                            }
+                                        }
+                                    }
+                                    deleteCount = 0;
+                                    flows = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    for (int i = 0; i - deleteCount < flows.getLength(); i++) {
+                                        Node flowNode = flows.item(i - deleteCount);
+                                        if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
+                                            String actualFlowId = flowElement.getAttribute("bpmnElement");
+                                            if(allFlowsId.stream().anyMatch(id -> id.equals(actualFlowId))) {
+                                                Node parentNode = flowElement.getParentNode();
+                                                parentNode.removeChild(flowElement);
+                                                deleteCount++;
+                                            }
+                                        }
+                                    }
+                                    deleteCount = 0;
+                                    NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
+                                    for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
+                                        Node shape = shapes.item(i - deleteCount);
+                                        if (shape.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element shapeElement = (org.w3c.dom.Element) shape;
+                                            String shapeId = shapeElement.getAttribute("bpmnElement");
+                                            if(shapeId.equals(callActivityId)) {
+                                                Node parentNode = shapeElement.getParentNode();
+                                                parentNode.removeChild(shapeElement);
+                                                deleteCount++;
+                                            }
+                                        }
+                                    }
+
+                                    Node parent = element.getParentNode();
+                                    parent.removeChild(element);
+                                    String newXML = DocumentToString(doc);
+                                    workflow.setBpmnContent(newXML);
+                                    save = true;
+                                    deletedElements++;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            } if(save){
+                bpmNfileRepository.save(workflow);
+            }
+        }
+        return true;
+    }
+
+    public boolean removeTaskFromAllWorkflows(Task taskToDelete){
+        var listOfProcesses = taskToDelete.getPartOfProcess();
+        for (Process proc : listOfProcesses) { //Check all processes
+            BPMNfile workflow = proc.getWorkflow();
+            if(workflow == null){
+                continue;
+            }
+            String XMLFile = workflow.getBpmnContent();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            boolean save = false;
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
+
+                //Check previous type of task
+                int deletedElements = 0;
+                NodeList list = doc.getElementsByTagName("bpmn:" + taskToDelete.getTaskType());
+                for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
+                    Node node = list.item(temp - deletedElements);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                        String callActivityId = element.getAttribute("id");
+                        if(Pattern.matches("Element_([0-9]+)_.*", callActivityId)) {
+                            Pattern p = Pattern.compile("Element_([0-9]+)_.*");
+                            Matcher m = p.matcher(callActivityId);
+
+                            if (m.find()) {
+                                long foundId = Long.parseLong(m.group(1));
+                                if (foundId == taskToDelete.getId()) {
+                                    List<String> allFlowsId = new ArrayList<>();
+                                    List<String> allInputAssociations = new ArrayList<>();
+                                    List<String> allOutputAssociations = new ArrayList<>();
+
+
                                     NodeList flows = element.getElementsByTagName("bpmn:incoming"); // all incoming flows
                                     for (int i = 0; i < flows.getLength(); i++) {
 
@@ -773,41 +891,76 @@ public class BPMNparser {
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
-                                    flows = doc.getElementsByTagName("bpmn:sequenceFlow");
-                                    for (int i = 0; i < flows.getLength(); i++) {
 
-                                        Node flowNode = flows.item(i);
+                                    NodeList associations = element.getElementsByTagName("bpmn:dataInputAssociation");
+                                    for (int i = 0; i < associations.getLength(); i++) {
+
+                                        Node assocNode = associations.item(i);
+                                        if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
+                                            allInputAssociations.add(assocElement.getAttribute("id"));
+                                        }
+                                    }
+
+                                    associations = element.getElementsByTagName("bpmn:dataOutputAssociation");
+                                    for (int i = 0; i < associations.getLength(); i++) {
+
+                                        Node assocNode = associations.item(i);
+                                        if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
+                                            allInputAssociations.add(assocElement.getAttribute("id"));
+                                        }
+                                    }
+
+                                    int deleteCount = 0;
+                                    flows = doc.getElementsByTagName("bpmn:sequenceFlow");
+                                    for (int i = 0; i - deleteCount < flows.getLength(); i++) {
+
+                                        Node flowNode = flows.item(i - deleteCount);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
                                             String actualFlowId = flowElement.getAttribute("id");
                                             if(allFlowsId.stream().anyMatch(id -> id.equals(actualFlowId))) {
                                                 Node parentNode = flowElement.getParentNode();
                                                 parentNode.removeChild(flowElement);
-                                            }
-                                        }
-                                    }
-                                    flows = doc.getElementsByTagName("bpmndi:BPMNEdge");
-                                    for (int i = 0; i < flows.getLength(); i++) {
-                                        Node flowNode = flows.item(i);
-                                        if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
-                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
-                                            String actualFlowId = flowElement.getAttribute("bpmnElement");
-                                            if(allFlowsId.stream().anyMatch(id -> id.equals(actualFlowId))) {
-                                                Node parentNode = flowElement.getParentNode();
-                                                parentNode.removeChild(flowElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
 
+                                    deleteCount = 0;
+                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    for (int i = 0; i - deleteCount < edges.getLength(); i++) {
+                                        Node edgeNode = edges.item(i - deleteCount);
+                                        if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element edgeElement = (org.w3c.dom.Element) edgeNode;
+                                            String actualId = edgeElement.getAttribute("bpmnElement");
+                                            if(allFlowsId.stream().anyMatch(id -> id.equals(actualId))) {
+                                                Node parentNode = edgeElement.getParentNode();
+                                                parentNode.removeChild(edgeElement);
+                                                deleteCount++;
+                                            } else if(allInputAssociations.stream().anyMatch(id -> id.equals(actualId))) {
+                                                Node parentNode = edgeElement.getParentNode();
+                                                parentNode.removeChild(edgeElement);
+                                                deleteCount++;
+                                            } else if(allOutputAssociations.stream().anyMatch(id -> id.equals(actualId))) {
+                                            Node parentNode = edgeElement.getParentNode();
+                                            parentNode.removeChild(edgeElement);
+                                            deleteCount++;
+                                            }
+                                        }
+                                    }
+                                    deleteCount = 0;
                                     NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
-                                    for (int i = 0; i < shapes.getLength(); i++) {
-                                        Node shape = shapes.item(i);
+                                    for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
+                                        Node shape = shapes.item(i - deleteCount);
                                         if (shape.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element shapeElement = (org.w3c.dom.Element) shape;
                                             String shapeId = shapeElement.getAttribute("bpmnElement");
                                             if(shapeId.equals(callActivityId)) {
                                                 Node parentNode = shapeElement.getParentNode();
                                                 parentNode.removeChild(shapeElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
@@ -816,11 +969,210 @@ public class BPMNparser {
                                     parent.removeChild(element);
                                     String newXML = DocumentToString(doc);
                                     workflow.setBpmnContent(newXML);
-                                    bpmNfileRepository.save(workflow);
+                                    save = true;
+                                    deletedElements++;
                                 }
                             }
                         }
                     }
+                }
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            } if(save){
+                bpmNfileRepository.save(workflow);
+            }
+        }
+        return true;
+    }
+
+    public boolean removeInputConnectionFromAllWorkflows(Task task, WorkItem workItem) {
+        var listOfProcesses = task.getPartOfProcess();
+        for (Process proc : listOfProcesses) { //Check all processes
+            BPMNfile workflow = proc.getWorkflow();
+            if (workflow == null) {
+                continue;
+            }
+            String XMLFile = workflow.getBpmnContent();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            boolean save = false;
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
+
+                //Check previous type of task
+                int deletedElements = 0;
+                NodeList list = doc.getElementsByTagName("bpmn:" + task.getTaskType());
+                for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
+                    Node node = list.item(temp - deletedElements);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                        String callActivityId = element.getAttribute("id");
+                        if (Pattern.matches("Element_([0-9]+)_.*", callActivityId)) {
+                            Pattern p = Pattern.compile("Element_([0-9]+)_.*");
+                            Matcher m = p.matcher(callActivityId);
+
+                            if (m.find()) {
+                                long foundId = Long.parseLong(m.group(1));
+                                if (foundId == task.getId()) {
+                                    List<String> allInputAssociations = new ArrayList<>();
+
+                                    int deleteCount = 0;
+                                    NodeList associations = element.getElementsByTagName("bpmn:dataInputAssociation");
+                                    for (int i = 0; i - deleteCount < associations.getLength(); i++) {
+                                        Node assocNode = associations.item(i - deleteCount);
+                                        if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
+                                            String workId = assocElement.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
+
+                                            if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workId)) {
+                                                Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                                Matcher m1 = p1.matcher(workId);
+
+                                                if (m1.find()) {
+                                                    long foundWorkItemId;
+                                                    if (m1.group(1) != null) {
+                                                        foundWorkItemId = Long.parseLong(m1.group(1));
+                                                    } else {
+                                                        foundWorkItemId = Long.parseLong(m1.group(2));
+                                                    }
+                                                    if (foundWorkItemId == workItem.getId()) {
+                                                        allInputAssociations.add(assocElement.getAttribute("id"));
+                                                        Node parent = assocElement.getParentNode();
+                                                        parent.removeChild(assocElement);
+                                                        deleteCount++;
+                                                        save = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    deleteCount = 0;
+                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    for (int i = 0; i - deleteCount < edges.getLength(); i++) {
+                                        Node edgeNode = edges.item(i - deleteCount);
+                                        if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element edgeElement = (org.w3c.dom.Element) edgeNode;
+                                            String actualId = edgeElement.getAttribute("bpmnElement");
+                                            if (allInputAssociations.stream().anyMatch(id -> id.equals(actualId))) {
+                                                Node parentNode = edgeElement.getParentNode();
+                                                parentNode.removeChild(edgeElement);
+                                                deleteCount++;
+                                                save = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (save) {
+                    String newXML = DocumentToString(doc);
+                    workflow.setBpmnContent(newXML);
+                    bpmNfileRepository.save(workflow);
+                }
+            } catch (ParserConfigurationException | SAXException | IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean removeOutputConnectionFromAllWorkflows(Task task, WorkItem workItem) {
+        var listOfProcesses = task.getPartOfProcess();
+        for (Process proc : listOfProcesses) { //Check all processes
+            BPMNfile workflow = proc.getWorkflow();
+            if (workflow == null) {
+                continue;
+            }
+            String XMLFile = workflow.getBpmnContent();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            boolean save = false;
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
+
+                //Check previous type of task
+                int deletedElements = 0;
+                NodeList list = doc.getElementsByTagName("bpmn:" + task.getTaskType());
+                for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
+                    Node node = list.item(temp - deletedElements);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                        String callActivityId = element.getAttribute("id");
+                        if (Pattern.matches("Element_([0-9]+)_.*", callActivityId)) {
+                            Pattern p = Pattern.compile("Element_([0-9]+)_.*");
+                            Matcher m = p.matcher(callActivityId);
+
+                            if (m.find()) {
+                                long foundId = Long.parseLong(m.group(1));
+                                if (foundId == task.getId()) {
+                                    List<String> allOutputAssociations = new ArrayList<>();
+
+                                    int deleteCount = 0;
+                                    NodeList associations = element.getElementsByTagName("bpmn:dataOutputAssociation");
+                                    for (int i = 0; i - deleteCount < associations.getLength(); i++) {
+                                        Node assocNode = associations.item(i - deleteCount);
+                                        if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
+                                            String workId = assocElement.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
+
+                                            if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workId)) {
+                                                Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                                Matcher m1 = p1.matcher(workId);
+
+                                                if (m1.find()) {
+                                                    long foundWorkItemId;
+                                                    if (m1.group(1) != null) {
+                                                        foundWorkItemId = Long.parseLong(m1.group(1));
+                                                    } else {
+                                                        foundWorkItemId = Long.parseLong(m1.group(2));
+                                                    }
+                                                    if (foundWorkItemId == workItem.getId()) {
+                                                        allOutputAssociations.add(assocElement.getAttribute("id"));
+                                                        Node parent = assocElement.getParentNode();
+                                                        parent.removeChild(assocElement);
+                                                        deleteCount++;
+                                                        save = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    deleteCount = 0;
+                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    for (int i = 0; i - deleteCount < edges.getLength(); i++) {
+                                        Node edgeNode = edges.item(i - deleteCount);
+                                        if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
+                                            org.w3c.dom.Element edgeElement = (org.w3c.dom.Element) edgeNode;
+                                            String actualId = edgeElement.getAttribute("bpmnElement");
+                                            if (allOutputAssociations.stream().anyMatch(id -> id.equals(actualId))) {
+                                                Node parentNode = edgeElement.getParentNode();
+                                                parentNode.removeChild(edgeElement);
+                                                deleteCount++;
+                                                save = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (save) {
+                    String newXML = DocumentToString(doc);
+                    workflow.setBpmnContent(newXML);
+                    bpmNfileRepository.save(workflow);
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
@@ -847,9 +1199,10 @@ public class BPMNparser {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
                 NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+                int deletedNodes = 0;
                 System.out.println(list.getLength());
-                for (int temp = 0; temp < list.getLength(); temp++) {
-                    Node node = list.item(temp);
+                for (int temp = 0; temp - deletedNodes < list.getLength(); temp++) {
+                    Node node = list.item(temp - deletedNodes);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         org.w3c.dom.Element element = (org.w3c.dom.Element) node;
                         String workItemId = element.getAttribute("id");
@@ -869,22 +1222,25 @@ public class BPMNparser {
                                     List<String> allInputAssociations = new ArrayList<>();
                                     List<String> allOutputAssociations = new ArrayList<>();
 
+                                    int deleteCount = 0;
                                     NodeList dataObjects = element.getElementsByTagName("bpmn:dataObject");
-                                    for (int i = 0; i < dataObjects.getLength(); i++) {
+                                    for (int i = 0; i - deleteCount < dataObjects.getLength(); i++) {
 
-                                        Node dataObject = dataObjects.item(i);
+                                        Node dataObject = dataObjects.item(i - deleteCount);
                                         if (dataObject.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element dataObjectElement = (org.w3c.dom.Element) dataObject;
                                             if (dataObjectElement.getAttribute("id").equals(DataObjectRefId)) {
                                                 Node parent = dataObject.getParentNode();
                                                 parent.removeChild(dataObjectElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
 
+                                    deleteCount = 0;
                                     NodeList inputAssociations = element.getElementsByTagName("bpmn:dataInputAssociation"); // all input associations
-                                    for (int i = 0; i < inputAssociations.getLength(); i++) {
-                                        Node inputAssociation = inputAssociations.item(i);
+                                    for (int i = 0; i - deleteCount < inputAssociations.getLength(); i++) {
+                                        Node inputAssociation = inputAssociations.item(i - deleteCount);
                                         if (inputAssociation.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element inputAssociationElement = (org.w3c.dom.Element) inputAssociation;
                                             String workId = inputAssociationElement.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
@@ -892,13 +1248,15 @@ public class BPMNparser {
                                                 allInputAssociations.add(inputAssociationElement.getAttribute("id"));
                                                 Node parent = inputAssociationElement.getParentNode();
                                                 parent.removeChild(inputAssociationElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
 
+                                    deleteCount = 0;
                                     NodeList outputAssociations = element.getElementsByTagName("bpmn:dataOutputAssociation"); // all input associations
-                                    for (int i = 0; i < outputAssociations.getLength(); i++) {
-                                        Node outputAssociation = outputAssociations.item(i);
+                                    for (int i = 0; i - deleteCount < outputAssociations.getLength(); i++) {
+                                        Node outputAssociation = outputAssociations.item(i - deleteCount);
                                         if (outputAssociation.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element outputAssociationElement = (org.w3c.dom.Element) outputAssociation;
                                             String workId = outputAssociationElement.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
@@ -906,35 +1264,41 @@ public class BPMNparser {
                                                 allOutputAssociations.add(outputAssociationElement.getAttribute("id"));
                                                 Node parent = outputAssociationElement.getParentNode();
                                                 parent.removeChild(outputAssociationElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
 
+                                    deleteCount = 0;
                                     NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
-                                    for (int i = 0; i < edges.getLength(); i++) {
-                                        Node edgeNode = edges.item(i);
+                                    for (int i = 0; i - deleteCount < edges.getLength(); i++) {
+                                        Node edgeNode = edges.item(i - deleteCount);
                                         if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element edgeElement = (org.w3c.dom.Element) edgeNode;
                                             String actualEdgeId = edgeElement.getAttribute("bpmnElement");
                                             if (allInputAssociations.stream().anyMatch(id -> id.equals(actualEdgeId))) {
                                                 Node parentNode = edgeElement.getParentNode();
                                                 parentNode.removeChild(edgeElement);
+                                                deleteCount++;
                                             } else if (allOutputAssociations.stream().anyMatch(id -> id.equals(actualEdgeId))) {
                                                 Node parentNode = edgeElement.getParentNode();
                                                 parentNode.removeChild(edgeElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
 
+                                    deleteCount = 0;
                                     NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
-                                    for (int i = 0; i < shapes.getLength(); i++) {
-                                        Node shape = shapes.item(i);
+                                    for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
+                                        Node shape = shapes.item(i - deleteCount);
                                         if (shape.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element shapeElement = (org.w3c.dom.Element) shape;
                                             String shapeId = shapeElement.getAttribute("bpmnElement");
                                             if (shapeId.equals(workItemId)) {
                                                 Node parentNode = shapeElement.getParentNode();
                                                 parentNode.removeChild(shapeElement);
+                                                deleteCount++;
                                             }
                                         }
                                     }
@@ -943,6 +1307,7 @@ public class BPMNparser {
                                     parent.removeChild(element);
                                     String newXML = DocumentToString(doc);
                                     workflow.setBpmnContent(newXML);
+                                    deletedNodes++;
                                     save = true;
                                 }
                             }
