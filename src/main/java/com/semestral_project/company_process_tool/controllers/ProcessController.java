@@ -6,6 +6,7 @@ import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import com.semestral_project.company_process_tool.services.ProcessService;
+import com.semestral_project.company_process_tool.services.RasciMatrixService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ public class ProcessController {
 
     @Autowired
     ProcessService processService;
+    @Autowired
+    RasciMatrixService rasciMatrixService;
 
     @GetMapping("/processes")
     public ResponseEntity<List<Process>> getProcesses() {
@@ -105,6 +108,17 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
+        }
+    }
+
+    @GetMapping("/processes/{id}/rasci")
+    public ResponseEntity<String[][]> processRasci(@PathVariable Long id) {
+        Process process = processService.getProcessById(id);
+        if(process != null){
+            String[][] matrix = rasciMatrixService.getMatrixForRender(process);
+            return ResponseEntity.ok(matrix);
+        } else {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
