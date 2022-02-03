@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.BPMNfile;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.Project;
 import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
@@ -21,6 +22,8 @@ public class ProcessService {
     ElementRepository elementRepository;
     @Autowired
     BPMNparser bpmnParser;
+    @Autowired
+    BPMNfileRepository bpmNfileRepository;
 
     private Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -167,5 +170,35 @@ public class ProcessService {
         {
             return 2;
         }
+    }
+
+    public int newProcessInProject(Process newProcess, Process template, Project project){
+        if(!(template == null)){
+            newProcess = fillProcess(newProcess, template);
+            newProcess = processRepository.save(newProcess);
+            for(Element e : template.getElements()){
+                var list = e.getPartOfProcess();
+                list.add(newProcess);
+                e.setPartOfProcess(list);
+                elementRepository.save(e);
+            }
+            BPMNfile templateBPMN = template.getWorkflow();
+            if(!(templateBPMN == null))
+            {
+                BPMNfile newBPMN = new BPMNfile();
+                newBPMN.setBpmnContent(templateBPMN.getBpmnContent());
+                newBPMN.setProcess(newProcess);
+                bpmNfileRepository.save(newBPMN);
+            }
+
+        }
+        newProcess.setProject(project);
+        processRepository.save(newProcess);
+        return 1;
+    }
+
+    public List<Process> getAllTemplates(){
+        List<Process> allTemplates = processRepository.findAllTemplates();
+        return allTemplates;
     }
 }

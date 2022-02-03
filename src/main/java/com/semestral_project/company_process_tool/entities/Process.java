@@ -27,6 +27,9 @@ public class Process extends Element{
     @JoinColumn(name = "bpmnId")
     private BPMNfile workflow;
 
+    private boolean isTemplate = false;
+
+    private Project project = null;
 
     public Process() {
     }
@@ -93,5 +96,21 @@ public class Process extends Element{
 
     public void setElements(List<Element> elements) {
         this.elements = elements;
+    }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }
