@@ -8,6 +8,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ProcessRepository extends CrudRepository<Process, Long> {
-    @Query("SELECT p FROM element WHERE e.isTemplate = true")
+    @Query("SELECT e FROM Element e WHERE e.isTemplate IS TRUE")
     List<Process> findAllTemplates();
 }

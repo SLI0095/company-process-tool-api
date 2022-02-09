@@ -153,17 +153,6 @@ public class ProcessService {
         if(processData.isPresent()) {
             Process process_ = processData.get();
             bpmnParser.saveBPMN(bpmn, process_);
-//            var bpmn_to_delete = process_.getWorkflow();
-//            bpmn.setProcess(process_);
-//            String bpmnContent = bpmnParser.saveBPMN(bpmn, process_);
-//            bpmn.setBpmnContent(bpmnContent);
-//            bpmn = BPMNrepository.save(bpmn);
-//            process_.setWorkflow(bpmn);
-//            processRepository.save(process_);
-//            if(bpmn_to_delete != null){
-//                BPMNrepository.delete(bpmn_to_delete);
-//            }
-//            var elementList = process_.getElements();
             return 1;
         }
         else

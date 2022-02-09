@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,11 @@ public class Process extends Element{
 
     private boolean isTemplate = false;
 
+    @ManyToOne
     private Project project = null;
+
+    @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
+    private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
 
     public Process() {
     }
@@ -112,5 +117,13 @@ public class Process extends Element{
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public List<HistoryBPMN> getHistoryWorkflow() {
+        return historyWorkflow;
+    }
+
+    public void setHistoryWorkflow(List<HistoryBPMN> historyWorkflow) {
+        this.historyWorkflow = historyWorkflow;
     }
 }
