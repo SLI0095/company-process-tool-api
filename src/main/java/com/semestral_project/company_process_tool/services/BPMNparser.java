@@ -52,6 +52,16 @@ public class BPMNparser {
 
 
     private  List<Element> inXML;
+    private String[] bpmnElements = {
+            "callActivity",
+            "task",
+            "sendTask",
+            "receiveTask",
+            "userTask",
+            "manualTask",
+            "serviceTask",
+            "scriptTask",
+            "businessRuleTask"};
 
     @Transactional
     public boolean saveBPMN(BPMNfile file, Process process) {
@@ -219,7 +229,6 @@ public class BPMNparser {
             returnXML = createNewTask(doc, returnXML, "serviceTask");
             returnXML = createNewTask(doc, returnXML, "scriptTask");
             returnXML = createNewTask(doc, returnXML, "businessRuleTask");
-            //returnXML = createNewTask(doc, returnXML, "subProcess");
 
             return returnXML;
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -1394,6 +1403,67 @@ public class BPMNparser {
                 bpmNfileRepository.save(workflow);
                 historyBPMNRepository.save(historyBPMN);
             }
+        }
+        return true;
+    }
+
+    public boolean canRestoreBPMN(String xml){
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(xml)));
+
+            for(String type : bpmnElements){
+                NodeList list = doc.getElementsByTagName("bpmn:" + type);
+                for (int temp = 0; temp < list.getLength(); temp++) {
+                    Node node = list.item(temp);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                        String activity = element.getAttribute("id");
+                        if (Pattern.matches("Element_([0-9]+)_.*", activity)) {
+                            Pattern p = Pattern.compile("Element_([0-9]+)_.*");
+                            Matcher m = p.matcher(activity);
+                            if (m.find()) {
+                                long foundId = Long.parseLong(m.group(1));
+                                if(!elementRepository.existsById(foundId)){
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+            for (int temp = 0; temp < list.getLength(); temp++) {
+                Node node = list.item(temp);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                    String workItem = element.getAttribute("id");
+                    if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workItem)) {
+                        Pattern p = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                        Matcher m = p.matcher(workItem);
+
+                        if (m.find()) {
+                            long foundId;
+                            if (m.group(1) != null) {
+                                foundId = Long.parseLong(m.group(1));
+                            } else {
+                                foundId = Long.parseLong(m.group(2));
+                            }
+                            if(!workItemRepository.existsById(foundId)){
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
         return true;
     }

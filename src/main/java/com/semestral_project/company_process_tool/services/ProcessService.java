@@ -1,9 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
-import com.semestral_project.company_process_tool.entities.BPMNfile;
-import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.Project;
 import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
@@ -157,6 +155,23 @@ public class ProcessService {
         }
         else
         {
+            return 2;
+        }
+    }
+
+    public int restoreWorkflow(long id, HistoryBPMN bpmn){
+        if(processRepository.existsById(id)){
+            if(bpmnParser.canRestoreBPMN(bpmn.getBpmnContent())){
+                BPMNfile file = new BPMNfile();
+                Process process_ = processRepository.findById(id).get();
+                file.setProcess(process_);
+                file.setBpmnContent(bpmn.getBpmnContent());
+                bpmnParser.saveBPMN(file, process_);
+                return 1;
+            } else {
+                return 3;
+            }
+        } else {
             return 2;
         }
     }

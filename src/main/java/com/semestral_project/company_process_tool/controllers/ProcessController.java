@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.BPMNfile;
 import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.HistoryBPMN;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
@@ -103,11 +104,23 @@ public class ProcessController {
     public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn){
         int ret = processService.saveWorkflow(id, bpmn);
         if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated. Workflow saved."));
         } else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/{id}/restoreBPMN")
+    public ResponseEntity<ResponseMessage> restoreBPMN(@PathVariable Long id, @RequestBody HistoryBPMN bpmn){
+
+        int ret = processService.restoreWorkflow(id, bpmn);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated. Revert successful."));
+        } else if(ret == 2) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+        else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("This version of BPMN can not be reverted"));
         }
     }
 
