@@ -97,32 +97,32 @@ public class ArtifactService {
         } else return 2;
     }
 
-    public int setArtifactState(long artifactId, State state){
-        Optional<Artifact> artifactData = artifactRepository.findById(artifactId);
-        if(artifactData.isPresent()){
-            Artifact artifact_ = artifactData.get();
-            if(state.getId() == -1 && artifact_.getArtifactState() != null)
-            {
-                State state_ = artifact_.getArtifactState();
-                List<Artifact> artifactList = state_.getArtifacts();
-                artifactList.remove(artifact_);
-                state_.setArtifacts(artifactList);
-                stateRepository.save(state_);
-                artifact_.setArtifactState(null);
-            } else if (state.getId() == -1 && artifact_.getArtifactState() == null){
-                return 3;
-            }
-            else {
-                artifact_.setArtifactState(state);
-            }
-            artifactRepository.save(artifact_);
-            return 1;
-        }
-        else
-        {
-            return 2;
-        }
-    }
+//    public int setArtifactState(long artifactId, State state){
+//        Optional<Artifact> artifactData = artifactRepository.findById(artifactId);
+//        if(artifactData.isPresent()){
+//            Artifact artifact_ = artifactData.get();
+//            if(state.getId() == -1 && artifact_.getArtifactState() != null)
+//            {
+//                State state_ = artifact_.getArtifactState();
+//                List<Artifact> artifactList = state_.getArtifacts();
+//                artifactList.remove(artifact_);
+//                state_.setArtifacts(artifactList);
+//                stateRepository.save(state_);
+//                artifact_.setArtifactState(null);
+//            } else if (state.getId() == -1 && artifact_.getArtifactState() == null){
+//                return 3;
+//            }
+//            else {
+//                artifact_.setArtifactState(state);
+//            }
+//            artifactRepository.save(artifact_);
+//            return 1;
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+//    }
 
     //@Transactional
     public int addRelationToArtifact(long id, Artifact artifact, String relationType){

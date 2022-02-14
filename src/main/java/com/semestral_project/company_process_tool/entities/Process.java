@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,6 @@ public class Process extends Element{
     private BPMNfile workflow;
 
     private boolean isTemplate = false;
-
-    @ManyToOne
-    private Project project = null;
 
     @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
@@ -109,14 +108,6 @@ public class Process extends Element{
 
     public void setTemplate(boolean template) {
         isTemplate = template;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 
     public List<HistoryBPMN> getHistoryWorkflow() {

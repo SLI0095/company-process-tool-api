@@ -12,7 +12,13 @@ public class Project extends Item{
     private long id;
 
     @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
-    private List<Process> processes = new ArrayList<>();
+    private List<Element> elements = new ArrayList<>();
+
+    @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
+    private List<WorkItem> workItems = new ArrayList<>();
+
+    @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
+    private List<Role> roles = new ArrayList<>();
 
     public Project() {
     }
@@ -25,11 +31,27 @@ public class Project extends Item{
         this.id = id;
     }
 
-    public List<Process> getProcesses() {
-        return processes;
+    public List<Element> getElements() {
+        return elements;
     }
 
-    public void setProcesses(List<Process> processes) {
-        this.processes = processes;
+    public void setElements(List<Element> elements) {
+        this.elements = elements;
+    }
+
+    public List<WorkItem> getWorkItems() {
+        return workItems;
+    }
+
+    public void setWorkItems(List<WorkItem> workItems) {
+        this.workItems = workItems;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }

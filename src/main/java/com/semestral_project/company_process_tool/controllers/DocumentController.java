@@ -1,21 +1,16 @@
 package com.semestral_project.company_process_tool.controllers;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Document;
-import com.semestral_project.company_process_tool.entities.DocumentOld;
 import com.semestral_project.company_process_tool.entities.DocumentRelation;
 import com.semestral_project.company_process_tool.repositories.DocumentRelationRepository;
 import com.semestral_project.company_process_tool.repositories.DocumentRepository;
 import com.semestral_project.company_process_tool.services.DocumentService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
-import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")

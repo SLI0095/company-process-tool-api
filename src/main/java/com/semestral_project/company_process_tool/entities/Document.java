@@ -59,11 +59,4 @@ public class Document extends WorkItem{
         this.relationsToAnotherDocuments = relationToAnotherDocuments;
     }
 
-    public List<DocumentRelation> getAsBase() {
-        return asBase;
-    }
-
-    public void setAsBase(List<DocumentRelation> asBase) {
-        this.asBase = asBase;
-    }
 }

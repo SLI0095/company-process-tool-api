@@ -23,11 +23,8 @@ public class Element extends Item{
     private List<Process> partOfProcess;
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(name = "element_activity",
-            joinColumns = {@JoinColumn(name = "element_id")},
-            inverseJoinColumns = {@JoinColumn(name = "activity_id")})
-    private List<Activity> partOfActivity;
+    @ManyToOne
+    private Project project = null;
 
 
     public Element() {
@@ -41,10 +38,6 @@ public class Element extends Item{
         return partOfProcess;
     }
 
-    public List<Activity> getPartOfActivity() {
-        return partOfActivity;
-    }
-
     public void setId(long id) {
         this.id = id;
     }
@@ -53,8 +46,11 @@ public class Element extends Item{
         this.partOfProcess = partOfProcess;
     }
 
-    public void setPartOfActivity(List<Activity> partOfActivity) {
-        this.partOfActivity = partOfActivity;
+    public Project getProject() {
+        return project;
     }
 
+    public void setProject(Project project) {
+        this.project = project;
+    }
 }

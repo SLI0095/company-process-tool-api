@@ -34,6 +34,10 @@ public class Role extends Item{
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asAdditionalPerformer;
 
+    @JsonIgnore
+    @ManyToOne
+    private Project project;
+
     public Role() {
     }
 

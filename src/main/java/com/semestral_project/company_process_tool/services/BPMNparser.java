@@ -22,7 +22,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -38,10 +37,6 @@ public class BPMNparser {
     @Autowired
     ProcessRepository processRepository;
     @Autowired
-    DocumentRepository documentRepository;
-    @Autowired
-    ArtifactRepository artifactRepository;
-    @Autowired
     ElementRepository elementRepository;
     @Autowired
     WorkItemRepository workItemRepository;
@@ -52,7 +47,7 @@ public class BPMNparser {
 
 
     private  List<Element> inXML;
-    private String[] bpmnElements = {
+    private final String[] bpmnElements = {
             "callActivity",
             "task",
             "sendTask",
@@ -64,21 +59,22 @@ public class BPMNparser {
             "businessRuleTask"};
 
     @Transactional
-    public boolean saveBPMN(BPMNfile file, Process process) {
+    public void saveBPMN(BPMNfile file, Process process) {
         inXML = new ArrayList<>();
 
         var bpmn_to_delete = process.getWorkflow();
         //if new BPMN is same as old change nothing
         if(bpmn_to_delete != null){
             if(bpmn_to_delete.getBpmnContent().equals(file.getBpmnContent())){
-                return true;
+                return;
             }
         }
         file.setProcess(process);
         String bpmnContent = file.getBpmnContent();
-        bpmnContent = this.newWorkItems(bpmnContent);
-        bpmnContent = this.newProcesses(bpmnContent);
-        bpmnContent = this.newTasks(bpmnContent);
+        Project project = process.getProject();
+        bpmnContent = this.newWorkItems(bpmnContent, project);
+        bpmnContent = this.newProcesses(bpmnContent, project);
+        bpmnContent = this.newTasks(bpmnContent, project);
         file.setProcess(process);
         file.setBpmnContent(bpmnContent);
         file = bpmNfileRepository.save(file);
@@ -94,12 +90,11 @@ public class BPMNparser {
         }
         this.updateProcesses(bpmnContent, process);
         this.updateTasks(bpmnContent, process);
-        this.updateWorkItems(bpmnContent, process);
-        return true;
+        this.updateWorkItems(bpmnContent);
     }
 
     //@Transactional
-    private String newWorkItems(String inputXML){
+    private String newWorkItems(String inputXML, Project project){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -118,24 +113,26 @@ public class BPMNparser {
                     String oldId = element.getAttribute("id");
                     String name = element.getAttribute("name");
 
-                    if (oldId.contains("Artifact_new_")) { //Create new Artifact
-                        Artifact a = new Artifact();
-                        String unchangedId = oldId.substring(12); //_DataObjectReference_....
-                        a.setName(name);
-                        Artifact savedArtifact = artifactRepository.save(a);
-                        String newId = "Document_" + savedArtifact.getId() + unchangedId;
-
-                        returnXML = returnXML.replaceAll(oldId, newId);
-
-                    } if (oldId.contains("Document_new_")) { //Create new Document
-                        com.semestral_project.company_process_tool.entities.Document d = new com.semestral_project.company_process_tool.entities.Document();
-                        String unchangedId = oldId.substring(12); //_DataObjectReference_....
-                        d.setName(name);
-                        com.semestral_project.company_process_tool.entities.Document savedDocument = documentRepository.save(d);
-                        String newId = "Document_" + savedDocument.getId() + unchangedId;
+                    if (oldId.contains("WorkItem_new_")) { //Create new WorkItem
+                        WorkItem w = new WorkItem();
+                        String unchangedId = oldId.substring(13); //_DataObjectReference_....
+                        w.setName(name);
+                        w.setProject(project);
+                        WorkItem savedWorkItem = workItemRepository.save(w);
+                        String newId = "WorkItem_" + savedWorkItem.getId() + unchangedId;
 
                         returnXML = returnXML.replaceAll(oldId, newId);
                     }
+
+//                    } if (oldId.contains("Document_new_")) { //Create new Document
+//                        com.semestral_project.company_process_tool.entities.Document d = new com.semestral_project.company_process_tool.entities.Document();
+//                        String unchangedId = oldId.substring(12); //_DataObjectReference_....
+//                        d.setName(name);
+//                        com.semestral_project.company_process_tool.entities.Document savedDocument = documentRepository.save(d);
+//                        String newId = "Document_" + savedDocument.getId() + unchangedId;
+//
+//                        returnXML = returnXML.replaceAll(oldId, newId);
+//                    }
                 }
             }
 
@@ -147,7 +144,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newProcesses(String inputXML){
+    private String newProcesses(String inputXML, Project project){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -170,6 +167,7 @@ public class BPMNparser {
                         Process p = new Process();
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
+                        p.setProject(project);
                         Process savedProcess = processRepository.save(p);
                         String newId = "Element_" + savedProcess.getId() + unchangedId;
 
@@ -186,7 +184,30 @@ public class BPMNparser {
         }
     }
 
-    private String createNewTask(Document doc, String returnXML, String type){
+    private String newTasks(String inputXML, Project project){
+        String returnXML = inputXML;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
+
+            returnXML = createNewTask(doc, returnXML, "task", project);
+            returnXML = createNewTask(doc, returnXML, "sendTask", project);
+            returnXML = createNewTask(doc, returnXML, "receiveTask", project);
+            returnXML = createNewTask(doc, returnXML, "userTask", project);
+            returnXML = createNewTask(doc, returnXML, "manualTask", project);
+            returnXML = createNewTask(doc, returnXML, "serviceTask", project);
+            returnXML = createNewTask(doc, returnXML, "scriptTask", project);
+            returnXML = createNewTask(doc, returnXML, "businessRuleTask", project);
+
+            return returnXML;
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+            return returnXML;
+        }
+    }
+
+    private String createNewTask(Document doc, String returnXML, String type, Project project){
         NodeList list = doc.getElementsByTagName("bpmn:" + type);
         for (int temp = 0; temp < list.getLength(); temp++) {
 
@@ -203,6 +224,7 @@ public class BPMNparser {
                     String unchangedId = oldId.substring(11); //_Activity_....
                     t.setName(name);
                     t.setTaskType(type);
+                    t.setProject(project);
                     Task savedTask = taskRepository.save(t);
                     String newId = "Element_" + savedTask.getId() + unchangedId;
 
@@ -211,30 +233,6 @@ public class BPMNparser {
             }
         }
         return returnXML;
-    }
-
-    //@Transactional
-    private String newTasks(String inputXML){
-        String returnXML = inputXML;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
-
-            returnXML = createNewTask(doc, returnXML, "task");
-            returnXML = createNewTask(doc, returnXML, "sendTask");
-            returnXML = createNewTask(doc, returnXML, "receiveTask");
-            returnXML = createNewTask(doc, returnXML, "userTask");
-            returnXML = createNewTask(doc, returnXML, "manualTask");
-            returnXML = createNewTask(doc, returnXML, "serviceTask");
-            returnXML = createNewTask(doc, returnXML, "scriptTask");
-            returnXML = createNewTask(doc, returnXML, "businessRuleTask");
-
-            return returnXML;
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
-            return returnXML;
-        }
     }
 
     //@Transactional
@@ -306,7 +304,7 @@ public class BPMNparser {
         }
     }
 
-    public boolean updateProcessInAllWorkflows(Process process, boolean nameChanged, Process alreadyChangedProcess) {
+    public void updateProcessInAllWorkflows(Process process, boolean nameChanged, Process alreadyChangedProcess) {
 
         var listOfProcesses = process.getPartOfProcess();
         boolean alreadyChanged = false;
@@ -367,15 +365,11 @@ public class BPMNparser {
                     bpmNfileRepository.save(workflow);
                     historyBPMNRepository.save(historyBPMN);
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
         }
-        return true;
     }
 
     private void makeTaskUpdate(org.w3c.dom.Document doc, Process process, String type){
@@ -435,17 +429,12 @@ public class BPMNparser {
                                     continue;
                                 }
                                 String inputId = elementInput.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
-                                if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", inputId)) {
-                                    Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                if (Pattern.matches("WorkItem_([0-9]+)_.*", inputId)) {
+                                    Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
                                     Matcher m1 = p1.matcher(inputId);
 
                                     if (m1.find()) {
-                                        long workItemId;
-                                        if(m1.group(1) != null){
-                                            workItemId = Long.parseLong(m1.group(1));
-                                        } else {
-                                            workItemId = Long.parseLong(m1.group(2));
-                                        }
+                                        long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
                                         List<WorkItem> inputList = task1.getMandatoryInputs();
@@ -477,17 +466,12 @@ public class BPMNparser {
                                 org.w3c.dom.Element elementOutput = (org.w3c.dom.Element) node2;
                                 String outputId = elementOutput.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
 
-                                if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", outputId)) {
-                                    Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                if (Pattern.matches("WorkItem_([0-9]+)_.*", outputId)) {
+                                    Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
                                     Matcher m1 = p1.matcher(outputId);
 
                                     if (m1.find()) {
-                                        long workItemId;
-                                        if(m1.group(1) != null){
-                                            workItemId = Long.parseLong(m1.group(1));
-                                        } else {
-                                            workItemId = Long.parseLong(m1.group(2));
-                                        }
+                                        long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
                                         List<WorkItem> outputList = task1.getOutputs();
@@ -508,7 +492,7 @@ public class BPMNparser {
                             }
                         }
                         if(needToSave){
-                            Task task = taskRepository.save(task1);
+                            taskRepository.save(task1);
                             this.updateTaskInAllWorkflows(task1, nameChanged,typeChanged,oldTaskType, process);
                         }
                         inXML.add(task1);
@@ -519,8 +503,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String updateTasks(String inputXML, Process process){
-        String returnXML = inputXML;
+    private void updateTasks(String inputXML, Process process){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -545,14 +528,12 @@ public class BPMNparser {
                     elementRepository.save(e);
                 }
             }
-            return returnXML;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            return returnXML;
         }
     }
 
-    public boolean updateTaskInAllWorkflows(Task task, boolean nameChanged, boolean typeChanged, String oldTaskType, Process alreadyChangedProcess) {
+    public void updateTaskInAllWorkflows(Task task, boolean nameChanged, boolean typeChanged, String oldTaskType, Process alreadyChangedProcess) {
 
         var listOfProcesses = task.getPartOfProcess();
         boolean alreadyChanged = false;
@@ -624,14 +605,12 @@ public class BPMNparser {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
         }
-        return true;
     }
 
-    private String updateWorkItems(String inputXML, Process process){
-        String returnXML = inputXML;
+    private void updateWorkItems(String inputXML){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -652,17 +631,12 @@ public class BPMNparser {
                     boolean nameChanged = false;
 
 
-                    if(Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", elementId)) {
-                        Pattern p = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                    if(Pattern.matches("WorkItem_([0-9]+)_.*", elementId)) {
+                        Pattern p = Pattern.compile("WorkItem_([0-9]+)_.*");
                         Matcher m = p.matcher(elementId);
 
                         if(m.find()){
-                            long workItemId;
-                            if(m.group(1) != null){
-                                workItemId = Long.parseLong(m.group(1));
-                            } else {
-                                workItemId = Long.parseLong(m.group(2));
-                            }
+                            long workItemId = Long.parseLong(m.group(1));
                             WorkItem workItem = workItemRepository.findById(workItemId).get();
 
                             if(!workItem.getName().equals(name)){ //Check if name was changed
@@ -680,14 +654,12 @@ public class BPMNparser {
                     }
                 }
             }
-            return returnXML;
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            return returnXML;
         }
     }
 
-    public boolean updateWorkItemInAllWorkflows(WorkItem workItem, boolean nameChanged, Process alreadyChangedProcess) {
+    public void updateWorkItemInAllWorkflows(WorkItem workItem, boolean nameChanged, Process alreadyChangedProcess) {
 
         var listOfProcesses = processRepository.findAll();
         boolean alreadyChanged = false;
@@ -726,17 +698,12 @@ public class BPMNparser {
 
                         org.w3c.dom.Element element = (org.w3c.dom.Element) node;
                         String elementId = element.getAttribute("id");
-                        if(Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", elementId)) {
-                            Pattern p = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                        if(Pattern.matches("WorkItem_([0-9]+)_.*", elementId)) {
+                            Pattern p = Pattern.compile("WorkItem_([0-9]+)_.*");
                             Matcher m = p.matcher(elementId);
 
                             if (m.find()) {
-                                long foundId;
-                                if(m.group(1) != null){
-                                    foundId = Long.parseLong(m.group(1));
-                                } else {
-                                    foundId = Long.parseLong(m.group(2));
-                                }
+                                long foundId = Long.parseLong(m.group(1));
                                 if (foundId == workItem.getId()) {
                                     if (nameChanged) {
                                         element.setAttribute("name", workItem.getName());
@@ -753,15 +720,11 @@ public class BPMNparser {
                     bpmNfileRepository.save(workflow);
                     historyBPMNRepository.save(historyBPMN);
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
         }
-        return true;
     }
 
     public boolean removeProcessFromAllWorkflows(Process processToDelete){
@@ -808,7 +771,6 @@ public class BPMNparser {
 
                                         Node flowNode = flows.item(i);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
-                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
@@ -817,7 +779,6 @@ public class BPMNparser {
 
                                         Node flowNode = flows.item( i);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
-                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
@@ -876,13 +837,11 @@ public class BPMNparser {
                         }
                     }
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
-            } if(save){
+            }
+            if(save){
                 bpmNfileRepository.save(workflow);
                 historyBPMNRepository.save(historyBPMN);
             }
@@ -935,7 +894,6 @@ public class BPMNparser {
 
                                         Node flowNode = flows.item(i);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
-                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
@@ -944,7 +902,6 @@ public class BPMNparser {
 
                                         Node flowNode = flows.item(i);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
-                                            org.w3c.dom.Element flowElement = (org.w3c.dom.Element) flowNode;
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
@@ -965,7 +922,7 @@ public class BPMNparser {
                                         Node assocNode = associations.item(i);
                                         if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
-                                            allInputAssociations.add(assocElement.getAttribute("id"));
+                                            allOutputAssociations.add(assocElement.getAttribute("id"));
                                         }
                                     }
 
@@ -1033,13 +990,11 @@ public class BPMNparser {
                         }
                     }
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
-            } if(save){
+            }
+            if(save){
                 bpmNfileRepository.save(workflow);
                 historyBPMNRepository.save(historyBPMN);
             }
@@ -1092,17 +1047,12 @@ public class BPMNparser {
                                             org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
                                             String workId = assocElement.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
 
-                                            if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workId)) {
-                                                Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                            if (Pattern.matches("WorkItem_([0-9]+)_.*", workId)) {
+                                                Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
                                                 Matcher m1 = p1.matcher(workId);
 
                                                 if (m1.find()) {
-                                                    long foundWorkItemId;
-                                                    if (m1.group(1) != null) {
-                                                        foundWorkItemId = Long.parseLong(m1.group(1));
-                                                    } else {
-                                                        foundWorkItemId = Long.parseLong(m1.group(2));
-                                                    }
+                                                    long foundWorkItemId = Long.parseLong(m1.group(1));
                                                     if (foundWorkItemId == workItem.getId()) {
                                                         allInputAssociations.add(assocElement.getAttribute("id"));
                                                         Node parent = assocElement.getParentNode();
@@ -1141,9 +1091,6 @@ public class BPMNparser {
                     bpmNfileRepository.save(workflow);
                     historyBPMNRepository.save(historyBPMN);
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -1152,7 +1099,7 @@ public class BPMNparser {
         return true;
     }
 
-    public boolean removeOutputConnectionFromAllWorkflows(Task task, WorkItem workItem) {
+    public void removeOutputConnectionFromAllWorkflows(Task task, WorkItem workItem) {
         var listOfProcesses = task.getPartOfProcess();
         for (Process proc : listOfProcesses) { //Check all processes
             BPMNfile workflow = proc.getWorkflow();
@@ -1197,17 +1144,12 @@ public class BPMNparser {
                                             org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
                                             String workId = assocElement.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
 
-                                            if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workId)) {
-                                                Pattern p1 = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                                            if (Pattern.matches("WorkItem_([0-9]+)_.*", workId)) {
+                                                Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
                                                 Matcher m1 = p1.matcher(workId);
 
                                                 if (m1.find()) {
-                                                    long foundWorkItemId;
-                                                    if (m1.group(1) != null) {
-                                                        foundWorkItemId = Long.parseLong(m1.group(1));
-                                                    } else {
-                                                        foundWorkItemId = Long.parseLong(m1.group(2));
-                                                    }
+                                                    long foundWorkItemId = Long.parseLong(m1.group(1));
                                                     if (foundWorkItemId == workItem.getId()) {
                                                         allOutputAssociations.add(assocElement.getAttribute("id"));
                                                         Node parent = assocElement.getParentNode();
@@ -1246,15 +1188,11 @@ public class BPMNparser {
                     bpmNfileRepository.save(workflow);
                     historyBPMNRepository.save(historyBPMN);
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return;
             }
         }
-        return true;
     }
 
     public boolean removeWorkItemFromAllWorkflows(WorkItem workItemToDelete){
@@ -1284,17 +1222,12 @@ public class BPMNparser {
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
                         org.w3c.dom.Element element = (org.w3c.dom.Element) node;
                         String workItemId = element.getAttribute("id");
-                        if(Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workItemId)) {
-                            Pattern p = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                        if(Pattern.matches("WorkItem_([0-9]+)_.*", workItemId)) {
+                            Pattern p = Pattern.compile("WorkItem_([0-9]+)_.*");
                             Matcher m = p.matcher(workItemId);
 
                             if (m.find()) {
-                                long foundId;
-                                if(m.group(1) != null){
-                                    foundId = Long.parseLong(m.group(1));
-                                } else {
-                                    foundId = Long.parseLong(m.group(2));
-                                }
+                                long foundId = Long.parseLong(m.group(1));
                                 if (foundId == workItemToDelete.getId()) {
                                     String DataObjectRefId = element.getAttribute("dataObjectRef");
                                     List<String> allInputAssociations = new ArrayList<>();
@@ -1392,9 +1325,6 @@ public class BPMNparser {
                         }
                     }
                 }
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                e.printStackTrace();
-                return false;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -1439,17 +1369,12 @@ public class BPMNparser {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     org.w3c.dom.Element element = (org.w3c.dom.Element) node;
                     String workItem = element.getAttribute("id");
-                    if (Pattern.matches("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*", workItem)) {
-                        Pattern p = Pattern.compile("Artifact_([0-9]+)_.*|Document_([0-9]+)_.*");
+                    if (Pattern.matches("WorkItem_([0-9]+)_.*", workItem)) {
+                        Pattern p = Pattern.compile("WorkItem_([0-9]+)_.*");
                         Matcher m = p.matcher(workItem);
 
                         if (m.find()) {
-                            long foundId;
-                            if (m.group(1) != null) {
-                                foundId = Long.parseLong(m.group(1));
-                            } else {
-                                foundId = Long.parseLong(m.group(2));
-                            }
+                            long foundId = Long.parseLong(m.group(1));
                             if(!workItemRepository.existsById(foundId)){
                                 return false;
                             }
@@ -1458,9 +1383,6 @@ public class BPMNparser {
                 }
             }
 
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
-            return false;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

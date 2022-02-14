@@ -95,13 +95,6 @@ public class Artifact extends WorkItem {
         this.artifactState = artifactState;
     }
 
-    public List<ArtifactRelation> getAsBase() {
-        return asBase;
-    }
-
-    public void setAsBase(List<ArtifactRelation> asBase) {
-        this.asBase = asBase;
-    }
 
     public List<ArtifactRelation> getRelationsToAnotherArtifacts() {
         return relationsToAnotherArtifacts;

@@ -8,14 +8,38 @@ import java.util.List;
 
 @Entity
 @Table(name = "work_item")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="work_item_type",
-        discriminatorType = DiscriminatorType.STRING)
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@DiscriminatorColumn(name="work_item_type",
+//        discriminatorType = DiscriminatorType.STRING)
 public class WorkItem extends Item{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @Column(columnDefinition="LONGTEXT")
+    private String purpose;
+    @Column(columnDefinition="LONGTEXT")
+    private String keyConsiderations;
+    @Column(columnDefinition="LONGTEXT")
+    private String briefOutline;
+    @Column(columnDefinition="LONGTEXT")
+    private String notation;
+    @Column(columnDefinition="LONGTEXT")
+    private String impactOfNotHaving;
+    @Column(columnDefinition="LONGTEXT")
+    private String reasonForNotNeeding;
+
+    private String workItemType = "";
+    @Column(columnDefinition="LONGTEXT")
+    private String urlAddress;
+
+    @OneToMany(mappedBy = "workItem", cascade = CascadeType.REMOVE)
+    private  List<State> workItemStates;
+
+    @JsonIgnore
+    @ManyToOne
+    private Project project = null;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
@@ -44,6 +68,13 @@ public class WorkItem extends Item{
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asGuidanceWorkItem;
+
+    @OneToMany(mappedBy ="relatedWorkItem")
+    private  List<WorkItemRelation> relationsToAnotherWorkItems;
+
+    @JsonIgnore
+    @OneToMany(mappedBy ="baseWorkItem", cascade = CascadeType.REMOVE)
+    private List<WorkItemRelation> asBase;
 
     public WorkItem() {
     }
@@ -86,5 +117,101 @@ public class WorkItem extends Item{
 
     public void setAsGuidanceWorkItem(List<Task> asGuidanceWorkItem) {
         this.asGuidanceWorkItem = asGuidanceWorkItem;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getKeyConsiderations() {
+        return keyConsiderations;
+    }
+
+    public void setKeyConsiderations(String keyConsiderations) {
+        this.keyConsiderations = keyConsiderations;
+    }
+
+    public String getBriefOutline() {
+        return briefOutline;
+    }
+
+    public void setBriefOutline(String briefOutline) {
+        this.briefOutline = briefOutline;
+    }
+
+    public String getNotation() {
+        return notation;
+    }
+
+    public void setNotation(String notation) {
+        this.notation = notation;
+    }
+
+    public String getImpactOfNotHaving() {
+        return impactOfNotHaving;
+    }
+
+    public void setImpactOfNotHaving(String impactOfNotHaving) {
+        this.impactOfNotHaving = impactOfNotHaving;
+    }
+
+    public String getReasonForNotNeeding() {
+        return reasonForNotNeeding;
+    }
+
+    public void setReasonForNotNeeding(String reasonForNotNeeding) {
+        this.reasonForNotNeeding = reasonForNotNeeding;
+    }
+
+    public String getWorkItemType() {
+        return workItemType;
+    }
+
+    public void setWorkItemType(String workItemType) {
+        this.workItemType = workItemType;
+    }
+
+    public String getUrlAddress() {
+        return urlAddress;
+    }
+
+    public void setUrlAddress(String urlAddress) {
+        this.urlAddress = urlAddress;
+    }
+
+    public List<State> getWorkItemStates() {
+        return workItemStates;
+    }
+
+    public void setWorkItemStates(List<State> workItemStates) {
+        this.workItemStates = workItemStates;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public List<WorkItemRelation> getRelationsToAnotherWorkItems() {
+        return relationsToAnotherWorkItems;
+    }
+
+    public void setRelationsToAnotherWorkItems(List<WorkItemRelation> relationsToAnotherWorkItems) {
+        this.relationsToAnotherWorkItems = relationsToAnotherWorkItems;
+    }
+
+    public List<WorkItemRelation> getAsBase() {
+        return asBase;
+    }
+
+    public void setAsBase(List<WorkItemRelation> asBase) {
+        this.asBase = asBase;
     }
 }

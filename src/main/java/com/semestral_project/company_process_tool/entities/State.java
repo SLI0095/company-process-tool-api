@@ -17,8 +17,9 @@ public class State {
     public String stateDescription;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "artifactState")
-    public List<Artifact> artifacts;
+    @ManyToOne
+    private WorkItem workItem;
+
 
     public State() {
     }
@@ -47,11 +48,11 @@ public class State {
         this.stateDescription = stateDescription;
     }
 
-    public List<Artifact> getArtifacts() {
-        return artifacts;
+    public WorkItem getWorkItem() {
+        return workItem;
     }
 
-    public void setArtifacts(List<Artifact> artifacts) {
-        this.artifacts = artifacts;
+    public void setWorkItem(WorkItem workItem) {
+        this.workItem = workItem;
     }
 }

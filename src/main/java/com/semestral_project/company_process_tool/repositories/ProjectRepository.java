@@ -1,14 +1,15 @@
 package com.semestral_project.company_process_tool.repositories;
 
 import com.semestral_project.company_process_tool.entities.Element;
-import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.Project;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface ElementRepository extends CrudRepository<Element, Long> {
+@Repository
+public interface ProjectRepository extends CrudRepository<Project, Long> {
 
-    @Query("SELECT e FROM Element e WHERE e.project.id = ?1")
-    List<Element> findAllElementsInProject(Long projectId);
+
 }

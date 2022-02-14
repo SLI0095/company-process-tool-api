@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,11 +18,6 @@ public class Task extends Element{
 
     private String taskType = "task";
 
-//    @ManyToMany(mappedBy = "asPrimaryPerformer")
-//    private List<Role> primaryPerformers;
-//    @ManyToMany(mappedBy = "asAdditionalPerformer")
-//    private List<Role> additionalPerformers;
-
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<WorkItem> mandatoryInputs;
 
@@ -35,6 +32,9 @@ public class Task extends Element{
 
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
     private List<WorkItem> guidanceWorkItems;
+
+
+
 
     public Task() {
     }
@@ -79,21 +79,6 @@ public class Task extends Element{
         this.guidanceWorkItems = guidanceWorkItems;
     }
 
-    //    public List<Role> getPrimaryPerformers() {
-//        return primaryPerformers;
-//    }
-//
-//    public void setPrimaryPerformers(List<Role> primaryPerformers) {
-//        this.primaryPerformers = primaryPerformers;
-//    }
-//
-//    public List<Role> getAdditionalPerformers() {
-//        return additionalPerformers;
-//    }
-//
-//    public void setAdditionalPerformers(List<Role> additionalPerformers) {
-//        this.additionalPerformers = additionalPerformers;
-//    }
 
     public List<WorkItem> getMandatoryInputs() {
         return mandatoryInputs;

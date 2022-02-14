@@ -70,18 +70,18 @@ public class ArtifactController {
         }
     }
 
-    @PutMapping("/artifacts/{id}/setState")
-    public ResponseEntity<ResponseMessage> setState(@PathVariable Long id, @RequestBody State state){
-
-        int status = artifactService.setArtifactState(id, state);
-        if(status == 1){
-            return ResponseEntity.ok(new ResponseMessage("Artifact id: " + id + " is updated"));
-        } else if(status == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Artifact id: " + id + " does not exist"));
-        } else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Artifact id: " + id + " does not have state."));
-        }
-    }
+//    @PutMapping("/artifacts/{id}/setState")
+//    public ResponseEntity<ResponseMessage> setState(@PathVariable Long id, @RequestBody State state){
+//
+//        int status = artifactService.setArtifactState(id, state);
+//        if(status == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Artifact id: " + id + " is updated"));
+//        } else if(status == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Artifact id: " + id + " does not exist"));
+//        } else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Artifact id: " + id + " does not have state."));
+//        }
+//    }
 
 
     @PutMapping("/artifacts/{id}/addRelation")
