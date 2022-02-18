@@ -27,4 +27,15 @@ public class ElementController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @GetMapping("/elements/templates")
+    public ResponseEntity<List<Element>> getElementsTemplates() {
+        List<Element> elements = elementService.getAllTemplates();
+        if(elements != null){
+            return ResponseEntity.ok(elements);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 }

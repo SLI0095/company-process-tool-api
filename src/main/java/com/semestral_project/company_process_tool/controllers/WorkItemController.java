@@ -27,6 +27,16 @@ public class WorkItemController {
         }
     }
 
+    @GetMapping("/workItems/templates")
+    public ResponseEntity<List<WorkItem>> getWorkItemsTemplates() {
+        List<WorkItem> workItems = workItemService.getAllTemplates();
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/workItems/{id}")
     public ResponseEntity<WorkItem> workItemById(@PathVariable Long id) {
         WorkItem workItem = workItemService.getWorkItemById(id);

@@ -9,10 +9,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ProcessRepository extends CrudRepository<Process, Long> {
-    @Query("SELECT e FROM Element e WHERE e.isTemplate IS TRUE")
-    List<Process> findAllTemplates();
+    @Query("SELECT p FROM Process p WHERE p.project = NULL")
+    List<Process> findAllTemplatesProcesses();
 
-    @Query("SELECT e FROM Element e WHERE e.project.id = ?1 AND e.class = process")
+    @Query("SELECT p FROM Process p WHERE p.project.id = ?1")
     List<Process> findAllProcessesInProject(Long projectId);
 
 }

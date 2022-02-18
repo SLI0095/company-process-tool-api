@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.services;
 
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.Rasci;
 import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.TaskStep;
@@ -378,6 +379,11 @@ public class TaskService {
         {
             return 2;
         }
+    }
+
+    public List<Task> getAllTemplates(){
+        List<Task> allTemplates = taskRepository.findAllTasksTemplates();
+        return allTemplates;
     }
 
     //    @PutMapping("/tasks/{id}/addPrimaryPerformer")

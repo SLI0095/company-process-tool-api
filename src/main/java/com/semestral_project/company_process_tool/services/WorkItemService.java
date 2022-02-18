@@ -182,4 +182,9 @@ public class WorkItemService {
             return 2;
         }
     }
+
+    public List<WorkItem> getAllTemplates(){
+        List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplate();
+        return allTemplates;
+    }
 }

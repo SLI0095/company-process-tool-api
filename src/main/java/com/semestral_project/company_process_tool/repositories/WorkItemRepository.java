@@ -11,4 +11,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
 
     @Query("SELECT w FROM WorkItem w WHERE w.project.id = ?1")
     List<WorkItem> findAllWorkItemsInProject(Long projectId);
+
+    @Query("SELECT w FROM WorkItem w WHERE w.project = NULL")
+    List<WorkItem> findAllWorkItemTemplate();
 }

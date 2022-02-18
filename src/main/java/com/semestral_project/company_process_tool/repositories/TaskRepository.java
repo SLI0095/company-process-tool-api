@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface TaskRepository extends CrudRepository<Task, Long> {
 
-    @Query("SELECT e FROM Element e WHERE e.project.id = ?1 AND e.class = task")
+    @Query("SELECT t FROM Task t WHERE t.project.id = ?1")
     List<Task> findAllTasksInProject(Long projectId);
+
+    @Query("SELECT t FROM Task t WHERE t.project = NULL")
+    List<Task> findAllTasksTemplates();
 
 }

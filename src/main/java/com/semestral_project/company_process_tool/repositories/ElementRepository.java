@@ -11,4 +11,7 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
 
     @Query("SELECT e FROM Element e WHERE e.project.id = ?1")
     List<Element> findAllElementsInProject(Long projectId);
+
+    @Query("SELECT e FROM Element e WHERE e.project = NULL")
+    List<Element> findAllElementsTemplate();
 }

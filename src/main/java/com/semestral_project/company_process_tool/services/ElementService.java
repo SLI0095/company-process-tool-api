@@ -22,4 +22,13 @@ public class ElementService {
             return null;
         }
     }
+
+    public List<Element> getAllTemplates(){
+        try {
+            return elementRepository.findAllElementsTemplate();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

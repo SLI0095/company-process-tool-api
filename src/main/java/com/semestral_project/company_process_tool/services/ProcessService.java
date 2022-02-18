@@ -32,6 +32,7 @@ public class ProcessService {
         oldProcess.setChangeDescription(updatedProcess.getChangeDescription());
         oldProcess.setPurpose(updatedProcess.getPurpose());
         oldProcess.setScope(updatedProcess.getScope());
+        oldProcess.setAlternatives(updatedProcess.getAlternatives());
         oldProcess.setUsageNotes(updatedProcess.getUsageNotes());
         oldProcess.setHowToStaff(updatedProcess.getHowToStaff());
         oldProcess.setKeyConsiderations(updatedProcess.getKeyConsiderations());
@@ -202,7 +203,7 @@ public class ProcessService {
     }
 
     public List<Process> getAllTemplates(){
-        List<Process> allTemplates = processRepository.findAllTemplates();
+        List<Process> allTemplates = processRepository.findAllTemplatesProcesses();
         return allTemplates;
     }
 }

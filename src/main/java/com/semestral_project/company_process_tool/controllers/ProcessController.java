@@ -35,6 +35,16 @@ public class ProcessController {
         }
     }
 
+    @GetMapping("/processes/templates")
+    public ResponseEntity<List<Process>> getProcessesTemplates() {
+        List<Process> processes = processService.getAllTemplates();
+        if(processes != null){
+            return ResponseEntity.ok(processes);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/processes/{id}")
     public ResponseEntity<Process> processById(@PathVariable Long id) {
         Process process = processService.getProcessById(id);

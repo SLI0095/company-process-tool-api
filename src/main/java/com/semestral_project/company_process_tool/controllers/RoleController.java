@@ -26,6 +26,16 @@ public class RoleController {
         }
     }
 
+    @GetMapping("/roles/templates")
+    public ResponseEntity<List<Role>> getRolesTemplates() {
+        List<Role> roles = roleService.getAllTemplates();
+        if(roles != null){
+            return ResponseEntity.ok(roles);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/roles/{id}")
     public ResponseEntity<Role> roleById(@PathVariable Long id){
         Role role = roleService.getRoleById(id);

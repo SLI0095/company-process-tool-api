@@ -30,8 +30,6 @@ public class Process extends Element{
     @JoinColumn(name = "bpmnId")
     private BPMNfile workflow;
 
-    private boolean isTemplate = false;
-
     @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
 
@@ -100,14 +98,6 @@ public class Process extends Element{
 
     public void setElements(List<Element> elements) {
         this.elements = elements;
-    }
-
-    public boolean isTemplate() {
-        return isTemplate;
-    }
-
-    public void setTemplate(boolean template) {
-        isTemplate = template;
     }
 
     public List<HistoryBPMN> getHistoryWorkflow() {

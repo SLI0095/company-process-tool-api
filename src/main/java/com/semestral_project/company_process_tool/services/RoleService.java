@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.entities.WorkItem;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,5 +79,10 @@ public class RoleService {
             System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    public List<Role> getAllTemplates(){
+        List<Role> allTemplates = roleRepository.findAllRolesTemplates();
+        return allTemplates;
     }
 }

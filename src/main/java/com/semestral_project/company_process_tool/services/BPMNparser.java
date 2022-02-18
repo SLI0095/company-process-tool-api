@@ -115,7 +115,7 @@ public class BPMNparser {
 
                     if (oldId.contains("WorkItem_new_")) { //Create new WorkItem
                         WorkItem w = new WorkItem();
-                        String unchangedId = oldId.substring(13); //_DataObjectReference_....
+                        String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
                         w.setProject(project);
                         WorkItem savedWorkItem = workItemRepository.save(w);

@@ -27,6 +27,16 @@ public class TaskController {
         }
     }
 
+    @GetMapping("/tasks/templates")
+    public ResponseEntity<List<Task>> getTasksTemplates() {
+        List<Task> tasks = taskService.getAllTemplates();
+        if(tasks != null){
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/tasks/{id}")
     public ResponseEntity<Task> taskById(@PathVariable Long id){
 
