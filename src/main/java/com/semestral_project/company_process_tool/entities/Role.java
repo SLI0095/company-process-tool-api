@@ -34,9 +34,9 @@ public class Role extends Item{
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asAdditionalPerformer;
 
-    @JsonIgnore
+
     @ManyToOne
-    private Project project;
+    private Project project = null;;
 
     public Role() {
     }
@@ -87,5 +87,14 @@ public class Role extends Item{
 
     public void setAsAdditionalPerformer(List<Task> asAdditionalPerformer) {
         this.asAdditionalPerformer = asAdditionalPerformer;
+    }
+
+    @JsonIgnore
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +13,15 @@ public class Project extends Item{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonIgnore
     @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<Element> elements = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<WorkItem> workItems = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<Role> roles = new ArrayList<>();
 
