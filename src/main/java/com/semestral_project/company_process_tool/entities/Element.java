@@ -22,7 +22,6 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> partOfProcess;
 
-    @JsonIgnore
     @ManyToOne
     private Project project = null;
 

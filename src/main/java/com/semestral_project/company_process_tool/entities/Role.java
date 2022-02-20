@@ -89,7 +89,6 @@ public class Role extends Item{
         this.asAdditionalPerformer = asAdditionalPerformer;
     }
 
-    @JsonIgnore
     public Project getProject() {
         return project;
     }

@@ -37,7 +37,6 @@ public class WorkItem extends Item{
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.REMOVE)
     private  List<State> workItemStates;
 
-    @JsonIgnore
     @ManyToOne
     private Project project = null;
 
