@@ -36,7 +36,10 @@ public class Role extends Item{
 
 
     @ManyToOne
-    private Project project = null;;
+    private Project project = null;
+
+    @JsonIgnore
+    private Long previousId = -1L;
 
     public Role() {
     }
@@ -95,5 +98,13 @@ public class Role extends Item{
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Long getPreviousId() {
+        return previousId;
+    }
+
+    public void setPreviousId(Long previousId) {
+        this.previousId = previousId;
     }
 }

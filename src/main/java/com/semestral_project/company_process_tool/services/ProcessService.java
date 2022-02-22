@@ -5,6 +5,7 @@ import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
+import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class ProcessService {
     @Autowired
     BPMNfileRepository bpmNfileRepository;
 
-    private Process fillProcess(Process oldProcess, Process updatedProcess){
+    public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
         oldProcess.setBriefDescription(updatedProcess.getBriefDescription());
         oldProcess.setMainDescription(updatedProcess.getMainDescription());
@@ -205,5 +206,15 @@ public class ProcessService {
     public List<Process> getAllTemplates(){
         List<Process> allTemplates = processRepository.findAllTemplatesProcesses();
         return allTemplates;
+    }
+
+    public boolean addProcessFromFile(ProcessAndBpmnHolder holder){
+        Process newProcess = holder.getProcess();
+        newProcess = processRepository.save(newProcess);
+        BPMNfile newWorkflow = holder.getBpmn();
+        newWorkflow.setBpmnContent(bpmnParser.prepareImportedFile(newWorkflow.getBpmnContent()));
+
+        this.saveWorkflow(newProcess.getId(), newWorkflow);
+        return true;
     }
 }

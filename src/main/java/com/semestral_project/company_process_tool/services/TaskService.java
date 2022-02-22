@@ -26,7 +26,7 @@ public class TaskService {
     @Autowired
     BPMNparser bpmNparser;
 
-    private Task fillTask(Task oldTask, Task updatedTask){
+    public Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
         oldTask.setBriefDescription(updatedTask.getBriefDescription());
         oldTask.setMainDescription(updatedTask.getMainDescription());
@@ -35,6 +35,7 @@ public class TaskService {
         oldTask.setChangeDescription(updatedTask.getChangeDescription());
         oldTask.setPurpose(updatedTask.getPurpose());
         oldTask.setKeyConsiderations(updatedTask.getKeyConsiderations());
+        oldTask.setTaskType(updatedTask.getTaskType());
         return oldTask;
     }
 
@@ -386,100 +387,5 @@ public class TaskService {
         return allTemplates;
     }
 
-    //    @PutMapping("/tasks/{id}/addPrimaryPerformer")
-//    public ResponseEntity<ResponseMessage> addPrimaryPerformer(@PathVariable Long id, @RequestBody Role role){
-//        Optional<Task> taskData = taskRepository.findById(id);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//            Role role_ = roleRepository.findById(role.getId()).get();
-//            var roleList = task_.getPrimaryPerformers();
-//            if(roleList.contains(role_))
-//            {
-//                return ResponseEntity.badRequest().body(new ResponseMessage("Performer already added"));
-//            }
-//            roleList.add(role_);
-//            task_.setPrimaryPerformers(roleList);
-//
-//            taskRepository.save(task_);
-//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Performer added."));
-//        }
-//        else
-//        {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-//        }
-//    }
-//
-//    @PutMapping("/tasks/{id}/removePrimaryPerformer")
-//    public ResponseEntity<ResponseMessage> removePrimaryPerformer(@PathVariable Long id, @RequestBody Role role){
-//        Optional<Task> taskData = taskRepository.findById(id);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//            Role role_ = roleRepository.findById(role.getId()).get();
-//            var roleList = task_.getPrimaryPerformers();
-//            if(roleList.contains(role_)) {
-//                roleList.remove(role_);
-//                task_.setPrimaryPerformers(roleList);
-//                taskRepository.save(task_);
-//                return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Performer removed."));
-//
-//            }
-//            else {
-//                return ResponseEntity.badRequest().body(new ResponseMessage("Performer not in task id: " + id));
-//            }
-//
-//        }
-//        else
-//        {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-//        }
-//    }
-//
-//    @PutMapping("/tasks/{id}/addAdditionalPerformer")
-//    public ResponseEntity<ResponseMessage> addAdditionalPerformer(@PathVariable Long id, @RequestBody Role role){
-//        Optional<Task> taskData = taskRepository.findById(id);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//            Role role_ = roleRepository.findById(role.getId()).get();
-//            var roleList = task_.getAdditionalPerformers();
-//            if(roleList.contains(role_))
-//            {
-//                return ResponseEntity.badRequest().body(new ResponseMessage("Performer already added"));
-//            }
-//            roleList.add(role_);
-//            task_.setAdditionalPerformers(roleList);
-//
-//            taskRepository.save(task_);
-//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Performer added."));
-//        }
-//        else
-//        {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-//        }
-//    }
-//
-//    @PutMapping("/tasks/{id}/removeAdditionalPerformer")
-//    public ResponseEntity<ResponseMessage> removeAdditionalPerformer(@PathVariable Long id, @RequestBody Role role){
-//        Optional<Task> taskData = taskRepository.findById(id);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//            Role role_ = roleRepository.findById(role.getId()).get();
-//            var roleList = task_.getAdditionalPerformers();
-//            if(roleList.contains(role_)) {
-//                roleList.remove(role_);
-//                task_.setAdditionalPerformers(roleList);
-//                taskRepository.save(task_);
-//                return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Performer removed."));
-//
-//            }
-//            else {
-//                return ResponseEntity.badRequest().body(new ResponseMessage("Performer not in task id: " + id));
-//            }
-//
-//        }
-//        else
-//        {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-//        }
-//    }
 
 }

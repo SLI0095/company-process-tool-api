@@ -24,7 +24,7 @@ public class WorkItemService {
     BPMNparser bpmNparser;
 
 
-    private WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem){
+    public WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem){
         oldWorkItem.setName(updatedWorkItem.getName());
         oldWorkItem.setBriefDescription(updatedWorkItem.getBriefDescription());
         oldWorkItem.setMainDescription(updatedWorkItem.getMainDescription());

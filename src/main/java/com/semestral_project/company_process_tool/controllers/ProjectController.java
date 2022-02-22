@@ -48,7 +48,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/projects/{id}")
-    public ResponseEntity<ResponseMessage> removeProcess(@PathVariable Long id) {
+    public ResponseEntity<ResponseMessage> removeProject(@PathVariable Long id) {
         boolean ret = projectService.deleteProject(id);
         if(ret){
             return ResponseEntity.ok(new ResponseMessage("Project id: " + id + " is deleted"));
@@ -58,7 +58,7 @@ public class ProjectController {
     }
 
     @PutMapping("/projects/{id}")
-    public ResponseEntity<ResponseMessage> updateProcess(@PathVariable Long id, @RequestBody Project project) {
+    public ResponseEntity<ResponseMessage> updateProject(@PathVariable Long id, @RequestBody Project project) {
         int ret = projectService.updateProject(id, project);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Project id: " + id + " is updated"));
@@ -114,6 +114,16 @@ public class ProjectController {
             return ResponseEntity.ok(elements);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/projects/{id}/importTemplate")
+    public ResponseEntity<ResponseMessage> importTemplate(@PathVariable Long id, @RequestBody Process processTemplate){
+        int ret = projectService.importTemplateProcess(id, processTemplate);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process imported"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be imported."));
         }
     }
 }

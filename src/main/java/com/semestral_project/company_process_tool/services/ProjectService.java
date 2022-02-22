@@ -4,8 +4,10 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,21 @@ public class ProjectService {
     ProcessRepository processRepository;
     @Autowired
     TaskRepository taskRepository;
+    @Autowired
+    WorkItemRepository workItemRepository;
+    @Autowired
+    RoleRepository roleRepository;
+    @Autowired
+    BPMNfileRepository bpmnFileRepository;
+
+    @Autowired
+    ProcessService processService;
+    @Autowired
+    RoleService roleService;
+    @Autowired
+    WorkItemService workItemService;
+    @Autowired
+    TaskService taskService;
 
 
     private Project fillProject(Project oldProject, Project updatedProject){
@@ -122,6 +139,214 @@ public class ProjectService {
 
     public List<Task> getAllTasksInProject(long projectId){
         return taskRepository.findAllTasksInProject(projectId);
+    }
+
+    private long importingProcess(Project project, Process processTemplate){
+
+        Process newProcess = new Process();
+        newProcess = processService.fillProcess(newProcess,processTemplate);
+        newProcess.setProject(project);
+        newProcess.setPreviousId(processTemplate.getId());
+        newProcess = processRepository.save(newProcess);
+        boolean noWorkfow = false;
+
+        if(processTemplate.getWorkflow() == null){
+            noWorkfow = true;
+        }
+
+        String xmlContent;
+        if(noWorkfow){
+            xmlContent = "";
+        } else {
+            xmlContent = processTemplate.getWorkflow().getBpmnContent();
+        }
+
+        for(Element e : processTemplate.getElements()){
+            if(e.getClass() == Task.class){
+                Task newTask = null;
+                for(Element eInProject : project.getElements()){
+                    if(eInProject.getPreviousId() == e.getId()){
+                        newTask = (Task)eInProject;
+                    }
+                }
+                if(newTask == null) { //task is not in project yet
+
+                    //fill info from template and save
+                    newTask = new Task();
+                    newTask = taskService.fillTask(newTask, (Task) e);
+                    newTask.setProject(project);
+                    newTask.setPreviousId(e.getId());
+                    newTask = taskRepository.save(newTask);
+
+                    //add steps
+                    for(TaskStep step : ((Task) e).getSteps()){
+                        TaskStep newStep = new TaskStep();
+                        newStep.setName(step.getName());
+                        newStep.setDescription(step.getDescription());
+                        taskService.addTaskStep(newTask.getId(),newStep);
+                    }
+
+                    //check all inputs of task
+                    for (WorkItem w : ((Task) e).getMandatoryInputs()) {
+                        WorkItem newWorkItem = null;
+                        for (WorkItem wInProject : project.getWorkItems()) {
+                            if (wInProject.getPreviousId() == w.getId()) {
+                                newWorkItem = wInProject;
+                            }
+                        }
+                        if (newWorkItem == null) { //work item is not in project yet
+
+                            //fill info from template and save
+                            newWorkItem = new WorkItem();
+                            newWorkItem = workItemService.fillWorkItem(newWorkItem, w);
+                            newWorkItem.setProject(project);
+                            newWorkItem.setPreviousId(w.getId());
+                            newWorkItem = workItemRepository.save(newWorkItem);
+
+                            //add states as in template and save
+                            for(State s: w.getWorkItemStates()){
+                                State newState = new State();
+                                newState.setStateName(s.getStateName());
+                                newState.setStateDescription(s.getStateDescription());
+                                workItemService.addWorkItemState(newWorkItem.getId(), newState);
+                            }
+                            taskService.addMandatoryInput(newTask.getId(),newWorkItem);
+                        }
+                        //update id in workflow of process
+                        xmlContent = xmlContent.replaceAll("WorkItem_" + w.getId() +"_", "WorkItem_" + newWorkItem.getId() + "_");
+                    }
+
+                    //as previous but outputs are imported
+                    for (WorkItem w : ((Task) e).getOutputs()) {
+                        WorkItem newWorkItem = null;
+                        for (WorkItem wInProject : project.getWorkItems()) {
+                            if (wInProject.getPreviousId() == w.getId()) {
+                                newWorkItem = wInProject;
+                            }
+                        }
+                        if (newWorkItem == null) {
+                            newWorkItem = new WorkItem();
+                            newWorkItem = workItemService.fillWorkItem(newWorkItem, w);
+                            newWorkItem.setProject(project);
+                            newWorkItem.setPreviousId(w.getId());
+                            newWorkItem = workItemRepository.save(newWorkItem);
+                            for(State s: w.getWorkItemStates()){
+                                State newState = new State();
+                                newState.setStateName(s.getStateName());
+                                newState.setStateDescription(s.getStateDescription());
+                                workItemService.addWorkItemState(newWorkItem.getId(), newState);
+                            }
+                            taskService.addOutput(newTask.getId(),newWorkItem);
+                        }
+                        xmlContent = xmlContent.replaceAll("WorkItem_" + w.getId() +"_", "WorkItem_" + newWorkItem.getId() + "_");
+                    }
+
+                    //as previous but guidance are imported
+                    for (WorkItem w : ((Task) e).getGuidanceWorkItems()) {
+                        WorkItem newWorkItem = null;
+                        for (WorkItem wInProject : project.getWorkItems()) {
+                            if (wInProject.getPreviousId() == w.getId()) {
+                                newWorkItem = wInProject;
+                            }
+                        }
+                        if (newWorkItem == null) {
+                            newWorkItem = new WorkItem();
+                            newWorkItem = workItemService.fillWorkItem(newWorkItem, w);
+                            newWorkItem.setProject(project);
+                            newWorkItem.setPreviousId(w.getId());
+                            newWorkItem = workItemRepository.save(newWorkItem);
+                            for(State s: w.getWorkItemStates()){
+                                State newState = new State();
+                                newState.setStateName(s.getStateName());
+                                newState.setStateDescription(s.getStateDescription());
+                                workItemService.addWorkItemState(newWorkItem.getId(), newState);
+                            }
+                            taskService.addGuidanceWorkItem(newTask.getId(),newWorkItem);
+                        }
+                        xmlContent = xmlContent.replaceAll("WorkItem_" + w.getId() +"_", "WorkItem_" + newWorkItem.getId() + "_");
+                    }
+
+                    //roles and rasci
+                    for(Rasci rasci : ((Task) e).getRasciList()){
+                        Role newRole = null;
+                        Role role = rasci.getRole();
+                        for (Role rInProject : project.getRoles()) { //check if role is already in project
+                            if (rInProject.getPreviousId() == role.getId()) {
+                                newRole = rInProject;
+                            }
+                        }
+                        if(newRole == null){ // role not in project yet
+                            newRole = new Role();
+                            newRole = roleService.fillRole(newRole,role);
+                            newRole.setProject(project);
+                            newRole.setPreviousId(role.getId());
+                            newRole = roleRepository.save(newRole);
+                        }
+                        Rasci newRasci = new Rasci();
+                        newRasci.setRole(newRole);
+                        newRasci.setType(rasci.getType());
+                        taskService.addRasci(newTask.getId(), newRasci);
+                    }
+                }
+                var listOfProcesses = newTask.getPartOfProcess();
+                listOfProcesses.add(newProcess);
+                newTask.setPartOfProcess(listOfProcesses);
+                newTask = taskRepository.save(newTask);
+                xmlContent = xmlContent.replaceAll("Element_" + e.getId() +"_", "Element_" + newTask.getId() + "_");
+            } else { //is Process
+                Process newSubProcess = null;
+                for(Element eInProject : project.getElements()){
+                    if(eInProject.getPreviousId() == e.getId()){
+                        newSubProcess = (Process) eInProject;
+                        var listOfProcesses = newSubProcess.getPartOfProcess();
+                        listOfProcesses.add(newProcess);
+                        newSubProcess.setPartOfProcess(listOfProcesses);
+                        newSubProcess = processRepository.save(newSubProcess);
+                        xmlContent = xmlContent.replaceAll("Element_" + e.getId() +"_", "Element_" + newSubProcess.getId() + "_");
+                    }
+                }
+                if(newSubProcess == null) {
+                    long newId = this.importingProcess(project, (Process) e);
+                    Process p = processRepository.findById(newId).get();
+                    var listOfProcesses = p.getPartOfProcess();
+                    listOfProcesses.add(newProcess);
+                    p.setPartOfProcess(listOfProcesses);
+                    p = processRepository.save(p);
+                    xmlContent = xmlContent.replaceAll("Element_" + e.getId() + "_", "Element_" + newId + "_");
+                }
+            }
+        }
+
+        //save bpmn and return newProcess id
+        if(!noWorkfow){
+            BPMNfile newWorkflow = new BPMNfile();
+            newWorkflow.setProcess(newProcess);
+            newWorkflow.setBpmnContent(xmlContent);
+            newWorkflow = bpmnFileRepository.save(newWorkflow);
+            newProcess.setWorkflow(newWorkflow);
+            processRepository.save(newProcess);
+        }
+        return newProcess.getId();
+    }
+
+    public int importTemplateProcess(long projectId, Process processTemplate){
+
+        Process processToImport = null;
+        Project project = null;
+
+        if(processRepository.existsById(processTemplate.getId())){
+            processToImport = processRepository.findById(processTemplate.getId()).get();
+        }
+
+        if(projectRepository.existsById(projectId)){
+            project = projectRepository.findById(projectId).get();
+        }
+
+        if(processToImport != null && project != null){
+            importingProcess(project, processToImport);
+            return 1;
+        }else
+            return 2;
     }
 
 

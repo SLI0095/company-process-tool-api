@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,14 +17,17 @@ public class Element extends Item{
     private long id;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany
     @JoinTable(name = "element_process",
             joinColumns = {@JoinColumn(name = "element_id")},
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
-    private List<Process> partOfProcess;
+    private List<Process> partOfProcess = new ArrayList<>();
 
     @ManyToOne
     private Project project = null;
+
+    @JsonIgnore
+    private Long previousId = -1L;
 
 
     public Element() {
@@ -51,5 +55,13 @@ public class Element extends Item{
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Long getPreviousId() {
+        return previousId;
+    }
+
+    public void setPreviousId(Long previousId) {
+        this.previousId = previousId;
     }
 }

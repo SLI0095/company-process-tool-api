@@ -23,8 +23,8 @@ public class Process extends Element{
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
-    @ManyToMany(mappedBy = "partOfProcess")
-    private List<Element> elements;
+    @ManyToMany(mappedBy = "partOfProcess", cascade = CascadeType.DETACH)
+    private List<Element> elements = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "bpmnId")

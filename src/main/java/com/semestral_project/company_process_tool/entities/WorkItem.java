@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -39,41 +40,44 @@ public class WorkItem extends Item{
 
     @ManyToOne
     private Project project = null;
+    @JsonIgnore
+    private Long previousId = -1L;
+
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_mandatory_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asMandatoryInput;
+    private List<Task> asMandatoryInput = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_optional_input",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asOptionalInput;
+    private List<Task> asOptionalInput = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_task_output",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asOutput;
+    private List<Task> asOutput = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(name = "work_item_activity_guidance",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asGuidanceWorkItem;
+    private List<Task> asGuidanceWorkItem = new ArrayList<>();
 
     @OneToMany(mappedBy ="relatedWorkItem")
-    private  List<WorkItemRelation> relationsToAnotherWorkItems;
+    private  List<WorkItemRelation> relationsToAnotherWorkItems = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy ="baseWorkItem", cascade = CascadeType.REMOVE)
-    private List<WorkItemRelation> asBase;
+    private List<WorkItemRelation> asBase = new ArrayList<>();
 
     public WorkItem() {
     }
@@ -212,5 +216,13 @@ public class WorkItem extends Item{
 
     public void setAsBase(List<WorkItemRelation> asBase) {
         this.asBase = asBase;
+    }
+
+    public Long getPreviousId() {
+        return previousId;
+    }
+
+    public void setPreviousId(Long previousId) {
+        this.previousId = previousId;
     }
 }

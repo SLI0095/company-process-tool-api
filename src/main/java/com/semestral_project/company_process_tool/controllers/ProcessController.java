@@ -8,6 +8,7 @@ import com.semestral_project.company_process_tool.repositories.ElementRepository
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.services.RasciMatrixService;
+import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -142,6 +143,16 @@ public class ProcessController {
             return ResponseEntity.ok(matrix);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/processes/fromBpmn")
+    public ResponseEntity<ResponseMessage> addProcesFromBPMN(@RequestBody ProcessAndBpmnHolder holder){
+        boolean ret = processService.addProcessFromFile(holder);
+        if(ret){
+            return ResponseEntity.ok(new ResponseMessage("Process added"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
         }
     }
 }

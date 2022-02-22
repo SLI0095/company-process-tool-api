@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -10,7 +11,7 @@ import java.util.List;
 public class Task extends Element{
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
-    private List<TaskStep> steps;
+    private List<TaskStep> steps = new ArrayList<>();
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
     @Column(columnDefinition="LONGTEXT")
@@ -19,19 +20,19 @@ public class Task extends Element{
     private String taskType = "task";
 
     @ManyToMany(mappedBy = "asMandatoryInput")
-    private List<WorkItem> mandatoryInputs;
+    private List<WorkItem> mandatoryInputs = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asOptionalInput")
-    private List<WorkItem> optionalInputs;
+    private List<WorkItem> optionalInputs = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asOutput")
-    private List<WorkItem> outputs;
+    private List<WorkItem> outputs = new ArrayList<>();
 
     @OneToMany(mappedBy = "element", cascade = CascadeType.REMOVE)
-    private List<Rasci> rasciList;
+    private List<Rasci> rasciList = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
-    private List<WorkItem> guidanceWorkItems;
+    private List<WorkItem> guidanceWorkItems = new ArrayList<>();
 
 
 

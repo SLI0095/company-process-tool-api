@@ -15,7 +15,7 @@ public class RoleService {
     @Autowired
     RoleRepository roleRepository;
 
-    private Role fillRole(Role oldRole, Role updateRole){
+    public Role fillRole(Role oldRole, Role updateRole){
         oldRole.setName(updateRole.getName());
         oldRole.setBriefDescription(updateRole.getBriefDescription());
         oldRole.setMainDescription(updateRole.getMainDescription());

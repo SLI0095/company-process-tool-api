@@ -97,12 +97,13 @@ public class BPMNparser {
     private String newWorkItems(String inputXML, Project project){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
             //Check new Artifacts and Documents
-            NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+            NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
             for (int temp = 0; temp < list.getLength(); temp++) {
 
                 Node node = list.item(temp);
@@ -147,12 +148,13 @@ public class BPMNparser {
     private String newProcesses(String inputXML, Project project){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
             //Check new Processes
-            NodeList list = doc.getElementsByTagName("bpmn:callActivity");
+            NodeList list = doc.getElementsByTagNameNS("*", "callActivity");
             for (int temp = 0; temp < list.getLength(); temp++) {
 
                 Node node = list.item(temp);
@@ -187,6 +189,7 @@ public class BPMNparser {
     private String newTasks(String inputXML, Project project){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
@@ -208,7 +211,7 @@ public class BPMNparser {
     }
 
     private String createNewTask(Document doc, String returnXML, String type, Project project){
-        NodeList list = doc.getElementsByTagName("bpmn:" + type);
+        NodeList list = doc.getElementsByTagNameNS("*", type);
         for (int temp = 0; temp < list.getLength(); temp++) {
 
             Node node = list.item(temp);
@@ -238,12 +241,13 @@ public class BPMNparser {
     //@Transactional
     private void updateProcesses(String inputXML, Process process){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
             //Check all Processes - callActivities in BPMN
-            NodeList list = doc.getElementsByTagName("bpmn:callActivity");
+            NodeList list = doc.getElementsByTagNameNS("*","callActivity");
             for (int temp = 0; temp < list.getLength(); temp++) {
 
                 Node node = list.item(temp);
@@ -328,13 +332,14 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
                 boolean saveNeeded = false;
 
                 //Check previous type of task
-                NodeList list = doc.getElementsByTagName("bpmn:callActivity");
+                NodeList list = doc.getElementsByTagNameNS("*","callActivity");
                 for (int temp = 0; temp < list.getLength(); temp++) {
 
                     Node node = list.item(temp);
@@ -373,7 +378,7 @@ public class BPMNparser {
     }
 
     private void makeTaskUpdate(org.w3c.dom.Document doc, Process process, String type){
-        NodeList list = doc.getElementsByTagName("bpmn:" + type);
+        NodeList list = doc.getElementsByTagNameNS("*", type);
         for (int temp = 0; temp < list.getLength(); temp++) {
 
             Node node = list.item(temp);
@@ -418,17 +423,17 @@ public class BPMNparser {
                         }
 
                         //Check added Inputs
-                        NodeList listOfInputs = element.getElementsByTagName("bpmn:dataInputAssociation");
+                        NodeList listOfInputs = element.getElementsByTagNameNS("*","dataInputAssociation");
                         for (int temp2 = 0; temp2 < listOfInputs.getLength(); temp2++) {
 
                             Node node2 = listOfInputs.item(temp2);
 
                             if (node2.getNodeType() == Node.ELEMENT_NODE) {
                                 org.w3c.dom.Element elementInput = (org.w3c.dom.Element) node2;
-                                if(elementInput.getElementsByTagName("bpmn:sourceRef").item(0) == null){
+                                if(elementInput.getElementsByTagNameNS("*","sourceRef").item(0) == null){
                                     continue;
                                 }
-                                String inputId = elementInput.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
+                                String inputId = elementInput.getElementsByTagNameNS("*","sourceRef").item(0).getTextContent();
                                 if (Pattern.matches("WorkItem_([0-9]+)_.*", inputId)) {
                                     Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
                                     Matcher m1 = p1.matcher(inputId);
@@ -457,14 +462,14 @@ public class BPMNparser {
                         }
 
                         //Check added Outputs
-                        NodeList listOfOutputs = element.getElementsByTagName("bpmn:dataOutputAssociation");
+                        NodeList listOfOutputs = element.getElementsByTagNameNS("*","dataOutputAssociation");
                         for (int temp2 = 0; temp2 < listOfOutputs.getLength(); temp2++) {
 
                             Node node2 = listOfOutputs.item(temp2);
 
                             if (node2.getNodeType() == Node.ELEMENT_NODE) {
                                 org.w3c.dom.Element elementOutput = (org.w3c.dom.Element) node2;
-                                String outputId = elementOutput.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
+                                String outputId = elementOutput.getElementsByTagNameNS("*","targetRef").item(0).getTextContent();
 
                                 if (Pattern.matches("WorkItem_([0-9]+)_.*", outputId)) {
                                     Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
@@ -505,6 +510,7 @@ public class BPMNparser {
     //@Transactional
     private void updateTasks(String inputXML, Process process){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
@@ -557,6 +563,7 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
@@ -568,7 +575,7 @@ public class BPMNparser {
                 }
 
                 //Check previous type of task
-                NodeList list = doc.getElementsByTagName("bpmn:" + tagName);
+                NodeList list = doc.getElementsByTagNameNS("*", tagName);
                 for (int temp = 0; temp < list.getLength(); temp++) {
 
                     Node node = list.item(temp);
@@ -612,12 +619,13 @@ public class BPMNparser {
 
     private void updateWorkItems(String inputXML){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
             //Check all workItems - dataObjectReference in BPMN
-            NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+            NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
             for (int temp = 0; temp < list.getLength(); temp++) {
 
                 Node node = list.item(temp);
@@ -683,13 +691,14 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
                 boolean saveNeeded = false;
 
                 //Check all dataObjectReference
-                NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+                NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
                 for (int temp = 0; temp < list.getLength(); temp++) {
 
                     Node node = list.item(temp);
@@ -743,6 +752,7 @@ public class BPMNparser {
 
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             boolean save = false;
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
@@ -750,7 +760,7 @@ public class BPMNparser {
 
                 //Check previous type of task
                 int deletedElements = 0;
-                NodeList list = doc.getElementsByTagName("bpmn:callActivity");
+                NodeList list = doc.getElementsByTagNameNS("*","callActivity");
                 for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
                     Node node = list.item(temp - deletedElements);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -766,7 +776,7 @@ public class BPMNparser {
                                     List<String> allFlowsId = new ArrayList<>();
 
 
-                                    NodeList flows = element.getElementsByTagName("bpmn:incoming"); // all incoming flows
+                                    NodeList flows = element.getElementsByTagNameNS("*","incoming"); // all incoming flows
                                     for (int i = 0; i < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item(i);
@@ -774,7 +784,7 @@ public class BPMNparser {
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
-                                    flows = element.getElementsByTagName("bpmn:outgoing"); // all outgoing flows
+                                    flows = element.getElementsByTagNameNS("*","outgoing"); // all outgoing flows
                                     for (int i = 0; i < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item( i);
@@ -783,7 +793,7 @@ public class BPMNparser {
                                         }
                                     }
                                     int deleteCount = 0;
-                                    flows = doc.getElementsByTagName("bpmn:sequenceFlow");
+                                    flows = doc.getElementsByTagNameNS("*","sequenceFlow");
                                     for (int i = 0; i - deleteCount < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item(i - deleteCount);
@@ -798,7 +808,7 @@ public class BPMNparser {
                                         }
                                     }
                                     deleteCount = 0;
-                                    flows = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    flows = doc.getElementsByTagNameNS("*","BPMNEdge");
                                     for (int i = 0; i - deleteCount < flows.getLength(); i++) {
                                         Node flowNode = flows.item(i - deleteCount);
                                         if (flowNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -812,7 +822,7 @@ public class BPMNparser {
                                         }
                                     }
                                     deleteCount = 0;
-                                    NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
+                                    NodeList shapes = doc.getElementsByTagNameNS("*","BPMNShape");
                                     for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
                                         Node shape = shapes.item(i - deleteCount);
                                         if (shape.getNodeType() == Node.ELEMENT_NODE) {
@@ -864,6 +874,7 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             boolean save = false;
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
@@ -871,7 +882,7 @@ public class BPMNparser {
 
                 //Check previous type of task
                 int deletedElements = 0;
-                NodeList list = doc.getElementsByTagName("bpmn:" + taskToDelete.getTaskType());
+                NodeList list = doc.getElementsByTagNameNS("*", taskToDelete.getTaskType());
                 for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
                     Node node = list.item(temp - deletedElements);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -889,7 +900,7 @@ public class BPMNparser {
                                     List<String> allOutputAssociations = new ArrayList<>();
 
 
-                                    NodeList flows = element.getElementsByTagName("bpmn:incoming"); // all incoming flows
+                                    NodeList flows = element.getElementsByTagNameNS("*","incoming"); // all incoming flows
                                     for (int i = 0; i < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item(i);
@@ -897,7 +908,7 @@ public class BPMNparser {
                                             allFlowsId.add(flowNode.getTextContent());
                                         }
                                     }
-                                    flows = element.getElementsByTagName("bpmn:outgoing"); // all outgoing flows
+                                    flows = element.getElementsByTagNameNS("*","outgoing"); // all outgoing flows
                                     for (int i = 0; i < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item(i);
@@ -906,7 +917,7 @@ public class BPMNparser {
                                         }
                                     }
 
-                                    NodeList associations = element.getElementsByTagName("bpmn:dataInputAssociation");
+                                    NodeList associations = element.getElementsByTagNameNS("*","dataInputAssociation");
                                     for (int i = 0; i < associations.getLength(); i++) {
 
                                         Node assocNode = associations.item(i);
@@ -916,7 +927,7 @@ public class BPMNparser {
                                         }
                                     }
 
-                                    associations = element.getElementsByTagName("bpmn:dataOutputAssociation");
+                                    associations = element.getElementsByTagNameNS("*","dataOutputAssociation");
                                     for (int i = 0; i < associations.getLength(); i++) {
 
                                         Node assocNode = associations.item(i);
@@ -927,7 +938,7 @@ public class BPMNparser {
                                     }
 
                                     int deleteCount = 0;
-                                    flows = doc.getElementsByTagName("bpmn:sequenceFlow");
+                                    flows = doc.getElementsByTagNameNS("*","sequenceFlow");
                                     for (int i = 0; i - deleteCount < flows.getLength(); i++) {
 
                                         Node flowNode = flows.item(i - deleteCount);
@@ -943,7 +954,7 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    NodeList edges = doc.getElementsByTagNameNS("*","BPMNEdge");
                                     for (int i = 0; i - deleteCount < edges.getLength(); i++) {
                                         Node edgeNode = edges.item(i - deleteCount);
                                         if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -965,7 +976,7 @@ public class BPMNparser {
                                         }
                                     }
                                     deleteCount = 0;
-                                    NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
+                                    NodeList shapes = doc.getElementsByTagNameNS("*","BPMNShape");
                                     for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
                                         Node shape = shapes.item(i - deleteCount);
                                         if (shape.getNodeType() == Node.ELEMENT_NODE) {
@@ -1017,6 +1028,7 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             boolean save = false;
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
@@ -1024,7 +1036,7 @@ public class BPMNparser {
 
                 //Check previous type of task
                 int deletedElements = 0;
-                NodeList list = doc.getElementsByTagName("bpmn:" + task.getTaskType());
+                NodeList list = doc.getElementsByTagNameNS("*", task.getTaskType());
                 for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
                     Node node = list.item(temp - deletedElements);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -1040,12 +1052,12 @@ public class BPMNparser {
                                     List<String> allInputAssociations = new ArrayList<>();
 
                                     int deleteCount = 0;
-                                    NodeList associations = element.getElementsByTagName("bpmn:dataInputAssociation");
+                                    NodeList associations = element.getElementsByTagNameNS("*","dataInputAssociation");
                                     for (int i = 0; i - deleteCount < associations.getLength(); i++) {
                                         Node assocNode = associations.item(i - deleteCount);
                                         if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
-                                            String workId = assocElement.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
+                                            String workId = assocElement.getElementsByTagNameNS("*","sourceRef").item(0).getTextContent();
 
                                             if (Pattern.matches("WorkItem_([0-9]+)_.*", workId)) {
                                                 Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
@@ -1066,7 +1078,7 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    NodeList edges = doc.getElementsByTagNameNS("*","BPMNEdge");
                                     for (int i = 0; i - deleteCount < edges.getLength(); i++) {
                                         Node edgeNode = edges.item(i - deleteCount);
                                         if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -1114,6 +1126,7 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             boolean save = false;
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
@@ -1121,7 +1134,7 @@ public class BPMNparser {
 
                 //Check previous type of task
                 int deletedElements = 0;
-                NodeList list = doc.getElementsByTagName("bpmn:" + task.getTaskType());
+                NodeList list = doc.getElementsByTagNameNS("*", task.getTaskType());
                 for (int temp = 0; temp - deletedElements < list.getLength(); temp++) {
                     Node node = list.item(temp - deletedElements);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -1137,12 +1150,12 @@ public class BPMNparser {
                                     List<String> allOutputAssociations = new ArrayList<>();
 
                                     int deleteCount = 0;
-                                    NodeList associations = element.getElementsByTagName("bpmn:dataOutputAssociation");
+                                    NodeList associations = element.getElementsByTagNameNS("*","dataOutputAssociation");
                                     for (int i = 0; i - deleteCount < associations.getLength(); i++) {
                                         Node assocNode = associations.item(i - deleteCount);
                                         if (assocNode.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element assocElement = (org.w3c.dom.Element) assocNode;
-                                            String workId = assocElement.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
+                                            String workId = assocElement.getElementsByTagNameNS("*","targetRef").item(0).getTextContent();
 
                                             if (Pattern.matches("WorkItem_([0-9]+)_.*", workId)) {
                                                 Pattern p1 = Pattern.compile("WorkItem_([0-9]+)_.*");
@@ -1163,7 +1176,7 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    NodeList edges = doc.getElementsByTagNameNS("*","BPMNEdge");
                                     for (int i = 0; i - deleteCount < edges.getLength(); i++) {
                                         Node edgeNode = edges.item(i - deleteCount);
                                         if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -1211,10 +1224,11 @@ public class BPMNparser {
             historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
             try {
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
-                NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+                NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
                 int deletedNodes = 0;
                 System.out.println(list.getLength());
                 for (int temp = 0; temp - deletedNodes < list.getLength(); temp++) {
@@ -1234,7 +1248,7 @@ public class BPMNparser {
                                     List<String> allOutputAssociations = new ArrayList<>();
 
                                     int deleteCount = 0;
-                                    NodeList dataObjects = element.getElementsByTagName("bpmn:dataObject");
+                                    NodeList dataObjects = element.getElementsByTagNameNS("*","dataObject");
                                     for (int i = 0; i - deleteCount < dataObjects.getLength(); i++) {
 
                                         Node dataObject = dataObjects.item(i - deleteCount);
@@ -1249,12 +1263,12 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList inputAssociations = element.getElementsByTagName("bpmn:dataInputAssociation"); // all input associations
+                                    NodeList inputAssociations = element.getElementsByTagNameNS("*","dataInputAssociation"); // all input associations
                                     for (int i = 0; i - deleteCount < inputAssociations.getLength(); i++) {
                                         Node inputAssociation = inputAssociations.item(i - deleteCount);
                                         if (inputAssociation.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element inputAssociationElement = (org.w3c.dom.Element) inputAssociation;
-                                            String workId = inputAssociationElement.getElementsByTagName("bpmn:sourceRef").item(0).getTextContent();
+                                            String workId = inputAssociationElement.getElementsByTagNameNS("*","sourceRef").item(0).getTextContent();
                                             if (workId.equals(workItemId)) {
                                                 allInputAssociations.add(inputAssociationElement.getAttribute("id"));
                                                 Node parent = inputAssociationElement.getParentNode();
@@ -1265,12 +1279,12 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList outputAssociations = element.getElementsByTagName("bpmn:dataOutputAssociation"); // all input associations
+                                    NodeList outputAssociations = element.getElementsByTagNameNS("*","dataOutputAssociation"); // all input associations
                                     for (int i = 0; i - deleteCount < outputAssociations.getLength(); i++) {
                                         Node outputAssociation = outputAssociations.item(i - deleteCount);
                                         if (outputAssociation.getNodeType() == Node.ELEMENT_NODE) {
                                             org.w3c.dom.Element outputAssociationElement = (org.w3c.dom.Element) outputAssociation;
-                                            String workId = outputAssociationElement.getElementsByTagName("bpmn:targetRef").item(0).getTextContent();
+                                            String workId = outputAssociationElement.getElementsByTagNameNS("*","targetRef").item(0).getTextContent();
                                             if (workId.equals(workItemId)) {
                                                 allOutputAssociations.add(outputAssociationElement.getAttribute("id"));
                                                 Node parent = outputAssociationElement.getParentNode();
@@ -1281,7 +1295,7 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList edges = doc.getElementsByTagName("bpmndi:BPMNEdge");
+                                    NodeList edges = doc.getElementsByTagNameNS("*","BPMNEdge");
                                     for (int i = 0; i - deleteCount < edges.getLength(); i++) {
                                         Node edgeNode = edges.item(i - deleteCount);
                                         if (edgeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -1300,7 +1314,7 @@ public class BPMNparser {
                                     }
 
                                     deleteCount = 0;
-                                    NodeList shapes = doc.getElementsByTagName("bpmndi:BPMNShape");
+                                    NodeList shapes = doc.getElementsByTagNameNS("*","BPMNShape");
                                     for (int i = 0; i - deleteCount < shapes.getLength(); i++) {
                                         Node shape = shapes.item(i - deleteCount);
                                         if (shape.getNodeType() == Node.ELEMENT_NODE) {
@@ -1339,12 +1353,13 @@ public class BPMNparser {
 
     public boolean canRestoreBPMN(String xml){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(xml)));
 
             for(String type : bpmnElements){
-                NodeList list = doc.getElementsByTagName("bpmn:" + type);
+                NodeList list = doc.getElementsByTagNameNS("*", type);
                 for (int temp = 0; temp < list.getLength(); temp++) {
                     Node node = list.item(temp);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -1363,7 +1378,7 @@ public class BPMNparser {
                     }
                 }
             }
-            NodeList list = doc.getElementsByTagName("bpmn:dataObjectReference");
+            NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
             for (int temp = 0; temp < list.getLength(); temp++) {
                 Node node = list.item(temp);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -1388,6 +1403,44 @@ public class BPMNparser {
             return false;
         }
         return true;
+    }
+
+    public String prepareImportedFile(String xml){
+        String returnXML = xml;
+
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(xml)));
+
+            for(String type : bpmnElements){
+                NodeList list = doc.getElementsByTagNameNS("*", type);
+                for (int temp = 0; temp < list.getLength(); temp++) {
+                    Node node = list.item(temp);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                        String id = element.getAttribute("id");
+                        returnXML = returnXML.replaceAll(id, "Element_new_" + id);
+                    }
+                }
+            }
+            NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
+            for (int temp = 0; temp < list.getLength(); temp++) {
+                Node node = list.item(temp);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    org.w3c.dom.Element element = (org.w3c.dom.Element) node;
+                    String id = element.getAttribute("id");
+                    returnXML = returnXML.replaceAll(id, "WorkItem_new_" + id);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+        return returnXML;
     }
 
 
