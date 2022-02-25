@@ -1,6 +1,5 @@
 package com.semestral_project.company_process_tool.controllers;
 
-import com.semestral_project.company_process_tool.entities.Document;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.services.ElementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ElementController {
 
     @Autowired

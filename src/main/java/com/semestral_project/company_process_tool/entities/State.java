@@ -10,9 +10,9 @@ public class State {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private long id;
 
-    public String stateName;
+    private String stateName;
     @Column(columnDefinition="LONGTEXT")
     public String stateDescription;
 

@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,15 @@ public class Role extends Item{
             joinColumns = {@JoinColumn(name = "role_id")},
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asAdditionalPerformer;
+
+    @ManyToMany
+    @JoinTable(name = "role_user",
+            joinColumns = {@JoinColumn(name = "role_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> hasAccess = new ArrayList<>();
+
+    @ManyToOne
+    private User owner;
 
 
     @ManyToOne
@@ -106,5 +116,21 @@ public class Role extends Item{
 
     public void setPreviousId(Long previousId) {
         this.previousId = previousId;
+    }
+
+    public List<User> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(List<User> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

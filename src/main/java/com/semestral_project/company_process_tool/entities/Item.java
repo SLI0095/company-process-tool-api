@@ -2,9 +2,10 @@ package com.semestral_project.company_process_tool.entities;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @MappedSuperclass
 public class Item {
@@ -19,6 +20,8 @@ public class Item {
     private LocalDate changeDate;
     @Column(columnDefinition="LONGTEXT")
     private String changeDescription;
+
+
 
     public Item() {
     }

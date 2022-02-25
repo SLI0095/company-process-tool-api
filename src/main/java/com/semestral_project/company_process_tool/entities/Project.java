@@ -25,6 +25,15 @@ public class Project extends Item{
     @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<Role> roles = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "project_user",
+            joinColumns = {@JoinColumn(name = "project_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> hasAccess = new ArrayList<>();
+
+    @ManyToOne
+    private User owner;
+
     public Project() {
     }
 
@@ -58,5 +67,21 @@ public class Project extends Item{
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<User> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(List<User> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

@@ -1,8 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
-import com.semestral_project.company_process_tool.entities.BPMNfile;
-import com.semestral_project.company_process_tool.entities.Element;
-import com.semestral_project.company_process_tool.entities.HistoryBPMN;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
@@ -10,6 +8,7 @@ import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.services.RasciMatrixService;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProcessController {
 
     @Autowired
@@ -52,6 +53,28 @@ public class ProcessController {
             return ResponseEntity.ok(process);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PutMapping("/processes/{id}/addMetric")
+    public ResponseEntity<ResponseMessage> addTaskStep(@PathVariable Long id, @RequestBody ProcessMetric metric){
+        int ret = processService.addMetric(id, metric);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/{id}/removeMetric")
+    public ResponseEntity<ResponseMessage> removeTaskStep(@PathVariable Long id, @RequestBody ProcessMetric metric){
+        int ret = processService.removeMetric(id, metric);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Metric not in process id: " + id));
         }
     }
 

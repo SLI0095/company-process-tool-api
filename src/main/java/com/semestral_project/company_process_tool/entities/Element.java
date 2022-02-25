@@ -23,6 +23,15 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> partOfProcess = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "element_user",
+            joinColumns = {@JoinColumn(name = "element_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> hasAccess = new ArrayList<>();
+
+    @ManyToOne
+    private User owner;
+
     @ManyToOne
     private Project project = null;
 
@@ -63,5 +72,21 @@ public class Element extends Item{
 
     public void setPreviousId(Long previousId) {
         this.previousId = previousId;
+    }
+
+    public List<User> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(List<User> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

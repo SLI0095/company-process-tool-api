@@ -6,6 +6,7 @@ import com.semestral_project.company_process_tool.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,13 +142,17 @@ public class ProjectService {
         return taskRepository.findAllTasksInProject(projectId);
     }
 
+
     private long importingProcess(Project project, Process processTemplate){
+
+        //TODO: fix elements, roles and work items in project not updating
 
         Process newProcess = new Process();
         newProcess = processService.fillProcess(newProcess,processTemplate);
         newProcess.setProject(project);
         newProcess.setPreviousId(processTemplate.getId());
         newProcess = processRepository.save(newProcess);
+        project = projectRepository.findById(project.getId()).get();
         boolean noWorkfow = false;
 
         if(processTemplate.getWorkflow() == null){
@@ -163,6 +168,7 @@ public class ProjectService {
 
         for(Element e : processTemplate.getElements()){
             if(e.getClass() == Task.class){
+                project = projectRepository.findById(project.getId()).get();
                 Task newTask = null;
                 for(Element eInProject : project.getElements()){
                     if(eInProject.getPreviousId() == e.getId()){
@@ -189,6 +195,7 @@ public class ProjectService {
                     //check all inputs of task
                     for (WorkItem w : ((Task) e).getMandatoryInputs()) {
                         WorkItem newWorkItem = null;
+                        project = projectRepository.findById(project.getId()).get();
                         for (WorkItem wInProject : project.getWorkItems()) {
                             if (wInProject.getPreviousId() == w.getId()) {
                                 newWorkItem = wInProject;
@@ -219,6 +226,7 @@ public class ProjectService {
                     //as previous but outputs are imported
                     for (WorkItem w : ((Task) e).getOutputs()) {
                         WorkItem newWorkItem = null;
+                        project = projectRepository.findById(project.getId()).get();
                         for (WorkItem wInProject : project.getWorkItems()) {
                             if (wInProject.getPreviousId() == w.getId()) {
                                 newWorkItem = wInProject;
@@ -244,6 +252,7 @@ public class ProjectService {
                     //as previous but guidance are imported
                     for (WorkItem w : ((Task) e).getGuidanceWorkItems()) {
                         WorkItem newWorkItem = null;
+                        project = projectRepository.findById(project.getId()).get();
                         for (WorkItem wInProject : project.getWorkItems()) {
                             if (wInProject.getPreviousId() == w.getId()) {
                                 newWorkItem = wInProject;
@@ -270,6 +279,7 @@ public class ProjectService {
                     for(Rasci rasci : ((Task) e).getRasciList()){
                         Role newRole = null;
                         Role role = rasci.getRole();
+                        project = projectRepository.findById(project.getId()).get();
                         for (Role rInProject : project.getRoles()) { //check if role is already in project
                             if (rInProject.getPreviousId() == role.getId()) {
                                 newRole = rInProject;

@@ -4,6 +4,7 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
+import com.semestral_project.company_process_tool.repositories.ProcessMetricRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ public class ProcessService {
     BPMNparser bpmnParser;
     @Autowired
     BPMNfileRepository bpmNfileRepository;
+    @Autowired
+    ProcessMetricRepository processMetricRepository;
 
     public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -216,5 +219,42 @@ public class ProcessService {
 
         this.saveWorkflow(newProcess.getId(), newWorkflow);
         return true;
+    }
+
+    public int addMetric(Long id, ProcessMetric metric) {
+        Optional<Process> processData = processRepository.findById(id);
+        if(processData.isPresent()) {
+            Process process_ = processData.get();
+
+            metric.setProcess(process_);
+            processMetricRepository.save(metric);
+
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
+    public int removeMetric(Long id, ProcessMetric metric) {
+        Optional<Process> processData = processRepository.findById(id);
+        if(processData.isPresent()) {
+            Process process_ = processData.get();
+            ProcessMetric metric_ = processMetricRepository.findById(metric.getId()).get();
+            if(metric_.getProcess().getId() == process_.getId())
+            {
+                processMetricRepository.delete(metric_);
+                return 1;
+            }
+            else {
+                return 3;
+            }
+
+        }
+        else
+        {
+            return 2;
+        }
     }
 }

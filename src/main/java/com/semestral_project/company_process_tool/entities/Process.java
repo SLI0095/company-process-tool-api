@@ -33,6 +33,9 @@ public class Process extends Element{
     @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
 
+    @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
+    private List<ProcessMetric> metrics = new ArrayList<>();
+
     public Process() {
     }
 
@@ -106,5 +109,13 @@ public class Process extends Element{
 
     public void setHistoryWorkflow(List<HistoryBPMN> historyWorkflow) {
         this.historyWorkflow = historyWorkflow;
+    }
+
+    public List<ProcessMetric> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<ProcessMetric> metrics) {
+        this.metrics = metrics;
     }
 }

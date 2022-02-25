@@ -39,6 +39,7 @@ public class WorkItemService {
         oldWorkItem.setReasonForNotNeeding(updatedWorkItem.getReasonForNotNeeding());
         oldWorkItem.setWorkItemType(updatedWorkItem.getWorkItemType());
         oldWorkItem.setUrlAddress(updatedWorkItem.getUrlAddress());
+        oldWorkItem.setTemplateText(updatedWorkItem.getTemplateText());
         return oldWorkItem;
     }
 

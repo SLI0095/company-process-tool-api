@@ -38,6 +38,9 @@ public class WorkItem extends Item{
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.REMOVE)
     private  List<State> workItemStates;
 
+    @Column(columnDefinition="LONGTEXT")
+    private String templateText;
+
     @ManyToOne
     private Project project = null;
     @JsonIgnore
@@ -78,6 +81,15 @@ public class WorkItem extends Item{
     @JsonIgnore
     @OneToMany(mappedBy ="baseWorkItem", cascade = CascadeType.REMOVE)
     private List<WorkItemRelation> asBase = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "work_item_user",
+            joinColumns = {@JoinColumn(name = "work_item_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> hasAccess = new ArrayList<>();
+
+    @ManyToOne
+    private User owner;
 
     public WorkItem() {
     }
@@ -224,5 +236,29 @@ public class WorkItem extends Item{
 
     public void setPreviousId(Long previousId) {
         this.previousId = previousId;
+    }
+
+    public List<User> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(List<User> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    public String getTemplateText() {
+        return templateText;
+    }
+
+    public void setTemplateText(String templateText) {
+        this.templateText = templateText;
     }
 }

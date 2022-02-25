@@ -1230,7 +1230,6 @@ public class BPMNparser {
                 org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(XMLFile)));
                 NodeList list = doc.getElementsByTagNameNS("*","dataObjectReference");
                 int deletedNodes = 0;
-                System.out.println(list.getLength());
                 for (int temp = 0; temp - deletedNodes < list.getLength(); temp++) {
                     Node node = list.item(temp - deletedNodes);
                     if (node.getNodeType() == Node.ELEMENT_NODE) {
