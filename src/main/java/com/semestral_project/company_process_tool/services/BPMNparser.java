@@ -44,6 +44,10 @@ public class BPMNparser {
     BPMNfileRepository bpmNfileRepository;
     @Autowired
     HistoryBPMNRepository historyBPMNRepository;
+    @Autowired
+    TaskService taskService;
+    @Autowired
+    ProcessService processService;
 
 
     private  List<Element> inXML;
@@ -72,9 +76,9 @@ public class BPMNparser {
         file.setProcess(process);
         String bpmnContent = file.getBpmnContent();
         Project project = process.getProject();
-        bpmnContent = this.newWorkItems(bpmnContent, project);
-        bpmnContent = this.newProcesses(bpmnContent, project);
-        bpmnContent = this.newTasks(bpmnContent, project);
+        bpmnContent = this.newWorkItems(bpmnContent, project, process);
+        bpmnContent = this.newProcesses(bpmnContent, project, process);
+        bpmnContent = this.newTasks(bpmnContent, project, process);
         file.setProcess(process);
         file.setBpmnContent(bpmnContent);
         file = bpmNfileRepository.save(file);
@@ -94,7 +98,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newWorkItems(String inputXML, Project project){
+    private String newWorkItems(String inputXML, Project project, Process process){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -119,21 +123,15 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
                         w.setProject(project);
+                        w.setCanEdit(process.getCanEdit());
+                        w.setHasAccess(process.getHasAccess());
+                        //TODO add projectOwner as access and processOwner as access, change to call service
+
                         WorkItem savedWorkItem = workItemRepository.save(w);
                         String newId = "WorkItem_" + savedWorkItem.getId() + unchangedId;
 
                         returnXML = returnXML.replaceAll(oldId, newId);
                     }
-
-//                    } if (oldId.contains("Document_new_")) { //Create new Document
-//                        com.semestral_project.company_process_tool.entities.Document d = new com.semestral_project.company_process_tool.entities.Document();
-//                        String unchangedId = oldId.substring(12); //_DataObjectReference_....
-//                        d.setName(name);
-//                        com.semestral_project.company_process_tool.entities.Document savedDocument = documentRepository.save(d);
-//                        String newId = "Document_" + savedDocument.getId() + unchangedId;
-//
-//                        returnXML = returnXML.replaceAll(oldId, newId);
-//                    }
                 }
             }
 
@@ -145,7 +143,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newProcesses(String inputXML, Project project){
+    private String newProcesses(String inputXML, Project project, Process process){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -170,6 +168,8 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
                         p.setProject(project);
+                        p.setCanEdit(process.getCanEdit());
+                        p.setHasAccess(process.getHasAccess());
                         Process savedProcess = processRepository.save(p);
                         String newId = "Element_" + savedProcess.getId() + unchangedId;
 
@@ -186,7 +186,7 @@ public class BPMNparser {
         }
     }
 
-    private String newTasks(String inputXML, Project project){
+    private String newTasks(String inputXML, Project project, Process process){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -194,14 +194,14 @@ public class BPMNparser {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
-            returnXML = createNewTask(doc, returnXML, "task", project);
-            returnXML = createNewTask(doc, returnXML, "sendTask", project);
-            returnXML = createNewTask(doc, returnXML, "receiveTask", project);
-            returnXML = createNewTask(doc, returnXML, "userTask", project);
-            returnXML = createNewTask(doc, returnXML, "manualTask", project);
-            returnXML = createNewTask(doc, returnXML, "serviceTask", project);
-            returnXML = createNewTask(doc, returnXML, "scriptTask", project);
-            returnXML = createNewTask(doc, returnXML, "businessRuleTask", project);
+            returnXML = createNewTask(doc, returnXML, "task", project, process);
+            returnXML = createNewTask(doc, returnXML, "sendTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "receiveTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "userTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "manualTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "serviceTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "scriptTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "businessRuleTask", project, process);
 
             return returnXML;
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -210,7 +210,7 @@ public class BPMNparser {
         }
     }
 
-    private String createNewTask(Document doc, String returnXML, String type, Project project){
+    private String createNewTask(Document doc, String returnXML, String type, Project project, Process process){
         NodeList list = doc.getElementsByTagNameNS("*", type);
         for (int temp = 0; temp < list.getLength(); temp++) {
 
@@ -228,6 +228,8 @@ public class BPMNparser {
                     t.setName(name);
                     t.setTaskType(type);
                     t.setProject(project);
+                    t.setCanEdit(process.getCanEdit());
+                    t.setHasAccess(process.getHasAccess());
                     Task savedTask = taskRepository.save(t);
                     String newId = "Element_" + savedTask.getId() + unchangedId;
 
@@ -273,15 +275,18 @@ public class BPMNparser {
                                 needToSave = true;
                                 nameChanged = true;
                             }
-                            var isPartOf = process1.getPartOfProcess();
-                            if(isPartOf == null){
-                                isPartOf = new ArrayList<>();
-                            }
-                            if(!isPartOf.contains(process)){ //Check if is sub process already part of Process
-                                isPartOf.add(process);
-                                process1.setPartOfProcess(isPartOf);
-                                needToSave = true;
-                            }
+
+                            processService.addElementToProcess(process.getId(),process1);
+
+//                            var isPartOf = process1.getPartOfProcess();
+//                            if(isPartOf == null){
+//                                isPartOf = new ArrayList<>();
+//                            }
+//                            if(!isPartOf.contains(process)){ //Check if is sub process already part of Process
+//                                isPartOf.add(process);
+//                                process1.setPartOfProcess(isPartOf);
+//                                needToSave = true;
+//                            }
                             if(needToSave){
                                 elementRepository.save(process1);
                             }
@@ -412,15 +417,18 @@ public class BPMNparser {
                             needToSave = true;
                             typeChanged = true;
                         }
-                        var isPartOf = task1.getPartOfProcess();
-                        if(isPartOf == null){
-                            isPartOf = new ArrayList<>();
-                        }
-                        if(!isPartOf.contains(process)){ //Check if task already part of Process
-                            isPartOf.add(process);
-                            task1.setPartOfProcess(isPartOf);
-                            needToSave = true;
-                        }
+
+                        processService.addElementToProcess(process.getId(), task1);
+
+//                        var isPartOf = task1.getPartOfProcess();
+//                        if(isPartOf == null){
+//                            isPartOf = new ArrayList<>();
+//                        }
+//                        if(!isPartOf.contains(process)){ //Check if task already part of Process
+//                            isPartOf.add(process);
+//                            task1.setPartOfProcess(isPartOf);
+//                            needToSave = true;
+//                        }
 
                         //Check added Inputs
                         NodeList listOfInputs = element.getElementsByTagNameNS("*","dataInputAssociation");
@@ -442,20 +450,20 @@ public class BPMNparser {
                                         long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
-                                        List<WorkItem> inputList = task1.getMandatoryInputs();
-                                        if(inputList == null){
-                                            inputList = new ArrayList<>();
-                                        }
-                                        if (!inputList.contains(workItem)) {
-                                            List<Task> tasksList = workItem.getAsMandatoryInput();
-                                            if(tasksList == null){
-                                                tasksList = new ArrayList<>();
-                                            }
-                                            tasksList.add(task1);
-                                            workItem.setAsMandatoryInput(tasksList);
-                                            workItemRepository.save(workItem);
-                                        }
-
+                                        taskService.addMandatoryInput(task1.getId(), workItem);
+//                                        List<WorkItem> inputList = task1.getMandatoryInputs();
+//                                        if(inputList == null){
+//                                            inputList = new ArrayList<>();
+//                                        }
+//                                        if (!inputList.contains(workItem)) {
+//                                            List<Task> tasksList = workItem.getAsMandatoryInput();
+//                                            if(tasksList == null){
+//                                                tasksList = new ArrayList<>();
+//                                            }
+//                                            tasksList.add(task1);
+//                                            workItem.setAsMandatoryInput(tasksList);
+//                                            workItemRepository.save(workItem);
+//                                        }
                                     }
                                 }
                             }
@@ -479,19 +487,21 @@ public class BPMNparser {
                                         long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
-                                        List<WorkItem> outputList = task1.getOutputs();
-                                        if(outputList == null){
-                                            outputList = new ArrayList<>();
-                                        }
-                                        if (!outputList.contains(workItem)) {
-                                            List<Task> tasksList = workItem.getAsOutput();
-                                            if(tasksList == null){
-                                                tasksList = new ArrayList<>();
-                                            }
-                                            tasksList.add(task1);
-                                            workItem.setAsOutput(tasksList);
-                                            workItemRepository.save(workItem);
-                                        }
+                                        taskService.addOutput(task1.getId(), workItem);
+
+//                                        List<WorkItem> outputList = task1.getOutputs();
+//                                        if(outputList == null){
+//                                            outputList = new ArrayList<>();
+//                                        }
+//                                        if (!outputList.contains(workItem)) {
+//                                            List<Task> tasksList = workItem.getAsOutput();
+//                                            if(tasksList == null){
+//                                                tasksList = new ArrayList<>();
+//                                            }
+//                                            tasksList.add(task1);
+//                                            workItem.setAsOutput(tasksList);
+//                                            workItemRepository.save(workItem);
+//                                        }
                                     }
                                 }
                             }

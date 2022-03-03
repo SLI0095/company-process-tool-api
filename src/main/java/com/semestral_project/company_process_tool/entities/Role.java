@@ -36,13 +36,16 @@ public class Role extends Item{
     private List<Task> asAdditionalPerformer;
 
     @ManyToMany
-    @JoinTable(name = "role_user",
+    @JoinTable(name = "role_user_access",
             joinColumns = {@JoinColumn(name = "role_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> hasAccess = new ArrayList<>();
 
-    @ManyToOne
-    private User owner;
+    @ManyToMany
+    @JoinTable(name = "role_user_edit",
+            joinColumns = {@JoinColumn(name = "role_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> canEdit = new ArrayList<>();
 
 
     @ManyToOne
@@ -126,11 +129,11 @@ public class Role extends Item{
         this.hasAccess = hasAccess;
     }
 
-    public User getOwner() {
-        return owner;
+    public List<User> getCanEdit() {
+        return canEdit;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setCanEdit(List<User> canEdit) {
+        this.canEdit = canEdit;
     }
 }

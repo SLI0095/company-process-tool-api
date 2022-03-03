@@ -14,26 +14,26 @@ public class User {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.DETACH)
-    private List<Element> asOwnerElements = new ArrayList<>();
+    @ManyToMany(mappedBy = "canEdit")
+    private List<Element> canEditElements = new ArrayList<>();
 
     @ManyToMany(mappedBy = "hasAccess")
     private List<Element> hasAccessElements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.DETACH)
-    private List<Project> asOwnerProjects = new ArrayList<>();
+    @ManyToMany(mappedBy = "canEdit")
+    private List<Project> canEditProjects = new ArrayList<>();
 
     @ManyToMany(mappedBy = "hasAccess")
     private List<Project> hasAccessProjects = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.DETACH)
-    private List<Role> asOwnerRoles = new ArrayList<>();
+    @ManyToMany(mappedBy = "canEdit")
+    private List<Role> canEditRoles = new ArrayList<>();
 
     @ManyToMany(mappedBy = "hasAccess")
     private List<Role> hasAccessRoles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.DETACH)
-    private List<WorkItem> asOwnerWorkItems = new ArrayList<>();
+    @ManyToMany(mappedBy = "canEdit")
+    private List<WorkItem> canEditWorkItems = new ArrayList<>();
 
     @ManyToMany(mappedBy = "hasAccess")
     private List<WorkItem> hasAccessWorkItems = new ArrayList<>();
@@ -65,28 +65,12 @@ public class User {
         this.password = password;
     }
 
-    public List<Element> getAsOwnerElements() {
-        return asOwnerElements;
-    }
-
-    public void setAsOwnerElements(List<Element> asOwnerElements) {
-        this.asOwnerElements = asOwnerElements;
-    }
-
     public List<Element> getHasAccessElements() {
         return hasAccessElements;
     }
 
     public void setHasAccessElements(List<Element> hasAccessElements) {
         this.hasAccessElements = hasAccessElements;
-    }
-
-    public List<Project> getAsOwnerProjects() {
-        return asOwnerProjects;
-    }
-
-    public void setAsOwnerProjects(List<Project> asOwnerProjects) {
-        this.asOwnerProjects = asOwnerProjects;
     }
 
     public List<Project> getHasAccessProjects() {
@@ -97,14 +81,6 @@ public class User {
         this.hasAccessProjects = hasAccessProjects;
     }
 
-    public List<Role> getAsOwnerRoles() {
-        return asOwnerRoles;
-    }
-
-    public void setAsOwnerRoles(List<Role> asOwnerRoles) {
-        this.asOwnerRoles = asOwnerRoles;
-    }
-
     public List<Role> getHasAccessRoles() {
         return hasAccessRoles;
     }
@@ -113,19 +89,43 @@ public class User {
         this.hasAccessRoles = hasAccessRoles;
     }
 
-    public List<WorkItem> getAsOwnerWorkItems() {
-        return asOwnerWorkItems;
-    }
-
-    public void setAsOwnerWorkItems(List<WorkItem> asOwnerWorkItems) {
-        this.asOwnerWorkItems = asOwnerWorkItems;
-    }
-
     public List<WorkItem> getHasAccessWorkItems() {
         return hasAccessWorkItems;
     }
 
     public void setHasAccessWorkItems(List<WorkItem> hasAccessWorkItems) {
         this.hasAccessWorkItems = hasAccessWorkItems;
+    }
+
+    public List<Element> getCanEditElements() {
+        return canEditElements;
+    }
+
+    public void setCanEditElements(List<Element> canEditElements) {
+        this.canEditElements = canEditElements;
+    }
+
+    public List<Project> getCanEditProjects() {
+        return canEditProjects;
+    }
+
+    public void setCanEditProjects(List<Project> canEditProjects) {
+        this.canEditProjects = canEditProjects;
+    }
+
+    public List<Role> getCanEditRoles() {
+        return canEditRoles;
+    }
+
+    public void setCanEditRoles(List<Role> canEditRoles) {
+        this.canEditRoles = canEditRoles;
+    }
+
+    public List<WorkItem> getCanEditWorkItems() {
+        return canEditWorkItems;
+    }
+
+    public void setCanEditWorkItems(List<WorkItem> canEditWorkItems) {
+        this.canEditWorkItems = canEditWorkItems;
     }
 }

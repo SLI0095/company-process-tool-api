@@ -1,8 +1,8 @@
 package com.semestral_project.company_process_tool.services;
 
-import com.semestral_project.company_process_tool.entities.Role;
-import com.semestral_project.company_process_tool.entities.WorkItem;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
+import com.semestral_project.company_process_tool.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +14,12 @@ public class RoleService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ProjectService projectService;
 
     public Role fillRole(Role oldRole, Role updateRole){
         oldRole.setName(updateRole.getName());
@@ -45,25 +51,152 @@ public class RoleService {
         else return null;
     }
 
-    public boolean addRole(Role role){
+    public long addRole(Role role, long userId){
         try {
-            roleRepository.save(role);
-            return true;
+            if(userRepository.existsById(userId)) {
+                User user = userRepository.findById(userId).get();
+                if(role.getProject() != null){
+                    Project project = projectService.getProjectById(role.getProject().getId());
+                    if(project.getCanEdit().contains(user)){
+                        var list = role.getCanEdit();
+                        list.add(user);
+                        role = roleRepository.save(role);
+                        return role.getId();
+                    } else {
+                        return -1;
+                    }
+                }
+                var list = role.getCanEdit();
+                list.add(user);
+                role = roleRepository.save(role);
+                return role.getId();
+            }
+            else return -1;
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return false;
+            return -1;
         }
-
     }
 
-    public int updateRole(long id, Role role){
+    public int addAccess(long roleId, long whoEdits, User getAccess){
+        Optional<Role> roleData = roleRepository.findById(roleId);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                User getAccess_ = userRepository.findById(getAccess.getId()).get();
+                if(role_.getCanEdit().contains(getAccess_)){
+                    return 4; //already can edit
+                } else if(role_.getHasAccess().contains(getAccess_)) {
+                    return 3; //already has access
+                } else{
+                    var list = role_.getHasAccess();
+                    list.add(getAccess_);
+                    role_.setHasAccess(list);
+                    roleRepository.save(role_);
+                    return 1; //OK
+                }
+            }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int removeAccess(long roleId, long whoEdits, User removeAccess){
+        Optional<Role> roleData = roleRepository.findById(roleId);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                User getAccess_ = userRepository.findById(removeAccess.getId()).get();
+                if(role_.getHasAccess().contains(getAccess_)) {
+                    var list = role_.getHasAccess();
+                    list.remove(getAccess_);
+                    role_.setHasAccess(list);
+                    roleRepository.save(role_);
+                    return 1; //access removed
+                } else{
+                    return 3; //nothing to remove
+                }
+            }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int removeEdit(long roleId, long whoEdits, User removeEdit){
+        Optional<Role> roleData = roleRepository.findById(roleId);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
+                if(role_.getCanEdit().contains(removeEdit_)) {
+                    var list = role_.getCanEdit();
+                    list.remove(removeEdit_);
+                    role_.setCanEdit(list);
+                    roleRepository.save(role_);
+                    return 1; //edit removed
+                } else{
+                    return 3; //nothing to remove
+                }
+            }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int addEdit(long roleId, long whoEdits, User getEdit){
+        Optional<Role> roleData = roleRepository.findById(roleId);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                User getEdit_ = userRepository.findById(getEdit.getId()).get();
+                if(role_.getCanEdit().contains(getEdit_)){
+                    return 4; //already can edit
+                } else if(role_.getHasAccess().contains(getEdit_)) {
+                    var list = role_.getHasAccess();
+                    list.remove(getEdit_);
+                    role_.setHasAccess(list);
+                    list = role_.getCanEdit();
+                    list.add(getEdit_);
+                    role_.setCanEdit(list);
+                    roleRepository.save(role_);
+                    return 1; //OK
+                } else{
+                    var list = role_.getCanEdit();
+                    list.add(getEdit_);
+                    role_.setCanEdit(list);
+                    roleRepository.save(role_);
+                    return 1; //OK
+                }
+            }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int updateRole(long id, Role role, long whoEdits){
         Optional<Role> roleData = roleRepository.findById(id);
         if(roleData.isPresent()) {
             Role role_ = roleData.get();
-            role_ = fillRole(role_, role);
-
-            roleRepository.save(role_);
-            return 1;
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                role_ = fillRole(role_, role);
+                roleRepository.save(role_);
+                return 1;
+            } else {
+                return 3; //cannot edit
+            }
         }
         else
         {
@@ -71,18 +204,30 @@ public class RoleService {
         }
     }
 
-    public boolean removeRoleById(long id){
-        try {
-            roleRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
+    public int removeRoleById(long id, long whoEdits){
+        Optional<Role> roleData = roleRepository.findById(id);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                roleRepository.delete(role_);
+                return 1;
+            } else {
+                return 3; //cannot edit
+            }
+        }
+        else
+        {
+            return 2; //role not found
         }
     }
 
-    public List<Role> getAllTemplates(){
-        List<Role> allTemplates = roleRepository.findAllRolesTemplates();
-        return allTemplates;
+    public List<Role> getAllTemplatesForUser(long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            List<Role> allTemplates = roleRepository.findAllRolesTemplatesForUser(user);
+            return allTemplates;
+        }
+        else return null;
     }
 }

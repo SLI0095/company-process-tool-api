@@ -22,4 +22,8 @@ public class CompanyProcessToolApplication {
         SpringApplication.run(CompanyProcessToolApplication.class, args);
     }
 
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

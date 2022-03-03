@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.State;
+import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
+import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ public class StateService {
 
     @Autowired
     StateRepository stateRepository;
+    @Autowired
+    UserRepository userRepository;
 
     public List<State> getAllStates(){
         try {
@@ -43,16 +47,20 @@ public class StateService {
         else return null;
     }
 
-    public int updateState(long id, State state){
+    public int updateState(long id, State state, long whoEdits){
         Optional<State> stateData = stateRepository.findById(id);
 
         if(stateData.isPresent()){
             State state_ = stateData.get();
-            state_.setStateName(state.getStateName());
-            state_.setStateDescription(state.getStateDescription());
+            User whoEdits_ = userRepository.findById(whoEdits).get();
+            if(state_.getWorkItem().getCanEdit().contains(whoEdits_)) {
+                state_.setStateName(state.getStateName());
+                state_.setStateDescription(state.getStateDescription());
 
-            stateRepository.save(state_);
-            return 1;
+                stateRepository.save(state_);
+                return 1;
+            }
+            return 3;
         }
         else
         {

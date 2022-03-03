@@ -14,25 +14,28 @@ public class Project extends Item{
     private long id;
 
     @JsonIgnore
-    @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Element> elements = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkItem> workItems = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy ="project", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Role> roles = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "project_user",
+    @JoinTable(name = "project_user_access",
             joinColumns = {@JoinColumn(name = "project_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> hasAccess = new ArrayList<>();
 
-    @ManyToOne
-    private User owner;
+    @ManyToMany
+    @JoinTable(name = "project_user_edit",
+            joinColumns = {@JoinColumn(name = "project_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> canEdit = new ArrayList<>();
 
     public Project() {
     }
@@ -77,11 +80,11 @@ public class Project extends Item{
         this.hasAccess = hasAccess;
     }
 
-    public User getOwner() {
-        return owner;
+    public List<User> getCanEdit() {
+        return canEdit;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setCanEdit(List<User> canEdit) {
+        this.canEdit = canEdit;
     }
 }

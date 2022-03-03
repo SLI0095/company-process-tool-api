@@ -24,13 +24,16 @@ public class Element extends Item{
     private List<Process> partOfProcess = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "element_user",
+    @JoinTable(name = "element_user_access",
             joinColumns = {@JoinColumn(name = "element_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> hasAccess = new ArrayList<>();
 
-    @ManyToOne
-    private User owner;
+    @ManyToMany
+    @JoinTable(name = "element_user_edit",
+            joinColumns = {@JoinColumn(name = "element_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> canEdit = new ArrayList<>();
 
     @ManyToOne
     private Project project = null;
@@ -82,11 +85,11 @@ public class Element extends Item{
         this.hasAccess = hasAccess;
     }
 
-    public User getOwner() {
-        return owner;
+    public List<User> getCanEdit() {
+        return canEdit;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setCanEdit(List<User> canEdit) {
+        this.canEdit = canEdit;
     }
 }

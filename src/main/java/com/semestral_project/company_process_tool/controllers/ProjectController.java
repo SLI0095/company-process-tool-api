@@ -38,8 +38,8 @@ public class ProjectController {
     }
 
     @PostMapping("/projects")
-    public ResponseEntity<ResponseMessage> addProject(@RequestBody Project project){
-        boolean ret = projectService.addProject(project);
+    public ResponseEntity<ResponseMessage> addProject(@RequestBody Project project, @RequestParam long userId){
+        boolean ret = projectService.addProject(project, userId);
         if(ret){
             return ResponseEntity.ok(new ResponseMessage("Project added"));
         } else {

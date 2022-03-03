@@ -83,13 +83,16 @@ public class WorkItem extends Item{
     private List<WorkItemRelation> asBase = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "work_item_user",
+    @JoinTable(name = "work_item_user_access",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> hasAccess = new ArrayList<>();
 
-    @ManyToOne
-    private User owner;
+    @ManyToMany
+    @JoinTable(name = "work_item_user_edit",
+            joinColumns = {@JoinColumn(name = "work_item_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<User> canEdit = new ArrayList<>();
 
     public WorkItem() {
     }
@@ -246,19 +249,19 @@ public class WorkItem extends Item{
         this.hasAccess = hasAccess;
     }
 
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
     public String getTemplateText() {
         return templateText;
     }
 
     public void setTemplateText(String templateText) {
         this.templateText = templateText;
+    }
+
+    public List<User> getCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(List<User> canEdit) {
+        this.canEdit = canEdit;
     }
 }
