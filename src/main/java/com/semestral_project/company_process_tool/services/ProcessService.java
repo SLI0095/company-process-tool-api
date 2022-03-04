@@ -114,25 +114,28 @@ public class ProcessService {
             User whoEdits_ = userRepository.findById(whoEdits).get();
             if(process_.getCanEdit().contains(whoEdits_)){
                 User getAccess_ = userRepository.findById(getAccess.getId()).get();
-                if(process_.getCanEdit().contains(getAccess_)){
-                    return 4; //already can edit
-                } else if(process_.getHasAccess().contains(getAccess_)) {
+                if(process_.getHasAccess().contains(getAccess_)) {
                     return 3; //already has access
-                } else{
-                    var list = process_.getHasAccess();
-                    list.add(getAccess_);
-                    process_.setHasAccess(list);
-                    processRepository.save(process_);
-                    for(Element e : process_.getElements())
-                    {
-                        if(e.getClass() == Task.class){
-                            taskService.addEdit(e.getId(), whoEdits_.getId(),getAccess);
-                        } else {
-                            this.addEdit(e.getId(),whoEdits_.getId(), getAccess); //
-                        }
-                    }
-                    return 1; //OK
                 }
+                if(process_.getCanEdit().contains(getAccess_)){
+                    var list = process_.getCanEdit();
+                    list.remove(getAccess_);
+                    process_.setCanEdit(list);
+                }
+                var list = process_.getHasAccess();
+                list.add(getAccess_);
+                process_.setHasAccess(list);
+                processRepository.save(process_);
+                for(Element e : process_.getElements())
+                {
+                    if(e.getClass() == Task.class){
+                        taskService.addAccess(e.getId(), whoEdits_.getId(),getAccess);
+                    } else {
+                        this.addAccess(e.getId(),whoEdits_.getId(), getAccess); //
+                    }
+                }
+                return 1; //OK
+
             }else return 5; //cannot edit
         }
         else
@@ -198,30 +201,25 @@ public class ProcessService {
                 User getEdit_ = userRepository.findById(getEdit.getId()).get();
                 if(process_.getCanEdit().contains(getEdit_)){
                     return 4; //already can edit
-                } else if(process_.getHasAccess().contains(getEdit_)) {
+                } if(process_.getHasAccess().contains(getEdit_)) {
                     var list = process_.getHasAccess();
                     list.remove(getEdit_);
                     process_.setHasAccess(list);
-                    list = process_.getCanEdit();
-                    list.add(getEdit_);
-                    process_.setCanEdit(list);
-                    processRepository.save(process_);
-                    for(Element e : process_.getElements())
-                    {
-                        if(e.getClass() == Task.class){
-                            taskService.addEdit(e.getId(), whoEdits_.getId(),getEdit);
-                        } else {
-                            this.addEdit(e.getId(),whoEdits_.getId(), getEdit); //
-                        }
-                    }
-                    return 1; //OK
-                } else{
-                    var list = process_.getCanEdit();
-                    list.add(getEdit_);
-                    process_.setCanEdit(list);
-                    processRepository.save(process_);
-                    return 1; //OK
                 }
+                var list = process_.getCanEdit();
+                list.add(getEdit_);
+                process_.setCanEdit(list);
+                processRepository.save(process_);
+                for(Element e : process_.getElements())
+                {
+                    if(e.getClass() == Task.class){
+                        taskService.addEdit(e.getId(), whoEdits_.getId(),getEdit);
+                    } else {
+                        this.addEdit(e.getId(),whoEdits_.getId(), getEdit); //
+                    }
+                }
+                    return 1; //OK
+
             }else return 5; //cannot edit
         }
         else
@@ -229,6 +227,73 @@ public class ProcessService {
             return 2; //role not found
         }
     }
+
+    public int addEditAutomatic(long processId, User getEdit){
+        Optional<Process> processData = processRepository.findById(processId);
+        if(processData.isPresent()) {
+            Process process_ = processData.get();
+            User getEdit_ = userRepository.findById(getEdit.getId()).get();
+            if (process_.getCanEdit().contains(getEdit_)) {
+                return 4; //already can edit
+            }
+            if (process_.getHasAccess().contains(getEdit_)) {
+                var list = process_.getHasAccess();
+                list.remove(getEdit_);
+                process_.setHasAccess(list);
+            }
+            var list = process_.getCanEdit();
+            list.add(getEdit_);
+            process_.setCanEdit(list);
+            processRepository.save(process_);
+            for (Element e : process_.getElements()) {
+                if (e.getClass() == Task.class) {
+                    taskService.addEditAutomatic(e.getId(), getEdit);
+                } else {
+                    this.addEditAutomatic(e.getId(), getEdit);
+                }
+            }
+            return 1; //OK
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int addAccessAutomatic(long processId, User getAccess){
+        Optional<Process> processData = processRepository.findById(processId);
+        if(processData.isPresent()) {
+            Process process_ = processData.get();
+
+            User getAccess_ = userRepository.findById(getAccess.getId()).get();
+            if (process_.getHasAccess().contains(getAccess_)) {
+                return 3; //already has access
+            }
+            if (process_.getCanEdit().contains(getAccess_)) {
+                var list = process_.getCanEdit();
+                list.remove(getAccess_);
+                process_.setCanEdit(list);
+            }
+            var list = process_.getHasAccess();
+            list.add(getAccess_);
+            process_.setHasAccess(list);
+            processRepository.save(process_);
+            for (Element e : process_.getElements()) {
+                if (e.getClass() == Task.class) {
+                    taskService.addAccessAutomatic(e.getId(), getAccess);
+                } else {
+                    this.addAccessAutomatic(e.getId(), getAccess); //
+                }
+            }
+            return 1; //OK
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+
 
     public int deleteProcessById(long id, long whoEdits){
         Optional<Process> processData = processRepository.findById(id);
@@ -274,10 +339,22 @@ public class ProcessService {
             }
             elementList.add(element_);
             process_.setElements(elementList);
-
-            //TODO add access and edit from process to element
-
             processRepository.save(process_);
+            //add access and edit from process to element
+            for(User u : process_.getCanEdit()){
+                if(element_.getClass() == Task.class){
+                    taskService.addEditAutomatic(element_.getId(), u);
+                } else {
+                    this.addEditAutomatic(element_.getId(), u);
+                }
+            }
+            for(User u : process_.getHasAccess()){
+                if(element_.getClass() == Task.class){
+                    taskService.addAccessAutomatic(element_.getId(), u);
+                } else {
+                    this.addAccessAutomatic(element_.getId(), u);
+                }
+            }
             return 1;
         }
         else

@@ -90,18 +90,47 @@ public class TaskService {
             User whoEdits_ = userRepository.findById(whoEdits).get();
             if(task_.getCanEdit().contains(whoEdits_)){
                 User getAccess_ = userRepository.findById(getAccess.getId()).get();
-                if(task_.getCanEdit().contains(getAccess_)){
-                    return 4; //already can edit
-                } else if(task_.getHasAccess().contains(getAccess_)) {
+                if(task_.getHasAccess().contains(getAccess_)) {
                     return 3; //already has access
-                } else{
+                }
+                if(task_.getCanEdit().contains(getAccess_)){
+                    var list = task_.getCanEdit();
+                    list.remove(getAccess_);
+                    task_.setCanEdit(list);
+                }
                     var list = task_.getHasAccess();
                     list.add(getAccess_);
                     task_.setHasAccess(list);
                     taskRepository.save(task_);
                     return 1; //OK
-                }
             }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+
+    public int addAccessAutomatic(long taskId, User getAccess){
+        Optional<Task> taskData = taskRepository.findById(taskId);
+        if(taskData.isPresent()) {
+            Task task_ = taskData.get();
+
+            User getAccess_ = userRepository.findById(getAccess.getId()).get();
+            if (task_.getHasAccess().contains(getAccess_)) {
+                return 3; //already has access
+            }
+            if (task_.getCanEdit().contains(getAccess_)) {
+                var list = task_.getCanEdit();
+                list.remove(getAccess_);
+                task_.setCanEdit(list);
+            }
+            var list = task_.getHasAccess();
+            list.add(getAccess_);
+            task_.setHasAccess(list);
+            taskRepository.save(task_);
+            return 1; //OK
         }
         else
         {
@@ -183,6 +212,36 @@ public class TaskService {
                     return 1; //OK
                 }
             }else return 5; //cannot edit
+        }
+        else
+        {
+            return 2; //role not found
+        }
+    }
+
+    public int addEditAutomatic(long taskId, User getEdit){
+        Optional<Task> taskData = taskRepository.findById(taskId);
+        if(taskData.isPresent()) {
+            Task task_ = taskData.get();
+            User getEdit_ = userRepository.findById(getEdit.getId()).get();
+            if (task_.getCanEdit().contains(getEdit_)) {
+                return 4; //already can edit
+            } else if (task_.getHasAccess().contains(getEdit_)) {
+                var list = task_.getHasAccess();
+                list.remove(getEdit_);
+                task_.setHasAccess(list);
+                list = task_.getCanEdit();
+                list.add(getEdit_);
+                task_.setCanEdit(list);
+                taskRepository.save(task_);
+                return 1; //OK
+            } else {
+                var list = task_.getCanEdit();
+                list.add(getEdit_);
+                task_.setCanEdit(list);
+                taskRepository.save(task_);
+                return 1; //OK
+            }
         }
         else
         {
@@ -416,6 +475,27 @@ public class TaskService {
         }
     }
 
+    public int addMandatoryInputWithoutUser(long id, WorkItem workItem) {
+        Optional<Task> taskData = taskRepository.findById(id);
+        if (taskData.isPresent()) {
+            Task task_ = taskData.get();
+            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+
+            List<WorkItem> inputList = task_.getMandatoryInputs();
+            if (inputList.contains(item_)) {
+                return 4;
+            }
+            List<Task> tasksList = item_.getAsMandatoryInput();
+            tasksList.add(task_);
+            item_.setAsMandatoryInput(tasksList);
+            workItemRepository.save(item_);
+            return 1;
+
+        } else {
+            return 2;
+        }
+    }
+
     public int removeMandatoryInput(long id, WorkItem workItem, long whoEdits){
         Optional<Task> taskData = taskRepository.findById(id);
         if(taskData.isPresent()) {
@@ -517,6 +597,28 @@ public class TaskService {
                 return 1;
             }
             return 3;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+
+    public int addOutputWithoutUser(long id, WorkItem workItem){
+        Optional<Task> taskData = taskRepository.findById(id);
+        if(taskData.isPresent()) {
+            Task task_ = taskData.get();
+            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+
+            List<WorkItem> outputList = task_.getOutputs();
+            if (outputList.contains(item_)) {
+                return 4;
+            }
+            List<Task> tasksList = item_.getAsOutput();
+            tasksList.add(task_);
+            item_.setAsOutput(tasksList);
+            workItemRepository.save(item_);
+            return 1;
         }
         else
         {

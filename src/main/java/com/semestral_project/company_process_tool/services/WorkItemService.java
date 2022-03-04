@@ -242,17 +242,20 @@ public class WorkItemService {
             User whoEdits_ = userRepository.findById(whoEdits).get();
             if(workItem_.getCanEdit().contains(whoEdits_)){
                 User getAccess_ = userRepository.findById(getAccess.getId()).get();
-                if(workItem_.getCanEdit().contains(getAccess_)){
-                    return 4; //already can edit
-                } else if(workItem_.getHasAccess().contains(getAccess_)) {
+                if(workItem_.getHasAccess().contains(getAccess_)) {
                     return 3; //already has access
-                } else{
+                }
+                if(workItem_.getCanEdit().contains(getAccess_)){
+                    var list = workItem_.getCanEdit();
+                    list.remove(getAccess_);
+                    workItem_.setCanEdit(list);
+                }
                     var list = workItem_.getHasAccess();
                     list.add(getAccess_);
                     workItem_.setHasAccess(list);
                     workItemRepository.save(workItem_);
                     return 1; //OK
-                }
+
             }else return 5; //cannot edit
         }
         else

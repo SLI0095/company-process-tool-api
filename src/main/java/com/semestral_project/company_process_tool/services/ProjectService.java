@@ -150,17 +150,20 @@ public class ProjectService {
             User whoEdits_ = userRepository.findById(whoEdits).get();
             if(project_.getCanEdit().contains(whoEdits_)){
                 User getAccess_ = userRepository.findById(getAccess.getId()).get();
-                if(project_.getCanEdit().contains(getAccess_)){
-                    return 4; //already can edit
-                } else if(project_.getHasAccess().contains(getAccess_)) {
+               if(project_.getHasAccess().contains(getAccess_)) {
                     return 3; //already has access
-                } else{
+                }
+                if(project_.getCanEdit().contains(getAccess_)){
+                    var list = project_.getCanEdit();
+                    list.remove(getAccess_);
+                    project_.setCanEdit(list);
+                }
                     var list = project_.getHasAccess();
                     list.add(getAccess_);
                     project_.setHasAccess(list);
                     projectRepository.save(project_);
                     return 1; //OK
-                }
+
             }else return 5; //cannot edit
         }
         else

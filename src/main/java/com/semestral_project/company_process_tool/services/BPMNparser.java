@@ -450,7 +450,7 @@ public class BPMNparser {
                                         long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
-                                        taskService.addMandatoryInput(task1.getId(), workItem);
+                                        taskService.addMandatoryInputWithoutUser(task1.getId(), workItem);
 //                                        List<WorkItem> inputList = task1.getMandatoryInputs();
 //                                        if(inputList == null){
 //                                            inputList = new ArrayList<>();
@@ -487,7 +487,7 @@ public class BPMNparser {
                                         long workItemId = Long.parseLong(m1.group(1));
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
-                                        taskService.addOutput(task1.getId(), workItem);
+                                        taskService.addOutputWithoutUser(task1.getId(), workItem);
 
 //                                        List<WorkItem> outputList = task1.getOutputs();
 //                                        if(outputList == null){
