@@ -105,11 +105,11 @@ public class ProjectService {
         }
     }
 
-    public int deleteProject(long id, Project project, User whoEdits){
+    public int deleteProject(long id, long whoEdits){
         Optional<Project> projectData = projectRepository.findById(id);
         if(projectData.isPresent()) {
             Project project_ = projectData.get();
-            User whoEdits_ = userRepository.findById(whoEdits.getId()).get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
             if(project_.getCanEdit().contains(whoEdits_)){
                 projectRepository.deleteById(id);
                 return 1;
@@ -124,11 +124,11 @@ public class ProjectService {
     }
 
 
-    public int updateProject(long id, Project project, User whoEdits){
+    public int updateProject(long id, Project project, long whoEdits){
         Optional<Project> projectData = projectRepository.findById(id);
         if(projectData.isPresent()) {
             Project project_ = projectData.get();
-            User whoEdits_ = userRepository.findById(whoEdits.getId()).get();
+            User whoEdits_ = userRepository.findById(whoEdits).get();
             if(project_.getCanEdit().contains(whoEdits_)){
                 project_ = fillProject(project_, project);
                 projectRepository.save(project_);

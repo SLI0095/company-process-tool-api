@@ -170,7 +170,7 @@ public class WorkItemService {
 
     public int addRelationToWorkItem(long id, WorkItem workItem, String relationType, long whoEdits){
         if(id == workItem.getId())
-            return 4;
+            return 5;
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
 
         if(workItemData.isPresent()){

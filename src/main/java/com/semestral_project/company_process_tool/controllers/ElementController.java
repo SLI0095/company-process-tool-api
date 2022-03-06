@@ -4,9 +4,7 @@ import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.services.ElementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,8 +26,8 @@ public class ElementController {
     }
 
     @GetMapping("/elements/templates")
-    public ResponseEntity<List<Element>> getElementsTemplates() {
-        List<Element> elements = elementService.getAllTemplates();
+    public ResponseEntity<List<Element>> getElementsTemplates(@RequestParam Long userId) {
+        List<Element> elements = elementService.getAllTemplatesForUser(userId);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {

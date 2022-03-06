@@ -49,11 +49,13 @@ public class StateController {
     }
 
     @PutMapping("/states/{id}")
-    public ResponseEntity<ResponseMessage> updateState(@PathVariable Long id, @RequestBody State state) {
-        int ret = stateService.updateState(id, state);
+    public ResponseEntity<ResponseMessage> updateState(@PathVariable Long id, @RequestBody State state, @RequestParam long userId) {
+        int ret = stateService.updateState(id, state, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("State id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("State id: " + id + " does not exist"));
         }
     }

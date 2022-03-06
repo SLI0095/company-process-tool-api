@@ -332,14 +332,14 @@ public class ProcessService {
         if(processData.isPresent()) {
             Process process_ = processData.get();
             Element element_ = elementRepository.findById(element.getId()).get();
-            var elementList = process_.getElements();
-            if(elementList.contains(element_))
+            var isPartOf = element_.getPartOfProcess();
+            if(isPartOf.contains(process_))
             {
                 return 3;
             }
-            elementList.add(element_);
-            process_.setElements(elementList);
-            processRepository.save(process_);
+            isPartOf.add(process_);
+            element_.setPartOfProcess(isPartOf);
+            elementRepository.save(element_);
             //add access and edit from process to element
             for(User u : process_.getCanEdit()){
                 if(element_.getClass() == Task.class){

@@ -28,8 +28,8 @@ public class WorkItemController {
     }
 
     @GetMapping("/workItems/templates")
-    public ResponseEntity<List<WorkItem>> getWorkItemsTemplates() {
-        List<WorkItem> workItems = workItemService.getAllTemplates();
+    public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId) {
+        List<WorkItem> workItems = workItemService.getAllTemplates(userId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -47,8 +47,8 @@ public class WorkItemController {
     }
 
     @PostMapping("/workItems")
-    public ResponseEntity<ResponseMessage> addWorkItem(@RequestBody WorkItem workItem){
-        if(workItemService.addWorkItem(workItem)){
+    public ResponseEntity<ResponseMessage> addWorkItem(@RequestBody WorkItem workItem, @RequestParam long userId){
+        if(workItemService.addWorkItem(workItem, userId) != -1){
             return ResponseEntity.ok(new ResponseMessage("Work item added"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item could not be added"));
@@ -56,8 +56,8 @@ public class WorkItemController {
     }
 
     @DeleteMapping("/workItems/{id}")
-    public ResponseEntity<ResponseMessage> removeWorkItem(@PathVariable Long id) {
-        if(workItemService.deleteWorkItem(id)) {
+    public ResponseEntity<ResponseMessage> removeWorkItem(@PathVariable Long id, @RequestParam long userId) {
+        if(workItemService.deleteWorkItem(id, userId)) {
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is deleted"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " could not be deleted"));
@@ -65,9 +65,9 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}")
-    public ResponseEntity<ResponseMessage> updateWorkItem(@PathVariable Long id, @RequestBody WorkItem workItem) {
+    public ResponseEntity<ResponseMessage> updateWorkItem(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId) {
 
-        int status = workItemService.updateWorkItem(id, workItem);
+        int status = workItemService.updateWorkItem(id, workItem, userId);
         if(status == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
         } else {
@@ -76,8 +76,8 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/addState")
-    public ResponseEntity<ResponseMessage> addWorkItemState(@PathVariable Long id, @RequestBody State state){
-        int ret = workItemService.addWorkItemState(id, state);
+    public ResponseEntity<ResponseMessage> addWorkItemState(@PathVariable Long id, @RequestBody State state, @RequestParam long userId){
+        int ret = workItemService.addWorkItemState(id, state, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
         } else {
@@ -86,26 +86,30 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/removeState")
-    public ResponseEntity<ResponseMessage> removeWorkItemState(@PathVariable Long id, @RequestBody State state){
-        int ret = workItemService.removeWorkItemState(id, state);
+    public ResponseEntity<ResponseMessage> removeWorkItemState(@PathVariable Long id, @RequestBody State state, @RequestParam long userId){
+        int ret = workItemService.removeWorkItemState(id, state, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
         } else if(ret == 2){
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
-        } else {
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("State not in work item id: " + id));
         }
     }
 
     @PutMapping("/workItems/{id}/addRelation")
-    public ResponseEntity<ResponseMessage> addRelation(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam String relationType) {
+    public ResponseEntity<ResponseMessage> addRelation(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam String relationType, @RequestParam long userId) {
 
-        int status = workItemService.addRelationToWorkItem(id, workItem, relationType);
+        int status = workItemService.addRelationToWorkItem(id, workItem, relationType, userId);
         if(status == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
         } else if(status == 2){
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else if(status == 4){
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " already has relation to work item " + workItem.getId()));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Can not add relation to itself"));
@@ -113,12 +117,14 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/removeRelation")
-    public ResponseEntity<ResponseMessage> removeRelation(@PathVariable Long id, @RequestBody WorkItemRelation workItemRelation) {
+    public ResponseEntity<ResponseMessage> removeRelation(@PathVariable Long id, @RequestBody WorkItemRelation workItemRelation, @RequestParam long userId) {
 
-        int status = workItemService.removeRelationFromWorkItem(id, workItemRelation);
+        int status = workItemService.removeRelationFromWorkItem(id, workItemRelation, userId);
         if(status == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-        } else {
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }
     }

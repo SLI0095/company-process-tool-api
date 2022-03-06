@@ -12,6 +12,8 @@ import java.util.List;
 public class HTMLGenerator {
     @Autowired
     ProcessService processService;
+    @Autowired
+    RasciMatrixService rasciMatrixService;
 
     private static String head =
             "<!DOCTYPE html>\n" +
@@ -24,6 +26,7 @@ public class HTMLGenerator {
     private List<Role> rolesToGenerate = new ArrayList<>();
     private List<Task> tasksToGenerate = new ArrayList<>();
     private List<WorkItem> workItemsToGenerate = new ArrayList<>();
+
     /*
     Process name
     Workflow image
@@ -54,12 +57,12 @@ public class HTMLGenerator {
 
         Process process = processService.getProcessById(processId);
         htmlBuilder.append(head);
-        htmlBuilder.append("<h1>" + process.getName() + "</h1>");
+        htmlBuilder.append("<h1>").append(process.getName()).append("</h1>");
         //workflow image
         htmlBuilder.append(processDetail(process));
         htmlBuilder.append(processMetrics(process));
         htmlBuilder.append(processElements(process));
-        //matrix
+        htmlBuilder.append(processRasciMatrix(process));
         htmlBuilder.append("<h1>Tasks</h1>");
         for(Task t : tasksToGenerate){
             htmlBuilder.append(taskPart(t));
@@ -100,8 +103,8 @@ public class HTMLGenerator {
         returnString.append("<h3>Process metrics</h3>");
         returnString.append("<dl>");
         for(ProcessMetric metric : process.getMetrics()){
-            returnString.append("<dt>" + metric.getName() + "</dt>");
-            returnString.append("<dd>" + metric.getDescription() + "</dd>");
+            returnString.append("<dt>").append(metric.getName()).append("</dt>");
+            returnString.append("<dd>").append(metric.getDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -116,15 +119,39 @@ public class HTMLGenerator {
         for(Element e : process.getElements()){
             if(e.getClass() == Task.class)
             {
-                returnString.append("<dt><a href='element_" + e.getId() + "'>" + e.getName() + "</a></dt>");
+                returnString.append("<dt><a href='element_").append(e.getId()).append("'>").append(e.getName()).append("</a></dt>");
                 this.tasksToGenerate.add((Task) e);
             } else {
-                returnString.append("<dt>" + e.getName() + "</dt>");
+                returnString.append("<dt>").append(e.getName()).append("</dt>");
             }
-            returnString.append("<dd>" + e.getBriefDescription() + "</dd>");
+            returnString.append("<dd>").append(e.getBriefDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
+        return returnString.toString();
+    }
+
+    private String processRasciMatrix(Process process){
+        StringBuilder returnString = new StringBuilder();
+        returnString.append("<div>");
+        returnString.append("<h3>RASCI matrix</h3>");
+        returnString.append("<table><tbody>");
+        String[][] matrix = rasciMatrixService.getMatrixForRenderInHtml(process);
+        for(int i = 0; i < matrix.length; i++){
+            returnString.append("<tr>");
+            for(int j = 0; j < matrix[i].length; j++){
+                if(i == 0){
+                    returnString.append("<td>").append(matrix[i][j]).append("</td>"); //Roles head
+                } else {
+                    if(j == 0){
+                        returnString.append("<td>").append(matrix[i][j]).append("</td>"); //tasks head
+                    }
+                    returnString.append("<td>").append(matrix[i][j]).append("</td>"); //tasks rasci
+                }
+            }
+            returnString.append("</tr>");
+        }
+        returnString.append("</tbody></table>");
         return returnString.toString();
     }
 
@@ -137,8 +164,8 @@ public class HTMLGenerator {
                 rolesToGenerate.add(role);
             }
         }
-        returnString.append("<div id='element_"+task.getId() +"' >");
-        returnString.append("<h2>" + task.getName() + "</h2>");
+        returnString.append("<div id='element_").append(task.getId()).append("' >");
+        returnString.append("<h2>").append(task.getName()).append("</h2>");
         returnString.append(taskDetail(task));
         returnString.append(taskSteps(task));
         returnString.append(taskInputs(task));
@@ -168,8 +195,8 @@ public class HTMLGenerator {
         returnString.append("<h3>Task steps</h3>");
         returnString.append("<dl>");
         for(TaskStep step : task.getSteps()){
-            returnString.append("<dt>" + step.getName() + "</dt>");
-            returnString.append("<dd>" + step.getDescription() + "</dd>");
+            returnString.append("<dt>").append(step.getName()).append("</dt>");
+            returnString.append("<dd>").append(step.getDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -185,8 +212,8 @@ public class HTMLGenerator {
             if(!workItemsToGenerate.contains(workItem)){
                 workItemsToGenerate.add(workItem);
             }
-            returnString.append("<dt><a href='workItem_" + workItem.getId() + "'>" + workItem.getName() + "</a></dt>");
-            returnString.append("<dd>" + workItem.getBriefDescription() + "</dd>");
+            returnString.append("<dt><a href='workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+            returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -202,8 +229,8 @@ public class HTMLGenerator {
             if(!workItemsToGenerate.contains(workItem)){
                 workItemsToGenerate.add(workItem);
             }
-            returnString.append("<dt><a href='workItem_" + workItem.getId() + "'>" + workItem.getName() + "</a></dt>");
-            returnString.append("<dd>" + workItem.getBriefDescription() + "</dd>");
+            returnString.append("<dt><a href='workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+            returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -219,8 +246,8 @@ public class HTMLGenerator {
             if(!workItemsToGenerate.contains(workItem)){
                 workItemsToGenerate.add(workItem);
             }
-            returnString.append("<dt><a href='workItem_" + workItem.getId() + "'>" + workItem.getName() + "</a></dt>");
-            returnString.append("<dd>" + workItem.getBriefDescription() + "</dd>");
+            returnString.append("<dt><a href='workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+            returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -229,8 +256,8 @@ public class HTMLGenerator {
 
     private String rolePart(Role role){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div id='role_"+role.getId() +"' >");
-        returnString.append("<h2>" + role.getName() + "</h2>");
+        returnString.append("<div id='role_").append(role.getId()).append("' >");
+        returnString.append("<h2>").append(role.getName()).append("</h2>");
         returnString.append(roleDetail(role));
         returnString.append("</div>");
         return returnString.toString();
@@ -252,8 +279,8 @@ public class HTMLGenerator {
 
     private String workItemPart(WorkItem workItem){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div id='workItem_"+workItem.getId() +"' >");
-        returnString.append("<h2>" + workItem.getName() + "</h2>");
+        returnString.append("<div id='workItem_").append(workItem.getId()).append("' >");
+        returnString.append("<h2>").append(workItem.getName()).append("</h2>");
         returnString.append(workItemDetail(workItem));
         returnString.append(workItemStates(workItem));
         returnString.append(workItemRelations(workItem));
@@ -288,8 +315,8 @@ public class HTMLGenerator {
         returnString.append("<h3>Possible states</h3>");
         returnString.append("<dl>");
         for(State state : workItem.getWorkItemStates()){
-            returnString.append("<dt>" + state.getStateName() + "</dt>");
-            returnString.append("<dd>" + state.getStateDescription() + "</dd>");
+            returnString.append("<dt>").append(state.getStateName()).append("</dt>");
+            returnString.append("<dd>").append(state.getStateDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -304,12 +331,12 @@ public class HTMLGenerator {
         for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
             WorkItem wi = relation.getRelatedWorkItem();
             if(workItemsToGenerate.contains(relation.getRelatedWorkItem())){
-                returnString.append("<dt><a href='workItem_" + wi.getId() + "'>" + wi.getName() + "</a></dt>");
+                returnString.append("<dt><a href='workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
             } else {
-                returnString.append("<dt>" + wi.getName() + "</dt>");
+                returnString.append("<dt>").append(wi.getName()).append("</dt>");
             }
-            returnString.append("<dd>Relation type: " + relation.getRelationType() + "</dd>");
-            returnString.append("<dd>" + wi.getBriefDescription() + "</dd>");
+            returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
+            returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
@@ -319,8 +346,8 @@ public class HTMLGenerator {
     private String generatePart(String name, String content){
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
-        returnString.append("<label>" + name + "</label>");
-        returnString.append("<p>" + content + "</p>");
+        returnString.append("<label>").append(name).append("</label>");
+        returnString.append("<p>").append(content).append("</p>");
         returnString.append("</div>");
 
         return returnString.toString();

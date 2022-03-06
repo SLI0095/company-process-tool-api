@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,27 +16,35 @@ public class User {
     private String username;
     private String password;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "canEdit")
     private List<Element> canEditElements = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "hasAccess")
     private List<Element> hasAccessElements = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "canEdit")
     private List<Project> canEditProjects = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "hasAccess")
     private List<Project> hasAccessProjects = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "canEdit")
     private List<Role> canEditRoles = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "hasAccess")
     private List<Role> hasAccessRoles = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "canEdit")
     private List<WorkItem> canEditWorkItems = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "hasAccess")
     private List<WorkItem> hasAccessWorkItems = new ArrayList<>();
 

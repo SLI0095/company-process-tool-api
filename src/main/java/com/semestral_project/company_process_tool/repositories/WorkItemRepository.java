@@ -12,9 +12,9 @@ import java.util.List;
 @Repository
 public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
 
-    @Query("SELECT w FROM WorkItem w WHERE w.project.id = ?1 AND (?2 IN (w.canEdit) OR ?2 IN (w.hasAccess))")
+    @Query("SELECT w FROM WorkItem w WHERE w.project.id = ?1 AND (?2 MEMBER w.canEdit OR ?2 MEMBER w.hasAccess)")
     List<WorkItem> findAllWorkItemsInProjectForUser(Long projectId, User user);
 
-    @Query("SELECT w FROM WorkItem w WHERE w.project = NULL AND (?1 IN (w.canEdit) OR ?1 IN (w.hasAccess))")
+    @Query("SELECT w FROM WorkItem w WHERE w.project = NULL AND (?1 MEMBER w.canEdit OR ?1 MEMBER w.hasAccess)")
     List<WorkItem> findAllWorkItemTemplateForUser(User user);
 }

@@ -123,8 +123,16 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
                         w.setProject(project);
-                        w.setCanEdit(process.getCanEdit());
-                        w.setHasAccess(process.getHasAccess());
+                        var listOfUsers = w.getCanEdit();
+                        for(User u : process.getCanEdit()){
+                            listOfUsers.add(u);
+                        }
+                        w.setCanEdit(listOfUsers);
+                        listOfUsers = w.getHasAccess();
+                        for(User u : process.getHasAccess()){
+                            listOfUsers.add(u);
+                        }
+                        w.setHasAccess(listOfUsers);
                         //TODO add projectOwner as access and processOwner as access, change to call service
 
                         WorkItem savedWorkItem = workItemRepository.save(w);
@@ -168,8 +176,6 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
                         p.setProject(project);
-                        p.setCanEdit(process.getCanEdit());
-                        p.setHasAccess(process.getHasAccess());
                         Process savedProcess = processRepository.save(p);
                         String newId = "Element_" + savedProcess.getId() + unchangedId;
 
@@ -228,8 +234,6 @@ public class BPMNparser {
                     t.setName(name);
                     t.setTaskType(type);
                     t.setProject(project);
-                    t.setCanEdit(process.getCanEdit());
-                    t.setHasAccess(process.getHasAccess());
                     Task savedTask = taskRepository.save(t);
                     String newId = "Element_" + savedTask.getId() + unchangedId;
 

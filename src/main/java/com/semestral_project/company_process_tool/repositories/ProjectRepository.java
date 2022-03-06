@@ -13,6 +13,6 @@ import java.util.List;
 @Repository
 public interface ProjectRepository extends CrudRepository<Project, Long> {
 
-    @Query("SELECT p FROM Project p WHERE ?1 IN (p.canEdit) OR ?1 IN (p.hasAccess)")
+    @Query("SELECT p FROM Project p WHERE ?1 MEMBER p.canEdit OR ?1 MEMBER p.hasAccess")
     List<Project> findAllProjectsForUser(User user);
 }

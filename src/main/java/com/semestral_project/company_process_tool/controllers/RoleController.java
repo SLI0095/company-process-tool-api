@@ -27,8 +27,8 @@ public class RoleController {
     }
 
     @GetMapping("/roles/templates")
-    public ResponseEntity<List<Role>> getRolesTemplates() {
-        List<Role> roles = roleService.getAllTemplates();
+    public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
+        List<Role> roles = roleService.getAllTemplatesForUser(userId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -47,9 +47,9 @@ public class RoleController {
     }
 
     @PostMapping("/roles")
-    public ResponseEntity<ResponseMessage> addRole(@RequestBody Role role) {
-        boolean ret = roleService.addRole(role);
-        if(ret){
+    public ResponseEntity<ResponseMessage> addRole(@RequestBody Role role, @RequestParam long userId) {
+        long ret = roleService.addRole(role, userId);
+        if(ret != -1){
             return ResponseEntity.ok(new ResponseMessage("Role added"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role could not be added"));
@@ -57,21 +57,25 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}")
-    public ResponseEntity<ResponseMessage> updateRole(@PathVariable Long id, @RequestBody Role role){
-        int ret = roleService.updateRole(id, role);
+    public ResponseEntity<ResponseMessage> updateRole(@PathVariable Long id, @RequestBody Role role, @RequestParam long userId){
+        int ret = roleService.updateRole(id, role, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
         }
     }
 
     @DeleteMapping("/roles/{id}")
-    public ResponseEntity<ResponseMessage> removeRole(@PathVariable Long id) {
-        boolean ret = roleService.removeRoleById(id);
-        if(ret){
+    public ResponseEntity<ResponseMessage> removeRole(@PathVariable Long id, @RequestParam long userId) {
+        int ret = roleService.removeRoleById(id, userId);
+        if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Role removed."));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role could not be removed."));
         }
     }

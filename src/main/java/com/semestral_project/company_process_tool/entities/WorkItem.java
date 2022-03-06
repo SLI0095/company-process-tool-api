@@ -32,6 +32,7 @@ public class WorkItem extends Item{
     private String reasonForNotNeeding;
 
     private String workItemType = "";
+
     @Column(columnDefinition="LONGTEXT")
     private String urlAddress;
 

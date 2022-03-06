@@ -15,11 +15,13 @@ public class ProcessMetricController {
     ProcessMetricService metricService;
 
     @PutMapping("/metrics/{id}")
-    public ResponseEntity<ResponseMessage> updateMetric(@PathVariable Long id, @RequestBody ProcessMetric metric) {
-        int ret = metricService.updateMetric(id, metric);
+    public ResponseEntity<ResponseMessage> updateMetric(@PathVariable Long id, @RequestBody ProcessMetric metric, @RequestParam long userId) {
+        int ret = metricService.updateMetric(id, metric, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Metric id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Metric id: " + id + " does not exist"));
         }
     }

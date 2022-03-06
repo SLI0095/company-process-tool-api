@@ -37,8 +37,8 @@ public class ProcessController {
     }
 
     @GetMapping("/processes/templates")
-    public ResponseEntity<List<Process>> getProcessesTemplates() {
-        List<Process> processes = processService.getAllTemplates();
+    public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId) {
+        List<Process> processes = processService.getAllTemplates(userId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {
@@ -57,98 +57,112 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}/addMetric")
-    public ResponseEntity<ResponseMessage> addTaskStep(@PathVariable Long id, @RequestBody ProcessMetric metric){
-        int ret = processService.addMetric(id, metric);
+    public ResponseEntity<ResponseMessage> addTaskStep(@PathVariable Long id, @RequestParam long userId, @RequestBody ProcessMetric metric){
+        int ret = processService.addMetric(id, metric, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
     }
 
     @PutMapping("/processes/{id}/removeMetric")
-    public ResponseEntity<ResponseMessage> removeTaskStep(@PathVariable Long id, @RequestBody ProcessMetric metric){
-        int ret = processService.removeMetric(id, metric);
+    public ResponseEntity<ResponseMessage> removeTaskStep(@PathVariable Long id, @RequestParam long userId, @RequestBody ProcessMetric metric){
+        int ret = processService.removeMetric(id, metric, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
         } else if(ret == 2){
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Metric not in process id: " + id));
         }
     }
 
     @PostMapping("/processes")
-    public ResponseEntity<ResponseMessage> addProcess(@RequestBody Process process){
-        boolean ret = processService.addProcess(process);
-        if(ret){
+    public ResponseEntity<ResponseMessage> addProcess(@RequestBody Process process, @RequestParam long userId){
+        long ret = processService.addProcess(process, userId);
+        if(ret != -1){
             return ResponseEntity.ok(new ResponseMessage("Process added"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
         }
     }
 
     @DeleteMapping("/processes/{id}")
-    public ResponseEntity<ResponseMessage> removeProcess(@PathVariable Long id) {
-        boolean ret = processService.deleteProcessById(id);
-        if(ret){
+    public ResponseEntity<ResponseMessage> removeProcess(@PathVariable Long id, @RequestParam long userId) {
+        int ret = processService.deleteProcessById(id, userId);
+        if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is deleted"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be deleted."));
         }
     }
 
     @PutMapping("/processes/{id}")
-    public ResponseEntity<ResponseMessage> updateProcess(@PathVariable Long id, @RequestBody Process process) {
-        int ret = processService.updateProcess(id, process);
+    public ResponseEntity<ResponseMessage> updateProcess(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId) {
+        int ret = processService.updateProcess(id, process, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
     }
 
-    @PutMapping("/processes/{id}/addElement")
-    public ResponseEntity<ResponseMessage> addElement(@PathVariable Long id, @RequestBody Element element){
-        int ret = processService.addElementToProcess(id, element);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-        } else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Element already added"));
-        }
-    }
-
-
-    @PutMapping("/processes/{id}/removeElement")
-    public ResponseEntity<ResponseMessage> removeElement(@PathVariable Long id, @RequestBody Element element){
-        int ret = processService.removeElementFromProcess(id, element);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-        } else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
-        }
-    }
+//    @PutMapping("/processes/{id}/addElement")
+//    public ResponseEntity<ResponseMessage> addElement(@PathVariable Long id, @RequestBody Element element){
+//        int ret = processService.addElementToProcess(id, element);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+//        } else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Element already added"));
+//        }
+//    }
+//
+//
+//    @PutMapping("/processes/{id}/removeElement")
+//    public ResponseEntity<ResponseMessage> removeElement(@PathVariable Long id, @RequestBody Element element){
+//        int ret = processService.removeElementFromProcess(id, element);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+//        } else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
+//        }
+//    }
 
     @PutMapping("/processes/{id}/saveBPMN")
-    public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn){
-        int ret = processService.saveWorkflow(id, bpmn);
+    public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn, @RequestParam long userId){
+        int ret = processService.saveWorkflow(id, bpmn, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated. Workflow saved."));
+        }else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
     }
 
     @PutMapping("/processes/{id}/restoreBPMN")
-    public ResponseEntity<ResponseMessage> restoreBPMN(@PathVariable Long id, @RequestBody HistoryBPMN bpmn){
+    public ResponseEntity<ResponseMessage> restoreBPMN(@PathVariable Long id, @RequestBody HistoryBPMN bpmn, @RequestParam long userId){
 
-        int ret = processService.restoreWorkflow(id, bpmn);
+        int ret = processService.restoreWorkflow(id, bpmn, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated. Revert successful."));
+        }else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process"));
         } else if(ret == 2) {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
@@ -169,8 +183,8 @@ public class ProcessController {
     }
 
     @PostMapping("/processes/fromBpmn")
-    public ResponseEntity<ResponseMessage> addProcesFromBPMN(@RequestBody ProcessAndBpmnHolder holder){
-        boolean ret = processService.addProcessFromFile(holder);
+    public ResponseEntity<ResponseMessage> addProcesFromBPMN(@RequestBody ProcessAndBpmnHolder holder, @RequestParam long userId){
+        boolean ret = processService.addProcessFromFile(holder,userId);
         if(ret){
             return ResponseEntity.ok(new ResponseMessage("Process added"));
         } else {
