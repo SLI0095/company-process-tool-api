@@ -30,7 +30,7 @@ public class ProcessService {
     @Autowired
     TaskService taskService;
     @Autowired
-    TaskRepository taskRepository;
+    HTMLGenerator htmlGenerator;
 
     public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -508,5 +508,13 @@ public class ProcessService {
         {
             return 2;
         }
+    }
+
+    public String generateHTML(long id){
+        Optional<Process> processData = processRepository.findById(id);
+        if(processData.isPresent()) {
+            return htmlGenerator.generateHTML(id);
+        }
+        return null;
     }
 }

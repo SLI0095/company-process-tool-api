@@ -121,11 +121,11 @@ public class RasciMatrixService {
                     if(j == 0){
                         returnMatrix[i][j] = "";
                     } else {
-                        returnMatrix[i][j] = "<a href='role_" + roles.get(j-1).getId() + "'>" + roles.get(j-1).getName() + "</a>"; // roles head
+                        returnMatrix[i][j] = "<a href='#role_" + roles.get(j-1).getId() + "'>" + roles.get(j-1).getName() + "</a>"; // roles head
                     }
                 } else {
                     if(j == 0){
-                        returnMatrix[i][j] = "<a href='element_" + tasks.get(i-1).getId() + "'>" + tasks.get(i-1).getName() + "</a>"; // tasks
+                        returnMatrix[i][j] = "<a href='#element_" + tasks.get(i-1).getId() + "'>" + tasks.get(i-1).getName() + "</a>"; // tasks
                     } else {
                         Role r = roles.get(j-1);
                         Task t = tasks.get(i-1);

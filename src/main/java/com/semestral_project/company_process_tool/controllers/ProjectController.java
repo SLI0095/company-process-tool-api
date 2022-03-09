@@ -121,6 +121,66 @@ public class ProjectController {
         }
     }
 
+    @PutMapping("/projects/{id}/addAccess")
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = projectService.addAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access granted."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/projects/{id}/removeAccess")
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = projectService.removeAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/projects/{id}/addEdit")
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = projectService.addEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing granted."));
+        } else if(status == 4){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already can edit."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/projects/{id}/removeEdit")
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = projectService.removeEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project id: " + id + " does not exist"));
+        }
+    }
+
 //    @PostMapping("/projects/{id}/importTemplate")
 //    public ResponseEntity<ResponseMessage> importTemplate(@PathVariable Long id, @RequestBody Process processTemplate, @RequestParam long userId){
 //        int ret = projectService.importTemplateProcess(id, processTemplate);

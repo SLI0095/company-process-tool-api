@@ -118,30 +118,6 @@ public class ProcessController {
         }
     }
 
-//    @PutMapping("/processes/{id}/addElement")
-//    public ResponseEntity<ResponseMessage> addElement(@PathVariable Long id, @RequestBody Element element){
-//        int ret = processService.addElementToProcess(id, element);
-//        if(ret == 1){
-//            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-//        } else if(ret == 2){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-//        } else {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Element already added"));
-//        }
-//    }
-//
-//
-//    @PutMapping("/processes/{id}/removeElement")
-//    public ResponseEntity<ResponseMessage> removeElement(@PathVariable Long id, @RequestBody Element element){
-//        int ret = processService.removeElementFromProcess(id, element);
-//        if(ret == 1){
-//            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
-//        } else if(ret == 2){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-//        } else {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Element not in activity id: " + id));
-//        }
-//    }
 
     @PutMapping("/processes/{id}/saveBPMN")
     public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn, @RequestParam long userId){
@@ -189,6 +165,76 @@ public class ProcessController {
             return ResponseEntity.ok(new ResponseMessage("Process added"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
+        }
+    }
+
+    @PutMapping("/processes/{id}/addAccess")
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = processService.addAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access granted."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/{id}/removeAccess")
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = processService.removeAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/{id}/addEdit")
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = processService.addEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing granted."));
+        } else if(status == 4){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already can edit."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/{id}/removeEdit")
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = processService.removeEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @GetMapping("/processes/{id}/generateHTML")
+    public ResponseEntity<String> processHTML(@PathVariable Long id) {
+        String html = processService.generateHTML(id);
+        if(html != null){
+            return ResponseEntity.ok(html);
+        } else {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }

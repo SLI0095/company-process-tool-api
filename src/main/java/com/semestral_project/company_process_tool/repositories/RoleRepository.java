@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface RoleRepository extends CrudRepository<Role, Long> {
 
-    @Query("SELECT r FROM Role r WHERE r.project.id = ?1 AND (?2 IN (r.canEdit) OR ?2 IN (r.hasAccess))")
+    @Query("SELECT r FROM Role r WHERE r.project.id = ?1 AND (?2 MEMBER r.canEdit OR ?2 MEMBER r.hasAccess)")
     List<Role> findAllRolesInProjectForUser(Long projectId, User user);
 
-    @Query("SELECT r FROM Role r WHERE r.project = NULL AND (?1 IN (r.canEdit) OR ?1 IN (r.hasAccess))")
+    @Query("SELECT r FROM Role r WHERE r.project = NULL AND (?1 MEMBER r.canEdit OR ?1 MEMBER r.hasAccess)")
     List<Role> findAllRolesTemplatesForUser(User user);
 
 

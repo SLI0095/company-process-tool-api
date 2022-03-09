@@ -70,6 +70,8 @@ public class WorkItemController {
         int status = workItemService.updateWorkItem(id, workItem, userId);
         if(status == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+        }else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }
@@ -80,7 +82,9 @@ public class WorkItemController {
         int ret = workItemService.addWorkItemState(id, state, userId);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-        } else {
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }
     }
@@ -123,6 +127,66 @@ public class WorkItemController {
         if(status == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
         } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/addAccess")
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = workItemService.addAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access granted."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/removeAccess")
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+
+        int status = workItemService.removeAccess(id, userId, getAccess);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Access removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have access."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/addEdit")
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = workItemService.addEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing granted."));
+        } else if(status == 4){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already can edit."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/removeEdit")
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+
+        int status = workItemService.removeEdit(id, userId, getEdit);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Editing removed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
+        }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
