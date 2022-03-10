@@ -18,9 +18,13 @@ public class HTMLGenerator {
     private static String head =
             "<!DOCTYPE html>\n" +
             "<html>\n" +
+            "<head>\n" +
+            "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
+            "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
             "<body>";
     private static String footer =
             "</body>\n" +
+            "</head>\n" +
             "</html>";
 
     private List<Role> rolesToGenerate = new ArrayList<>();
@@ -59,6 +63,9 @@ public class HTMLGenerator {
         htmlBuilder.append(head);
         htmlBuilder.append("<h1>").append(process.getName()).append("</h1>");
         //workflow image
+        if(process.getWorkflow() != null){
+            htmlBuilder.append(processWorkflow(process));
+        }
         htmlBuilder.append(processDetail(process));
         htmlBuilder.append(processMetrics(process));
         htmlBuilder.append(processElements(process));
@@ -77,6 +84,21 @@ public class HTMLGenerator {
         }
         htmlBuilder.append(footer);
         return htmlBuilder.toString();
+    }
+
+    private String processWorkflow(Process process){
+        StringBuilder returnString = new StringBuilder();
+        returnString.append("<div id=\"canvas\"></div>");
+        returnString.append("<script>");
+        String st = process.getWorkflow().getBpmnContent();
+        st = st.replace("\n", "");
+        returnString.append("var xml = ").append("\'").append(st).append("\';");
+        returnString.append("var bpmnViewer = new BpmnJS({\n" +
+                "        container: '#canvas'\n" +
+                "      });");
+        returnString.append("bpmnViewer.importXML(xml);");
+        returnString.append("</script>");
+        return returnString.toString();
     }
 
     private String processDetail(Process process){
@@ -375,18 +397,18 @@ public class HTMLGenerator {
         returnString.append("<h3>Relations to other work items</h3>");
         returnString.append("<dl>");
         for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
-            WorkItem wi = relation.getRelatedWorkItem();
-            if(workItemsToGenerate.contains(relation.getRelatedWorkItem())){
+            WorkItem wi = relation.getBaseWorkItem();
+            if(workItemsToGenerate.contains(relation.getBaseWorkItem())){
                 returnString.append("<dt><a href='#workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
             } else {
                 returnString.append("<dt>").append(wi.getName()).append("</dt>");
             }
-            returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
             if(wi.getBriefDescription() == null){
                 returnString.append("<dd>-</dd>");
             } else {
                 returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
             }
+            returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
         }
         returnString.append("</dl>");
         returnString.append("</div>");
