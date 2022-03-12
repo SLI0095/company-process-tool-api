@@ -19,6 +19,109 @@ public class HTMLGenerator {
             "<!DOCTYPE html>\n" +
             "<html>\n" +
             "<head>\n" +
+                    "<style>\n" +
+                    "    body{\n" +
+                    "      font-family: Tahoma, sans-serif;\n" +
+                    "      padding-right: 2rem;\n" +
+                    "      padding-left: 2rem;\n" +
+                    "    }\n" +
+                    "    #canvas{\n" +
+                    "      height: 50vh;\n" +
+                    "    }\n" +
+                    "    h1{\n" +
+                    "      font-size: 4rem;\n" +
+                    "      text-align: center;\n" +
+                    "    }\n" +
+                    "    h2{\n" +
+                    "      font-size: 3rem;\n" +
+                    "      padding-top: 3.5rem;\n" +
+                    "    }\n" +
+                    "    h3{\n" +
+                    "      font-size: 2rem;\n" +
+                    "      padding-top: 3.5rem;\n" +
+                    "    }\n" +
+                    "    label{\n" +
+                    "      display: block; \n" +
+                    "      font-size: 1.25rem;\n" +
+                    "      font-weight: bold;\n" +
+                    "      padding-top: 2rem;\n" +
+                    "    }\n" +
+                    "    dt{\n" +
+                    "      font-size: 1.25rem;\n" +
+                    "      font-weight: bold;\n" +
+                    "      padding-top: 2rem;\n" +
+                    "    }\n" +
+                    "    dd{\n" +
+                    "      margin-left: 1.5rem;\n" +
+                    "    }\n" +
+                    "    p{\n" +
+                    "      font-size: 1rem;\n" +
+                    "    }\n" +
+                    "    table, td, th {  \n" +
+                    "      border: 1px solid #ddd;\n" +
+                    "      text-align: left;\n" +
+                    "    }\n" +
+                    "    table {\n" +
+                    "      border-collapse: collapse;\n" +
+                    "      /* width: 50%; */\n" +
+                    "    }\n" +
+                    "    th, td {\n" +
+                    "      padding: 15px;\n" +
+                    "      text-align: left;\n" +
+                    "    }\n" +
+                    ".tableR {\n" +
+                    "      text-align: center;\n" +
+                    "      background: green;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .tableA {\n" +
+                    "      text-align: center;\n" +
+                    "      background: crimson;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .tableS {\n" +
+                    "      text-align: center;\n" +
+                    "      background: darkorchid;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .tableC {\n" +
+                    "      text-align: center;\n" +
+                    "      background: royalblue;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .tableI {\n" +
+                    "      text-align: center;\n" +
+                    "      background: goldenrod;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    .table- {\n" +
+                    "      text-align: center;\n" +
+                    "      background: gray;\n" +
+                    "      padding-left: 0;\n" +
+                    "      padding-right: 0;\n" +
+                    "      color: white;\n" +
+                    "    }" +
+                    ".null{\n" +
+                    "      font-size: 2rem;\n" +
+                    "      margin-left: 1.5rem;\n" +
+                    "    }" +
+                    "\n" +
+                    "  </style>\n" +
             "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
             "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
             "<body>";
@@ -62,7 +165,6 @@ public class HTMLGenerator {
         Process process = processService.getProcessById(processId);
         htmlBuilder.append(head);
         htmlBuilder.append("<h1>").append(process.getName()).append("</h1>");
-        //workflow image
         if(process.getWorkflow() != null){
             htmlBuilder.append(processWorkflow(process));
         }
@@ -96,7 +198,9 @@ public class HTMLGenerator {
         returnString.append("var bpmnViewer = new BpmnJS({\n" +
                 "        container: '#canvas'\n" +
                 "      });");
-        returnString.append("bpmnViewer.importXML(xml);");
+        returnString.append("bpmnViewer.importXML(xml);\n");
+        returnString.append("var canvas = bpmnViewer.get('canvas');\n");
+        returnString.append("canvas.zoom('fit-viewport');\n");
         returnString.append("</script>");
         return returnString.toString();
     }
@@ -127,17 +231,21 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Process metrics</h3>");
-        returnString.append("<dl>");
-        for(ProcessMetric metric : process.getMetrics()){
-            returnString.append("<dt>").append(metric.getName()).append("</dt>");
-            if(metric.getDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(metric.getDescription()).append("</dd>");
-            }
+        if(process.getMetrics().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(ProcessMetric metric : process.getMetrics()){
+                returnString.append("<dt>").append(metric.getName()).append("</dt>");
+                if(metric.getDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(metric.getDescription()).append("</dd>");
+                }
 
+            }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -181,7 +289,7 @@ public class HTMLGenerator {
                     if(j == 0){
                         returnString.append("<td>").append(matrix[i][j]).append("</td>"); //tasks head
                     } else {
-                        returnString.append("<td>").append(matrix[i][j]).append("</td>"); //tasks rasci
+                        returnString.append("<td class='table").append(matrix[i][j]).append("'>").append(matrix[i][j]).append("</td>"); //tasks rasci
                     }
                 }
             }
@@ -233,16 +341,20 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Task steps</h3>");
-        returnString.append("<dl>");
-        for(TaskStep step : task.getSteps()){
-            returnString.append("<dt>").append(step.getName()).append("</dt>");
-            if(step.getDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(step.getDescription()).append("</dd>");
+        if(task.getSteps().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(TaskStep step : task.getSteps()){
+                returnString.append("<dt>").append(step.getName()).append("</dt>");
+                if(step.getDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(step.getDescription()).append("</dd>");
+                }
             }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -251,19 +363,23 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Task inputs</h3>");
-        returnString.append("<dl>");
-        for(WorkItem workItem : task.getMandatoryInputs()){
-            if(!workItemsToGenerate.contains(workItem)){
-                workItemsToGenerate.add(workItem);
+        if(task.getMandatoryInputs().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(WorkItem workItem : task.getMandatoryInputs()){
+                if(!workItemsToGenerate.contains(workItem)){
+                    workItemsToGenerate.add(workItem);
+                }
+                returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+                if(workItem.getBriefDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
+                }
             }
-            returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
-            if(workItem.getBriefDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
-            }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -272,19 +388,23 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Task outputs</h3>");
-        returnString.append("<dl>");
-        for(WorkItem workItem : task.getOutputs()){
-            if(!workItemsToGenerate.contains(workItem)){
-                workItemsToGenerate.add(workItem);
+        if(task.getOutputs().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(WorkItem workItem : task.getOutputs()){
+                if(!workItemsToGenerate.contains(workItem)){
+                    workItemsToGenerate.add(workItem);
+                }
+                returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+                if(workItem.getBriefDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
+                }
             }
-            returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
-            if(workItem.getBriefDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
-            }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -293,19 +413,23 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Task guidance work items</h3>");
-        returnString.append("<dl>");
-        for(WorkItem workItem : task.getGuidanceWorkItems()){
-            if(!workItemsToGenerate.contains(workItem)){
-                workItemsToGenerate.add(workItem);
+        if(task.getGuidanceWorkItems().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(WorkItem workItem : task.getGuidanceWorkItems()){
+                if(!workItemsToGenerate.contains(workItem)){
+                    workItemsToGenerate.add(workItem);
+                }
+                returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
+                if(workItem.getBriefDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
+                }
             }
-            returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
-            if(workItem.getBriefDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
-            }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -377,16 +501,20 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Possible states</h3>");
-        returnString.append("<dl>");
-        for(State state : workItem.getWorkItemStates()){
-            returnString.append("<dt>").append(state.getStateName()).append("</dt>");
-            if(state.getStateDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(state.getStateDescription()).append("</dd>");
+        if(workItem.getWorkItemStates().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(State state : workItem.getWorkItemStates()){
+                returnString.append("<dt>").append(state.getStateName()).append("</dt>");
+                if(state.getStateDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(state.getStateDescription()).append("</dd>");
+                }
             }
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -395,22 +523,26 @@ public class HTMLGenerator {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div>");
         returnString.append("<h3>Relations to other work items</h3>");
-        returnString.append("<dl>");
-        for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
-            WorkItem wi = relation.getBaseWorkItem();
-            if(workItemsToGenerate.contains(relation.getBaseWorkItem())){
-                returnString.append("<dt><a href='#workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
-            } else {
-                returnString.append("<dt>").append(wi.getName()).append("</dt>");
+        if(workItem.getRelationsToAnotherWorkItems().size() == 0){
+            returnString.append("<p class='null'>-</p>");
+        } else {
+            returnString.append("<dl>");
+            for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
+                WorkItem wi = relation.getBaseWorkItem();
+                if(workItemsToGenerate.contains(relation.getBaseWorkItem())){
+                    returnString.append("<dt><a href='#workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
+                } else {
+                    returnString.append("<dt>").append(wi.getName()).append("</dt>");
+                }
+                if(wi.getBriefDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
+                }
+                returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
             }
-            if(wi.getBriefDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
-            }
-            returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
+            returnString.append("</dl>");
         }
-        returnString.append("</dl>");
         returnString.append("</div>");
         return returnString.toString();
     }
