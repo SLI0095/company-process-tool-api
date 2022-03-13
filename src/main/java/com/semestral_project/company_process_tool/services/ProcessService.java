@@ -300,6 +300,13 @@ public class ProcessService {
         if(processData.isPresent()) {
             Process process_ = processData.get();
             if (bpmnParser.removeProcessFromAllWorkflows(process_)) {
+                var elements = process_.getElements();
+                for(Element e : elements){
+                    var list = e.getPartOfProcess();
+                    list.remove(process_);
+                    e.setPartOfProcess(list);
+                    elementRepository.save(e);
+                }
                 processRepository.deleteById(id);
                 return 1;
             }
