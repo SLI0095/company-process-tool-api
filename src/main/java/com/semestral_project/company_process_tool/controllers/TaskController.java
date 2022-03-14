@@ -37,6 +37,16 @@ public class TaskController {
         }
     }
 
+    @GetMapping("/tasks/templatesCanEdit")
+    public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
+        List<Task> tasks = taskService.getAllTemplatesCanEdit(userId);
+        if(tasks != null){
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/tasks/{id}")
     public ResponseEntity<Task> taskById(@PathVariable Long id){
 

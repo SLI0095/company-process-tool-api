@@ -456,11 +456,35 @@ public class ProcessService {
         return 1;
     }
 
+    public long newVersionOfProcess(Process newProcess, long oldProcess, long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            var list = newProcess.getCanEdit();
+            list.add(user);
+            newProcess.setCanEdit(list);
+            newProcess = processRepository.save(newProcess);
+
+            Process old = processRepository.findById(oldProcess).get();
+            BPMNfile newFile = new BPMNfile();
+            newFile.setBpmnContent(old.getWorkflow().getBpmnContent());
+            bpmnParser.saveBPMN(newFile, newProcess);
+            return newProcess.getId();
+        }else return -1;
+    }
+
     public List<Process> getAllTemplates(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
             List<Process> allTemplates = processRepository.findAllTemplatesProcessesForUser(user);
              return allTemplates;
+        }else return null;
+    }
+
+    public List<Process> getAllTemplatesCanEdit(long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            List<Process> allTemplates = processRepository.findAllTemplatesProcessesForUserCanEdit(user);
+            return allTemplates;
         }else return null;
     }
 

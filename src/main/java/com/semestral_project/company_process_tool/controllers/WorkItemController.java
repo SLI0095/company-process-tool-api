@@ -37,6 +37,16 @@ public class WorkItemController {
         }
     }
 
+    @GetMapping("/workItems/templatesCanEdit")
+    public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
+        List<WorkItem> workItems = workItemService.getAllTemplatesCanEdit(userId);
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/workItems/{id}")
     public ResponseEntity<WorkItem> workItemById(@PathVariable Long id) {
         WorkItem workItem = workItemService.getWorkItemById(id);

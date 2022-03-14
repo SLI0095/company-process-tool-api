@@ -235,6 +235,15 @@ public class WorkItemService {
         else return null;
     }
 
+    public List<WorkItem> getAllTemplatesCanEdit(long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplateForUserCanEdit(user);
+            return allTemplates;
+        }
+        else return null;
+    }
+
     public int addAccess(long workItemId, long whoEdits, User getAccess){
         Optional<WorkItem> workItemData = workItemRepository.findById(workItemId);
         if(workItemData.isPresent()) {

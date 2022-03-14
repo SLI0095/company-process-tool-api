@@ -17,4 +17,7 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
 
     @Query("SELECT e FROM Element e WHERE e.project = NULL AND (?1 MEMBER e.canEdit OR ?1 MEMBER e.hasAccess)")
     List<Element> findAllElementsTemplateForUser(User user);
+
+    @Query("SELECT e FROM Element e WHERE e.project = NULL AND (?1 MEMBER e.canEdit)")
+    List<Element> findAllElementsTemplateForUserCanEdit(User user);
 }

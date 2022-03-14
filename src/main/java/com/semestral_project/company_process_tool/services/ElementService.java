@@ -38,4 +38,16 @@ public class ElementService {
             return null;
         }
     }
+
+    public List<Element> getAllTemplatesForUserCanEdit(long userId){
+        try {
+            if(userRepository.existsById(userId)) {
+                User user = userRepository.findById(userId).get();
+                return elementRepository.findAllElementsTemplateForUserCanEdit(user);
+            } else return null;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

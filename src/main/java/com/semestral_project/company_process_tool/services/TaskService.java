@@ -662,5 +662,13 @@ public class TaskService {
         }else return null;
     }
 
+    public List<Task> getAllTemplatesCanEdit(long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            List<Task> allTemplates = taskRepository.findAllTasksTemplatesForUserCanEdit(user);
+            return allTemplates;
+        }else return null;
+    }
+
 
 }

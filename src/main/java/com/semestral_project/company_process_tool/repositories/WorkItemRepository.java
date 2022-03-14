@@ -17,4 +17,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
 
     @Query("SELECT w FROM WorkItem w WHERE w.project = NULL AND (?1 MEMBER w.canEdit OR ?1 MEMBER w.hasAccess)")
     List<WorkItem> findAllWorkItemTemplateForUser(User user);
+
+    @Query("SELECT w FROM WorkItem w WHERE w.project = NULL AND (?1 MEMBER w.canEdit)")
+    List<WorkItem> findAllWorkItemTemplateForUserCanEdit(User user);
 }

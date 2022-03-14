@@ -35,4 +35,14 @@ public class ElementController {
         }
     }
 
+    @GetMapping("/elements/templatesCanEdit")
+    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId) {
+        List<Element> elements = elementService.getAllTemplatesForUserCanEdit(userId);
+        if(elements != null){
+            return ResponseEntity.ok(elements);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 }

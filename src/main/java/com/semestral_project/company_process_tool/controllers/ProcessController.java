@@ -46,6 +46,16 @@ public class ProcessController {
         }
     }
 
+    @GetMapping("/processes/templatesCanEdit")
+    public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId) {
+        List<Process> processes = processService.getAllTemplatesCanEdit(userId);
+        if(processes != null){
+            return ResponseEntity.ok(processes);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/processes/{id}")
     public ResponseEntity<Process> processById(@PathVariable Long id) {
         Process process = processService.getProcessById(id);
@@ -87,8 +97,20 @@ public class ProcessController {
         long ret = processService.addProcess(process, userId);
         if(ret != -1){
             return ResponseEntity.ok(new ResponseMessage("Process added"));
-        } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
+        }
+    }
+
+    @PostMapping("/processes/neVersion")
+    public ResponseEntity<ResponseMessage> newVersion(@RequestBody Process process, @RequestParam long userId, @RequestParam long oldProcess){
+        long ret = processService.newVersionOfProcess(process,oldProcess, userId);
+        if(ret != -1){
+            return ResponseEntity.ok(new ResponseMessage("Process added"));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
         }
