@@ -104,7 +104,7 @@ public class ProcessController {
         }
     }
 
-    @PostMapping("/processes/neVersion")
+    @PostMapping("/processes/newVersion")
     public ResponseEntity<ResponseMessage> newVersion(@RequestBody Process process, @RequestParam long userId, @RequestParam long oldProcess){
         long ret = processService.newVersionOfProcess(process,oldProcess, userId);
         if(ret != -1){

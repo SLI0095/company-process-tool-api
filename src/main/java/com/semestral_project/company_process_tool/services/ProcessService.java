@@ -465,9 +465,11 @@ public class ProcessService {
             newProcess = processRepository.save(newProcess);
 
             Process old = processRepository.findById(oldProcess).get();
-            BPMNfile newFile = new BPMNfile();
-            newFile.setBpmnContent(old.getWorkflow().getBpmnContent());
-            bpmnParser.saveBPMN(newFile, newProcess);
+            if(old.getWorkflow() != null){
+                BPMNfile newFile = new BPMNfile();
+                newFile.setBpmnContent(old.getWorkflow().getBpmnContent());
+                bpmnParser.saveBPMN(newFile, newProcess);
+            }
             return newProcess.getId();
         }else return -1;
     }

@@ -481,6 +481,9 @@ public class BPMNparser {
 
                             if (node2.getNodeType() == Node.ELEMENT_NODE) {
                                 org.w3c.dom.Element elementOutput = (org.w3c.dom.Element) node2;
+                                if(elementOutput.getElementsByTagNameNS("*","targetRef").item(0) == null){
+                                    continue;
+                                }
                                 String outputId = elementOutput.getElementsByTagNameNS("*","targetRef").item(0).getTextContent();
 
                                 if (Pattern.matches("WorkItem_([0-9]+)_.*", outputId)) {
