@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.services.RoleService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -30,6 +31,16 @@ public class RoleController {
     @GetMapping("/roles/templates")
     public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
         List<Role> roles = roleService.getAllTemplatesForUser(userId);
+        if(roles != null){
+            return ResponseEntity.ok(roles);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/roles/templatesCanEdit")
+    public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
+        List<Role> roles = roleService.getAllTemplatesForUserCanEdit(userId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -91,6 +102,8 @@ public class RoleController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
         }
@@ -136,6 +149,8 @@ public class RoleController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
         }

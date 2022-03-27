@@ -119,6 +119,9 @@ public class ProcessService {
                 }
                 if(process_.getCanEdit().contains(getAccess_)){
                     var list = process_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(getAccess_);
                     process_.setCanEdit(list);
                 }
@@ -177,6 +180,9 @@ public class ProcessService {
                 User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
                 if(process_.getCanEdit().contains(removeEdit_)) {
                     var list = process_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(removeEdit_);
                     process_.setCanEdit(list);
                     processRepository.save(process_);

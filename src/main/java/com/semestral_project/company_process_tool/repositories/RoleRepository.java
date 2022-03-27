@@ -17,5 +17,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
     @Query("SELECT r FROM Role r WHERE r.project = NULL AND (?1 MEMBER r.canEdit OR ?1 MEMBER r.hasAccess)")
     List<Role> findAllRolesTemplatesForUser(User user);
 
+    @Query("SELECT r FROM Role r WHERE r.project = NULL AND (?1 MEMBER r.canEdit)")
+    List<Role> findAllTasksTemplatesForUserCanEdit(User user);
 
 }

@@ -89,7 +89,10 @@ public class RoleService {
                     return 3; //already has access
                 }
                 if(role_.getCanEdit().contains(getAccess_)){
-                    var list = role_.getHasAccess();
+                    var list = role_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6; //cannot remove all edit rights
+                    }
                     list.remove(getAccess_);
                     role_.setCanEdit(list);
                 }
@@ -136,10 +139,13 @@ public class RoleService {
         if(roleData.isPresent()) {
             Role role_ = roleData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(role_.getCanEdit().contains(whoEdits_)){
+            if(role_.getCanEdit().contains(whoEdits_) ){
                 User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
                 if(role_.getCanEdit().contains(removeEdit_)) {
                     var list = role_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(removeEdit_);
                     role_.setCanEdit(list);
                     roleRepository.save(role_);
@@ -229,6 +235,15 @@ public class RoleService {
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
             List<Role> allTemplates = roleRepository.findAllRolesTemplatesForUser(user);
+            return allTemplates;
+        }
+        else return null;
+    }
+
+    public List<Role> getAllTemplatesForUserCanEdit(long userId){
+        if(userRepository.existsById(userId)) {
+            User user = userRepository.findById(userId).get();
+            List<Role> allTemplates = roleRepository.findAllTasksTemplatesForUserCanEdit(user);
             return allTemplates;
         }
         else return null;

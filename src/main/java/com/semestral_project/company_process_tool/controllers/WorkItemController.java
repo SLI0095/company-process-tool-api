@@ -153,6 +153,8 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }
@@ -198,6 +200,8 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }

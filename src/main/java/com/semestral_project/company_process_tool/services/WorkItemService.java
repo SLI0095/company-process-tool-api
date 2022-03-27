@@ -256,6 +256,9 @@ public class WorkItemService {
                 }
                 if(workItem_.getCanEdit().contains(getAccess_)){
                     var list = workItem_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(getAccess_);
                     workItem_.setCanEdit(list);
                 }
@@ -306,6 +309,9 @@ public class WorkItemService {
                 User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
                 if(workItem_.getCanEdit().contains(removeEdit_)) {
                     var list = workItem_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(removeEdit_);
                     workItem_.setCanEdit(list);
                     workItemRepository.save(workItem_);

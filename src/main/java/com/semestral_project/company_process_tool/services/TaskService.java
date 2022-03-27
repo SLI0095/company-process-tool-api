@@ -95,6 +95,9 @@ public class TaskService {
                 }
                 if(task_.getCanEdit().contains(getAccess_)){
                     var list = task_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(getAccess_);
                     task_.setCanEdit(list);
                 }
@@ -171,6 +174,9 @@ public class TaskService {
                 User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
                 if(task_.getCanEdit().contains(removeEdit_)) {
                     var list = task_.getCanEdit();
+                    if(list.size() == 1){
+                        return 6;
+                    }
                     list.remove(removeEdit_);
                     task_.setCanEdit(list);
                     taskRepository.save(task_);

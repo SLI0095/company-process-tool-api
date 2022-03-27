@@ -272,6 +272,8 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User already has access."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
         }
@@ -317,6 +319,8 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User don't have editing rights."));
         }else if(status == 5){
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+        }else if(status == 6){
+            return ResponseEntity.badRequest().body(new ResponseMessage("At least one editing user must remain."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
         }
