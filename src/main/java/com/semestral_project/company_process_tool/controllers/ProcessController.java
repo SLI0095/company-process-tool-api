@@ -12,6 +12,7 @@ import com.semestral_project.company_process_tool.utils.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -255,12 +256,10 @@ public class ProcessController {
     }
 
     @GetMapping("/processes/{id}/generateHTML")
-    public ResponseEntity<String> processHTML(@PathVariable Long id) {
-        String html = processService.generateHTML(id);
-        if(html != null){
-            return ResponseEntity.ok(html);
-        } else {
-            return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<StreamingResponseBody> processHTML(@PathVariable Long id) {
+        return ResponseEntity
+                .ok()
+                .header("Content-Disposition", "attachment; filename=\"HTML_report.zip\"")
+                .body(out -> processService.generateHTML(id,out));
         }
-    }
 }

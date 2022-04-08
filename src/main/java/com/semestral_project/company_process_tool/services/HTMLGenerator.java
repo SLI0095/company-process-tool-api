@@ -5,8 +5,15 @@ import com.semestral_project.company_process_tool.entities.Process;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class HTMLGenerator {
@@ -19,110 +26,9 @@ public class HTMLGenerator {
             "<!DOCTYPE html>\n" +
             "<html>\n" +
             "<head>\n" +
-                    "<style>\n" +
-                    "    body{\n" +
-                    "      font-family: Tahoma, sans-serif;\n" +
-                    "      padding-right: 2rem;\n" +
-                    "      padding-left: 2rem;\n" +
-                    "    }\n" +
-                    "    #canvas{\n" +
-                    "      height: 50vh;\n" +
-                    "    }\n" +
-                    "    h1{\n" +
-                    "      font-size: 4rem;\n" +
-                    "      text-align: center;\n" +
-                    "    }\n" +
-                    "    h2{\n" +
-                    "      font-size: 3rem;\n" +
-                    "      padding-top: 3.5rem;\n" +
-                    "    }\n" +
-                    "    h3{\n" +
-                    "      font-size: 2rem;\n" +
-                    "      padding-top: 3.5rem;\n" +
-                    "    }\n" +
-                    "    label{\n" +
-                    "      display: block; \n" +
-                    "      font-size: 1.25rem;\n" +
-                    "      font-weight: bold;\n" +
-                    "      padding-top: 2rem;\n" +
-                    "    }\n" +
-                    "    dt{\n" +
-                    "      font-size: 1.25rem;\n" +
-                    "      font-weight: bold;\n" +
-                    "      padding-top: 2rem;\n" +
-                    "    }\n" +
-                    "    dd{\n" +
-                    "      margin-left: 1.5rem;\n" +
-                    "    }\n" +
-                    "    p{\n" +
-                    "      font-size: 1rem;\n" +
-                    "    }\n" +
-                    "    table, td, th {  \n" +
-                    "      border: 1px solid #ddd;\n" +
-                    "      text-align: left;\n" +
-                    "    }\n" +
-                    "    table {\n" +
-                    "      border-collapse: collapse;\n" +
-                    "      /* width: 50%; */\n" +
-                    "    }\n" +
-                    "    th, td {\n" +
-                    "      padding: 15px;\n" +
-                    "      text-align: left;\n" +
-                    "    }\n" +
-                    ".tableR {\n" +
-                    "      text-align: center;\n" +
-                    "      background: green;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    .tableA {\n" +
-                    "      text-align: center;\n" +
-                    "      background: crimson;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    .tableS {\n" +
-                    "      text-align: center;\n" +
-                    "      background: darkorchid;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    .tableC {\n" +
-                    "      text-align: center;\n" +
-                    "      background: royalblue;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    .tableI {\n" +
-                    "      text-align: center;\n" +
-                    "      background: goldenrod;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    .table- {\n" +
-                    "      text-align: center;\n" +
-                    "      background: gray;\n" +
-                    "      padding-left: 0;\n" +
-                    "      padding-right: 0;\n" +
-                    "      color: white;\n" +
-                    "    }" +
-                    ".null{\n" +
-                    "      font-size: 2rem;\n" +
-                    "      margin-left: 1.5rem;\n" +
-                    "    }" +
-                    "\n" +
-                    "  </style>\n" +
             "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
+            "<link rel=\"stylesheet\" href=\"styles/basic.css\">\n" +
+            " <!--- <link rel=\"stylesheet\" href=\"styles/pretty.css\"> --->\n" +
             "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
             "<body>";
     private static String footer =
@@ -130,6 +36,7 @@ public class HTMLGenerator {
             "</head>\n" +
             "</html>";
 
+    private List<Process> processList = new ArrayList<>();
     private List<Role> rolesToGenerate = new ArrayList<>();
     private List<Task> tasksToGenerate = new ArrayList<>();
     private List<WorkItem> workItemsToGenerate = new ArrayList<>();
@@ -156,13 +63,145 @@ public class HTMLGenerator {
         relations
      */
 
-    public String generateHTML(long processId){
-        this.tasksToGenerate = new ArrayList<>();
-        this.rolesToGenerate = new ArrayList<>();
-        this.workItemsToGenerate = new ArrayList<>();
+    public ZipOutputStream generateHTML(long processId, OutputStream stream) {
+        try {
+            Process process = processService.getProcessById(processId);
+            this.fillList(process);
+            for (Process p : processList) {
+                String html = generateProcessHTML(p);
+                String fileName = p.getName() + "_" + p.getId() + ".html";
+                File htmlFile = new File("html/" + fileName);
+                htmlFile.getParentFile().mkdirs();
+                htmlFile.createNewFile();
+                FileWriter myWriter = new FileWriter("html/" + fileName);
+                myWriter.write(html);
+                myWriter.close();
+            }
+            ZipOutputStream zipOutputStream = new ZipOutputStream(stream);
+            addIndex(process,zipOutputStream);
+            setupCss();
+
+            File fileToZip = new File("html");
+            zipFile(fileToZip, fileToZip.getName(), zipOutputStream);
+            zipOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void setupCss(){
+        copyCss("src/main/resources/basic.css", "html/styles/basic.css");
+        copyCss("src/main/resources/pretty.css", "html/styles/pretty.css");
+        copyCss("src/main/resources/template.css", "html/styles/template.css");
+    }
+
+    private void copyCss(String fromPath, String toPath){
+        File from = new File(fromPath);
+        File to = new File(toPath);
+        try {
+            to.getParentFile().mkdirs();
+            to.createNewFile();
+            this.copy(from,to);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void copy(File src, File dest) throws IOException{
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(src);
+            os = new FileOutputStream(dest); // buffer size 1K
+            byte[] buf = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = is.read(buf)) > 0) {
+                os.write(buf, 0, bytesRead); }
+        } finally {
+            is.close();
+            os.close();
+        }
+    }
+
+
+    private void addIndex(Process process, ZipOutputStream stream){
+        try {
+            File index = new File("index.html");
+            index.createNewFile();
+            FileWriter myWriter = new FileWriter("index.html");
+            myWriter.write(String.format("<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "   <head>\n" +
+                    "      <title>HTML Meta Tag</title>\n" +
+                    "      <meta http-equiv = \"refresh\" content = \"0; url = html/%s_%d.html\" />\n" +
+                    "   </head>\n" +
+                    "   <body>\n" +
+                    "   </body>\n" +
+                    "</html>", process.getName(), process.getId()));
+            myWriter.close();
+            FileInputStream fis = new FileInputStream(index);
+            ZipEntry zipEntry = new ZipEntry(index.getName());
+            stream.putNextEntry(zipEntry);
+            byte[] bytes = new byte[1024];
+            int length;
+            while ((length = fis.read(bytes)) >= 0) {
+                stream.write(bytes, 0, length);
+            }
+            fis.close();
+            index.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void zipFile(File fileToZip, String fileName, ZipOutputStream zipOut) throws IOException {
+        if (fileToZip.isHidden()) {
+            return;
+        }
+        if (fileToZip.isDirectory()) {
+            if (fileName.endsWith("/")) {
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.closeEntry();
+            } else {
+                zipOut.putNextEntry(new ZipEntry(fileName + "/"));
+                zipOut.closeEntry();
+            }
+            File[] children = fileToZip.listFiles();
+            for (File childFile : children) {
+                zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
+            }
+            fileToZip.delete();
+            return;
+        }
+        FileInputStream fis = new FileInputStream(fileToZip);
+        ZipEntry zipEntry = new ZipEntry(fileName);
+        zipOut.putNextEntry(zipEntry);
+        byte[] bytes = new byte[1024];
+        int length;
+        while ((length = fis.read(bytes)) >= 0) {
+            zipOut.write(bytes, 0, length);
+        }
+        fis.close();
+        fileToZip.delete();
+    }
+
+    private void fillList(Process process){
+        processList.add(process);
+        for(Element e : process.getElements()){
+            if(e.getClass() == Process.class){
+                fillList((Process) e);
+            }
+        }
+    }
+
+
+    private String generateProcessHTML(Process process){
+        rolesToGenerate = new ArrayList<>();
+        tasksToGenerate = new ArrayList<>();
+        workItemsToGenerate = new ArrayList<>();
         StringBuilder htmlBuilder = new StringBuilder();
 
-        Process process = processService.getProcessById(processId);
         htmlBuilder.append(head);
         htmlBuilder.append("<h1>").append(process.getName()).append("</h1>");
         if(process.getWorkflow() != null){
@@ -172,21 +211,29 @@ public class HTMLGenerator {
         htmlBuilder.append(processMetrics(process));
         htmlBuilder.append(processElements(process));
         htmlBuilder.append(processRasciMatrix(process));
-        htmlBuilder.append("<h1>Tasks</h1>");
+        htmlBuilder.append("<h1 class='tasksHeading'>Tasks</h1>");
         for(Task t : tasksToGenerate){
+            htmlBuilder.append("<div class='task'>");
             htmlBuilder.append(taskPart(t));
+            htmlBuilder.append("</div>");
         }
-        htmlBuilder.append("<h1>Roles</h1>");
+        htmlBuilder.append("<h1 class='rolesHeading'>Roles</h1>");
         for(Role r : rolesToGenerate){
+            htmlBuilder.append("<div class='role'>");
             htmlBuilder.append(rolePart(r));
+            htmlBuilder.append("</div>");
         }
-        htmlBuilder.append("<h1>Work items</h1>");
+        htmlBuilder.append("<h1 class='rolesHeading'>Work items</h1>");
         for(WorkItem w : workItemsToGenerate){
+            htmlBuilder.append("<div class='workItem'>");
             htmlBuilder.append(workItemPart(w));
+            htmlBuilder.append("</div>");
         }
         htmlBuilder.append(footer);
         return htmlBuilder.toString();
     }
+
+
 
     private String processWorkflow(Process process){
         StringBuilder returnString = new StringBuilder();
@@ -207,7 +254,7 @@ public class HTMLGenerator {
 
     private String processDetail(Process process){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='processDetails'>");
         returnString.append(generatePart("Brief description:", process.getBriefDescription()));
         returnString.append(generatePart("Main description:", process.getMainDescription()));
         returnString.append(generatePart("Purpose:", process.getPurpose()));
@@ -229,7 +276,7 @@ public class HTMLGenerator {
 
     private String processMetrics(Process process){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='processMetrics'>");
         returnString.append("<h3>Process metrics</h3>");
         if(process.getMetrics().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -252,7 +299,7 @@ public class HTMLGenerator {
 
     private String processElements(Process process){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='processActivities'>");
         returnString.append("<h3>Activities in process</h3>");
         returnString.append("<dl>");
         for(Element e : process.getElements()){
@@ -261,7 +308,7 @@ public class HTMLGenerator {
                 returnString.append("<dt><a href='#element_").append(e.getId()).append("'>").append(e.getName()).append("</a></dt>");
                 this.tasksToGenerate.add((Task) e);
             } else {
-                returnString.append("<dt>").append(e.getName()).append("</dt>");
+                returnString.append("<dt><a href='").append(e.getName()).append("_").append(e.getId()).append(".html'>").append(e.getName()).append("</a></dt>");
             }
             if(e.getBriefDescription() == null){
                 returnString.append("<dd>-</dd>");
@@ -276,7 +323,7 @@ public class HTMLGenerator {
 
     private String processRasciMatrix(Process process){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='processMatrix'>");
         returnString.append("<h3>RASCI matrix</h3>");
         returnString.append("<table><tbody>");
         String[][] matrix = rasciMatrixService.getMatrixForRenderInHtml(process);
@@ -309,7 +356,7 @@ public class HTMLGenerator {
             }
         }
         returnString.append("<div id='element_").append(task.getId()).append("' >");
-        returnString.append("<h2>").append(task.getName()).append("</h2>");
+        returnString.append("<h2 class='taskName'>").append(task.getName()).append("</h2>");
         returnString.append(taskDetail(task));
         returnString.append(taskSteps(task));
         returnString.append(taskInputs(task));
@@ -321,7 +368,7 @@ public class HTMLGenerator {
 
     private String taskDetail(Task task){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='taskDetail'>");
         returnString.append(generatePart("Brief description:", task.getBriefDescription()));
         returnString.append(generatePart("Main description:", task.getMainDescription()));
         returnString.append(generatePart("Purpose:", task.getPurpose()));
@@ -339,7 +386,7 @@ public class HTMLGenerator {
 
     private String taskSteps(Task task){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='taskSteps'>");
         returnString.append("<h3>Task steps</h3>");
         if(task.getSteps().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -361,7 +408,7 @@ public class HTMLGenerator {
 
     private String taskInputs(Task task){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='taskInputs'>");
         returnString.append("<h3>Task inputs</h3>");
         if(task.getMandatoryInputs().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -386,7 +433,7 @@ public class HTMLGenerator {
 
     private String taskOutputs(Task task){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='taskOutputs'>");
         returnString.append("<h3>Task outputs</h3>");
         if(task.getOutputs().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -411,7 +458,7 @@ public class HTMLGenerator {
 
     private String taskGuidance(Task task){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='taskGuidance'>");
         returnString.append("<h3>Task guidance work items</h3>");
         if(task.getGuidanceWorkItems().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -437,7 +484,7 @@ public class HTMLGenerator {
     private String rolePart(Role role){
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div id='role_").append(role.getId()).append("' >");
-        returnString.append("<h2>").append(role.getName()).append("</h2>");
+        returnString.append("<h2 class='roleName'>").append(role.getName()).append("</h2>");
         returnString.append(roleDetail(role));
         returnString.append("</div>");
         return returnString.toString();
@@ -445,7 +492,7 @@ public class HTMLGenerator {
 
     private String roleDetail(Role role){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='roleDetail'>");
         returnString.append(generatePart("Brief description:", role.getBriefDescription()));
         returnString.append(generatePart("Main description:", role.getMainDescription()));
         returnString.append(generatePart("Skills:", role.getSkills()));
@@ -464,7 +511,7 @@ public class HTMLGenerator {
     private String workItemPart(WorkItem workItem){
         StringBuilder returnString = new StringBuilder();
         returnString.append("<div id='workItem_").append(workItem.getId()).append("' >");
-        returnString.append("<h2>").append(workItem.getName()).append("</h2>");
+        returnString.append("<h2 class='workItemName'>").append(workItem.getName()).append("</h2>");
         returnString.append(workItemDetail(workItem));
         returnString.append(workItemStates(workItem));
         returnString.append(workItemRelations(workItem));
@@ -474,7 +521,7 @@ public class HTMLGenerator {
 
     private String workItemDetail(WorkItem workItem){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='workItemDetail'>");
         returnString.append(generatePart("Brief description:", workItem.getBriefDescription()));
         returnString.append(generatePart("Main description:", workItem.getMainDescription()));
         returnString.append(generatePart("Work item type:", workItem.getWorkItemType()));
@@ -499,7 +546,7 @@ public class HTMLGenerator {
 
     private String workItemStates(WorkItem workItem){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='workItemStates'>");
         returnString.append("<h3>Possible states</h3>");
         if(workItem.getWorkItemStates().size() == 0){
             returnString.append("<p class='null'>-</p>");
@@ -521,7 +568,7 @@ public class HTMLGenerator {
 
     private String workItemRelations(WorkItem workItem){
         StringBuilder returnString = new StringBuilder();
-        returnString.append("<div>");
+        returnString.append("<div class='workItemRelations'>");
         returnString.append("<h3>Relations to other work items</h3>");
         if(workItem.getRelationsToAnotherWorkItems().size() == 0){
             returnString.append("<p class='null'>-</p>");

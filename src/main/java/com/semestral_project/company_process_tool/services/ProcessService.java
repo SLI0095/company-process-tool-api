@@ -7,8 +7,10 @@ import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class ProcessService {
@@ -498,11 +500,12 @@ public class ProcessService {
 
     public boolean addProcessFromFile(ProcessAndBpmnHolder holder, long whoEdits){
         Process newProcess = holder.getProcess();
-        newProcess = processRepository.save(newProcess);
+        long id = this.addProcess(newProcess,whoEdits);
+        //newProcess = processRepository.save(newProcess);
         BPMNfile newWorkflow = holder.getBpmn();
         newWorkflow.setBpmnContent(bpmnParser.prepareImportedFile(newWorkflow.getBpmnContent()));
 
-        this.saveWorkflow(newProcess.getId(), newWorkflow, whoEdits);
+        this.saveWorkflow(id, newWorkflow, whoEdits);
         return true;
     }
 
@@ -549,10 +552,10 @@ public class ProcessService {
         }
     }
 
-    public String generateHTML(long id){
+    public ZipOutputStream generateHTML(long id, OutputStream stream){
         Optional<Process> processData = processRepository.findById(id);
         if(processData.isPresent()) {
-            return htmlGenerator.generateHTML(id);
+            return htmlGenerator.generateHTML(id, stream);
         }
         return null;
     }
