@@ -1,0 +1,392 @@
+body {
+    font-family: Tahoma, sans-serif;
+    padding-right: 2rem;
+    padding-left: 2rem;
+}
+
+a:link {
+    color: #d3927e;
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:visited {
+    color:#9c6b5c;
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #9c6b5c;
+    background-color: transparent;
+    text-decoration: bold;
+  }
+
+  a:active {
+    color: #9c6b5c;
+    background-color: transparent;
+    text-decoration: bold;
+  }
+
+#canvas {
+    height: 50vh;
+    border: solid #d3927e;
+}
+
+h1.processName {
+    font-size: 5rem;
+    text-align: center;
+    color: #d3927e;
+     /*text-shadow: -1px -1px 0 gold, 1px -1px 0 gold, -1px 1px 0 gold, 1px 1px 0 gold; */
+}
+
+h1.tasksHeading {
+    font-size: 4rem;
+    text-align: left;
+    color:#6768ab;
+}
+
+h1.rolesHeading {
+    font-size: 4rem;
+    text-align: left;
+    color:#859f94;
+}
+
+h1.workItemsHeading {
+    font-size: 4rem;
+    text-align: left;
+    color:#8a4b5e;
+}
+
+h2 {
+    font-size: 3rem;
+}
+
+h3 {
+    font-size: 2rem;
+}
+
+label {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding-top: 2rem;
+}
+
+dt {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding-top: 2rem;
+}
+
+dd {
+    margin-left: 1.5rem;
+}
+
+p {
+    font-size: 1rem;
+}
+
+table, td, th {
+    border: 1px solid #d3927e;
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    /* width: 50%; */
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+.processDetails {
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: solid #d3927e;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.processMetrics{
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: solid #d3927e;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.processMetrics h3{
+    border-bottom: 3px solid #d3927e;
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.processActivities {
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: solid #d3927e;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.processActivities h3{
+    border-bottom: 3px solid #d3927e;
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.processMatrix {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: solid #d3927e;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+}
+
+.processMatrix h3{
+    border-bottom: 3px solid #d3927e;
+    color: #d3927e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.task {
+   border: solid #6768ab;
+   padding: 1rem;
+   margin-bottom: 1rem;
+}
+
+.task p,
+.task label,
+.task .null,
+.task dt,
+.task dd,
+.task li{
+   color: #6768ab;
+}
+
+.task a:link{
+    color: #6768ab;
+ }
+
+ .task a:visited,
+ .task a:hover,
+ .task a:active{
+    color: #464774;
+ }
+
+.taskName{
+    border-bottom: 3px solid #6768ab;
+    color: #6768ab;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.taskDetail {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.taskSteps {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.taskSteps h3{
+    border-bottom: 3px solid #6768ab;
+    color: #6768ab;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.taskInputs {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.taskInputs h3{
+    border-bottom: 3px solid #6768ab;
+    color: #6768ab;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.taskOutputs {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.taskOutputs h3{
+    border-bottom: 3px solid #6768ab;
+    color: #6768ab;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.taskGuidance {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.taskGuidance h3{
+    border-bottom: 3px solid #6768ab;
+    color: #6768ab;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.role {
+    border: solid #859f94;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.role p,
+.role label,
+.role .null,
+.role dt,
+.role dd,
+.role li{
+   color: #859f94;
+}
+
+.role a:link{
+    color: #859f94;
+ }
+
+ .role a:visited,
+ .role a:hover,
+ .role a:active{
+    color: #6f837a;
+ }
+
+.roleName{
+    border-bottom: 3px solid #859f94;
+    color: #859f94;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.workItem {
+    border: solid #8a4b5e;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.workItem p,
+.workItem label,
+.workItem .null,
+.workItem dt,
+.workItem dd,
+.workItem li{
+   color: #8a4b5e;
+}
+
+.workItem a:link{
+    color: #8a4b5e;
+ }
+
+ .workItem a:visited,
+ .workItem a:hover,
+ .workItem a:active{
+    color: #58303c;
+ }
+
+ .workItemName{
+    border-bottom: 3px solid #8a4b5e;
+    color: #8a4b5e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.workItemDetail {
+    color: #8a4b5e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.workItemStates {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.workItemStates h3{
+    border-bottom: 3px solid #8a4b5e;
+    color: #8a4b5e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.workItemRelations {
+   margin-top: 1rem;
+   margin-bottom: 1rem;
+}
+
+.workItemRelations h3{
+    border-bottom: 3px solid #8a4b5e;
+    color: #8a4b5e;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
+
+.tableR {
+    text-align: center;
+    background: #859f94;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableA {
+    text-align: center;
+    background: #8a4b5e;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableS {
+    text-align: center;
+    background: #9067ab;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableC {
+    text-align: center;
+    background: #6768ab;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableI {
+    text-align: center;
+    background: #cdb97e;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.table- {
+    text-align: center;
+    background: white;
+    padding-left: 0;
+    padding-right: 0;
+    color: #d3927e;
+}
+
+.null {
+    font-size: 2rem;
+    margin-left: 1.5rem;
+}

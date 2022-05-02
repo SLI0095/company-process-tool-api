@@ -6,10 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -27,8 +23,7 @@ public class HTMLGenerator {
             "<html>\n" +
             "<head>\n" +
             "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
-            "<link rel=\"stylesheet\" href=\"styles/basic.css\">\n" +
-            " <!--- <link rel=\"stylesheet\" href=\"styles/pretty.css\"> --->\n" +
+            "<link rel=\"stylesheet\" href=\"styles/main.css\">\n" +
             "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
             "<body>";
     private static String footer =
@@ -91,6 +86,7 @@ public class HTMLGenerator {
     }
 
     private void setupCss(){
+        copyCss("src/main/resources/basic.css", "html/styles/main.css");
         copyCss("src/main/resources/basic.css", "html/styles/basic.css");
         copyCss("src/main/resources/pretty.css", "html/styles/pretty.css");
         copyCss("src/main/resources/template.css", "html/styles/template.css");
@@ -203,7 +199,7 @@ public class HTMLGenerator {
         StringBuilder htmlBuilder = new StringBuilder();
 
         htmlBuilder.append(head);
-        htmlBuilder.append("<h1>").append(process.getName()).append("</h1>");
+        htmlBuilder.append("<h1 class='processName'>").append(process.getName()).append("</h1>");
         if(process.getWorkflow() != null){
             htmlBuilder.append(processWorkflow(process));
         }
@@ -223,7 +219,7 @@ public class HTMLGenerator {
             htmlBuilder.append(rolePart(r));
             htmlBuilder.append("</div>");
         }
-        htmlBuilder.append("<h1 class='rolesHeading'>Work items</h1>");
+        htmlBuilder.append("<h1 class='workItemsHeading'>Work items</h1>");
         for(WorkItem w : workItemsToGenerate){
             htmlBuilder.append("<div class='workItem'>");
             htmlBuilder.append(workItemPart(w));
@@ -343,6 +339,7 @@ public class HTMLGenerator {
             returnString.append("</tr>");
         }
         returnString.append("</tbody></table>");
+        returnString.append("</div>");
         return returnString.toString();
     }
 
