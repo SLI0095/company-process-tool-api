@@ -14,18 +14,21 @@ h1 {
 }
 
 h1.tasksHeading {
-    padding-top: 1rem;
-    border-top: dotted 5px black;
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
 }
 
 h1.rolesHeading {
-    padding-top: 1rem;
-    border-top: dotted 5px black;
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
 }
 
 h1.workItemsHeading {
-    padding-top: 1rem;
-    border-top: dotted 5px black;
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
 }
 
 h2 {
@@ -76,13 +79,18 @@ th, td {
     margin-bottom: 2rem;
 }
 
-.processActivities {
-   border-top: dashed black;
+.processMetrics h3{
+    border-bottom: dashed black;
+    margin-bottom: 2rem;
+ }
+
+.processActivities h3{
+   border-bottom: dashed black;
    margin-bottom: 2rem;
 }
 
-.processMatrix {
-   border-top: dashed black;
+.processMatrix h3{
+   border-bottom: dashed black;
    margin-bottom: 2rem;
 }
 
@@ -92,33 +100,46 @@ th, td {
    margin-bottom: 1rem;
 }
 
+.taskName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
+}
+
 .taskDetail {
     margin-bottom: 2rem;
 }
 
-.taskSteps {
-   border-top: dashed black;
-   margin-bottom: 2rem;
+.taskSteps h3{
+   border-bottom: dashed black;
+   margin-bottom: 0rem;
 }
 
-.taskInputs {
-   border-top: dashed black;
-   margin-bottom: 2rem;
+.taskInputs h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
 }
 
-.taskOutputs {
-   border-top: dashed black;
-   margin-bottom: 2rem;
-}
+.taskOutputs h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+ }
 
-.taskGuidance {
-   border-top: dashed black;
-}
+.taskGuidance h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+ }
 
 .role {
    border-style: solid;
    padding: 1rem;
    margin-bottom: 1rem;
+}
+
+.roleName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
 }
 
 .workItem {
@@ -127,18 +148,24 @@ th, td {
    margin-bottom: 1rem;
 }
 
+.workItemName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
+}
+
 .workItemDetail {
     margin-bottom: 2rem;
 }
 
-.workItemStates {
-   border-top: dashed black;
-   margin-bottom: 2rem;
+.workItemStates h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
 }
 
-.workItemRelations {
-   border-top: dashed black;
-   margin-bottom: 2rem;
+.workItemRelations h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
 }
 
 .tableR {

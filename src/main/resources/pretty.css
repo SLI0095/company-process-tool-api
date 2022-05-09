@@ -31,6 +31,7 @@ a:link {
 #canvas {
     height: 50vh;
     border: solid #d3927e;
+    background: #d3927e2a;
 }
 
 h1.processName {
@@ -104,6 +105,7 @@ th, td {
 
 .processDetails {
     color: #d3927e;
+    background: #d3927e2a;
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: solid #d3927e;
@@ -113,6 +115,7 @@ th, td {
 
 .processMetrics{
     color: #d3927e;
+    background: #d3927e2a;
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: solid #d3927e;
@@ -129,6 +132,7 @@ th, td {
 
 .processActivities {
     color: #d3927e;
+    background: #d3927e2a;
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: solid #d3927e;
@@ -147,6 +151,7 @@ th, td {
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: solid #d3927e;
+    background: #d3927e2a;
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 1rem;
@@ -161,6 +166,7 @@ th, td {
 
 .task {
    border: solid #6768ab;
+   background: #6768ab2d;
    padding: 1rem;
    margin-bottom: 1rem;
 }
@@ -246,6 +252,7 @@ th, td {
 
 .role {
     border: solid #859f94;
+    background: #859f942d;
     padding: 1rem;
     margin-bottom: 1rem;
 }
@@ -278,6 +285,7 @@ th, td {
 
 .workItem {
     border: solid #8a4b5e;
+    background: #8a4b5e41;
     padding: 1rem;
     margin-bottom: 1rem;
 }
@@ -380,7 +388,6 @@ th, td {
 
 .table- {
     text-align: center;
-    background: white;
     padding-left: 0;
     padding-right: 0;
     color: #d3927e;
