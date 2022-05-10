@@ -26,14 +26,6 @@ public class User {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "canEdit")
-    private List<Project> canEditProjects = new ArrayList<>();
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "hasAccess")
-    private List<Project> hasAccessProjects = new ArrayList<>();
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "canEdit")
     private List<Role> canEditRoles = new ArrayList<>();
 
     @JsonIgnore
@@ -83,14 +75,6 @@ public class User {
         this.hasAccessElements = hasAccessElements;
     }
 
-    public List<Project> getHasAccessProjects() {
-        return hasAccessProjects;
-    }
-
-    public void setHasAccessProjects(List<Project> hasAccessProjects) {
-        this.hasAccessProjects = hasAccessProjects;
-    }
-
     public List<Role> getHasAccessRoles() {
         return hasAccessRoles;
     }
@@ -113,14 +97,6 @@ public class User {
 
     public void setCanEditElements(List<Element> canEditElements) {
         this.canEditElements = canEditElements;
-    }
-
-    public List<Project> getCanEditProjects() {
-        return canEditProjects;
-    }
-
-    public void setCanEditProjects(List<Project> canEditProjects) {
-        this.canEditProjects = canEditProjects;
     }
 
     public List<Role> getCanEditRoles() {

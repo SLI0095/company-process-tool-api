@@ -25,9 +25,6 @@ public class WorkItemService {
     BPMNparser bpmNparser;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    ProjectService projectService;
-
 
     public WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem){
         oldWorkItem.setName(updatedWorkItem.getName());
@@ -68,17 +65,6 @@ public class WorkItemService {
         try {
             if(userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
-                if(workItem.getProject() != null){
-                    Project project = projectService.getProjectById(workItem.getProject().getId());
-                    if(project.getCanEdit().contains(user)){
-                        var list = workItem.getCanEdit();
-                        list.add(user);
-                        workItem = workItemRepository.save(workItem);
-                        return workItem.getId();
-                    } else {
-                        return -1;
-                    }
-                }
                 var list = workItem.getCanEdit();
                 list.add(user);
                 workItem = workItemRepository.save(workItem);

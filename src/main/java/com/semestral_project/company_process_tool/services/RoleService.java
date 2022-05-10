@@ -18,8 +18,6 @@ public class RoleService {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    ProjectService projectService;
 
     public Role fillRole(Role oldRole, Role updateRole){
         oldRole.setName(updateRole.getName());
@@ -55,17 +53,6 @@ public class RoleService {
         try {
             if(userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
-                if(role.getProject() != null){
-                    Project project = projectService.getProjectById(role.getProject().getId());
-                    if(project.getCanEdit().contains(user)){
-                        var list = role.getCanEdit();
-                        list.add(user);
-                        role = roleRepository.save(role);
-                        return role.getId();
-                    } else {
-                        return -1;
-                    }
-                }
                 var list = role.getCanEdit();
                 list.add(user);
                 role = roleRepository.save(role);

@@ -12,12 +12,9 @@ import java.util.List;
 @Repository
 public interface ElementRepository extends CrudRepository<Element, Long> {
 
-    @Query("SELECT e FROM Element e WHERE e.project.id = ?1 AND (?2 MEMBER e.canEdit OR ?2 MEMBER e.hasAccess)")
-    List<Element> findAllElementsInProjectForUser(Long projectId, User user);
-
-    @Query("SELECT e FROM Element e WHERE e.project = NULL AND (?1 MEMBER e.canEdit OR ?1 MEMBER e.hasAccess)")
+    @Query("SELECT e FROM Element e WHERE (?1 MEMBER e.canEdit OR ?1 MEMBER e.hasAccess)")
     List<Element> findAllElementsTemplateForUser(User user);
 
-    @Query("SELECT e FROM Element e WHERE e.project = NULL AND (?1 MEMBER e.canEdit)")
+    @Query("SELECT e FROM Element e WHERE (?1 MEMBER e.canEdit)")
     List<Element> findAllElementsTemplateForUserCanEdit(User user);
 }

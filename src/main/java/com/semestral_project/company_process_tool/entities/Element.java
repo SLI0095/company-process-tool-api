@@ -35,9 +35,6 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> canEdit = new ArrayList<>();
 
-    @ManyToOne
-    private Project project = null;
-
     @JsonIgnore
     private Long previousId = -1L;
 
@@ -59,14 +56,6 @@ public class Element extends Item{
 
     public void setPartOfProcess(List<Process> partOfProcess) {
         this.partOfProcess = partOfProcess;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 
     public Long getPreviousId() {

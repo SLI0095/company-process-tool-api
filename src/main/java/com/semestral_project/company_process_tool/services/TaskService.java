@@ -24,8 +24,6 @@ public class TaskService {
     BPMNparser bpmNparser;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    ProjectService projectService;
 
     public Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
@@ -61,17 +59,6 @@ public class TaskService {
         try {
             if (userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
-                if(task.getProject() != null){
-                    Project project = projectService.getProjectById(task.getProject().getId());
-                    if(project.getCanEdit().contains(user)){
-                        var list = task.getCanEdit();
-                        list.add(user);
-                        task = taskRepository.save(task);
-                        return task.getId();
-                    } else {
-                        return -1;
-                    }
-                }
                 var list = task.getCanEdit();
                 list.add(user);
                 task = taskRepository.save(task);

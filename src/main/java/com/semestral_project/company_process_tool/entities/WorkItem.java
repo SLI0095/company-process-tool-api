@@ -42,8 +42,6 @@ public class WorkItem extends Item{
     @Column(columnDefinition="LONGTEXT")
     private String templateText;
 
-    @ManyToOne
-    private Project project = null;
     @JsonIgnore
     private Long previousId = -1L;
 
@@ -208,14 +206,6 @@ public class WorkItem extends Item{
 
     public void setWorkItemStates(List<State> workItemStates) {
         this.workItemStates = workItemStates;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 
     public List<WorkItemRelation> getRelationsToAnotherWorkItems() {

@@ -48,9 +48,6 @@ public class Role extends Item{
     private List<User> canEdit = new ArrayList<>();
 
 
-    @ManyToOne
-    private Project project = null;
-
     @JsonIgnore
     private Long previousId = -1L;
 
@@ -103,14 +100,6 @@ public class Role extends Item{
 
     public void setAsAdditionalPerformer(List<Task> asAdditionalPerformer) {
         this.asAdditionalPerformer = asAdditionalPerformer;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 
     public Long getPreviousId() {

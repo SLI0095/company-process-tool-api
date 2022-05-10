@@ -75,10 +75,9 @@ public class BPMNparser {
         }
         file.setProcess(process);
         String bpmnContent = file.getBpmnContent();
-        Project project = process.getProject();
-        bpmnContent = this.newWorkItems(bpmnContent, project, process);
-        bpmnContent = this.newProcesses(bpmnContent, project, process);
-        bpmnContent = this.newTasks(bpmnContent, project, process);
+        bpmnContent = this.newWorkItems(bpmnContent, process);
+        bpmnContent = this.newProcesses(bpmnContent);
+        bpmnContent = this.newTasks(bpmnContent, process);
         file.setProcess(process);
         file.setBpmnContent(bpmnContent);
         file = bpmNfileRepository.save(file);
@@ -98,7 +97,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newWorkItems(String inputXML, Project project, Process process){
+    private String newWorkItems(String inputXML, Process process){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -122,7 +121,6 @@ public class BPMNparser {
                         WorkItem w = new WorkItem();
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
-                        w.setProject(project);
                         var listOfUsers = w.getCanEdit();
                         for(User u : process.getCanEdit()){
                             listOfUsers.add(u);
@@ -133,7 +131,6 @@ public class BPMNparser {
                             listOfUsers.add(u);
                         }
                         w.setHasAccess(listOfUsers);
-                        //TODO add projectOwner as access and processOwner as access, change to call service
 
                         WorkItem savedWorkItem = workItemRepository.save(w);
                         String newId = "WorkItem_" + savedWorkItem.getId() + unchangedId;
@@ -151,7 +148,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newProcesses(String inputXML, Project project, Process process){
+    private String newProcesses(String inputXML){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -175,7 +172,6 @@ public class BPMNparser {
                         Process p = new Process();
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
-                        p.setProject(project);
                         Process savedProcess = processRepository.save(p);
                         String newId = "Element_" + savedProcess.getId() + unchangedId;
 
@@ -192,7 +188,7 @@ public class BPMNparser {
         }
     }
 
-    private String newTasks(String inputXML, Project project, Process process){
+    private String newTasks(String inputXML, Process process){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -200,14 +196,14 @@ public class BPMNparser {
             DocumentBuilder db = dbf.newDocumentBuilder();
             org.w3c.dom.Document doc = db.parse(new InputSource(new StringReader(inputXML)));
 
-            returnXML = createNewTask(doc, returnXML, "task", project, process);
-            returnXML = createNewTask(doc, returnXML, "sendTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "receiveTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "userTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "manualTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "serviceTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "scriptTask", project, process);
-            returnXML = createNewTask(doc, returnXML, "businessRuleTask", project, process);
+            returnXML = createNewTask(doc, returnXML, "task", process);
+            returnXML = createNewTask(doc, returnXML, "sendTask", process);
+            returnXML = createNewTask(doc, returnXML, "receiveTask", process);
+            returnXML = createNewTask(doc, returnXML, "userTask", process);
+            returnXML = createNewTask(doc, returnXML, "manualTask", process);
+            returnXML = createNewTask(doc, returnXML, "serviceTask", process);
+            returnXML = createNewTask(doc, returnXML, "scriptTask", process);
+            returnXML = createNewTask(doc, returnXML, "businessRuleTask", process);
 
             return returnXML;
         } catch (ParserConfigurationException | SAXException | IOException e) {
@@ -216,7 +212,7 @@ public class BPMNparser {
         }
     }
 
-    private String createNewTask(Document doc, String returnXML, String type, Project project, Process process){
+    private String createNewTask(Document doc, String returnXML, String type, Process process){
         NodeList list = doc.getElementsByTagNameNS("*", type);
         for (int temp = 0; temp < list.getLength(); temp++) {
 
@@ -233,7 +229,6 @@ public class BPMNparser {
                     String unchangedId = oldId.substring(11); //_Activity_....
                     t.setName(name);
                     t.setTaskType(type);
-                    t.setProject(project);
                     Task savedTask = taskRepository.save(t);
                     String newId = "Element_" + savedTask.getId() + unchangedId;
 

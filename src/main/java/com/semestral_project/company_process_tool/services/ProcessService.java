@@ -28,8 +28,6 @@ public class ProcessService {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    ProjectService projectService;
-    @Autowired
     TaskService taskService;
     @Autowired
     HTMLGenerator htmlGenerator;
@@ -72,17 +70,6 @@ public class ProcessService {
         try {
             if(userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
-                if(process.getProject() != null){
-                    Project project = projectService.getProjectById(process.getProject().getId());
-                    if(project.getCanEdit().contains(user)){
-                        var list = process.getCanEdit();
-                        list.add(user);
-                        process = processRepository.save(process);
-                        return process.getId();
-                    } else {
-                        return -1;
-                    }
-                }
                 var list = process.getCanEdit();
                 list.add(user);
                 process = processRepository.save(process);
@@ -437,31 +424,6 @@ public class ProcessService {
         } else {
             return 2;
         }
-    }
-
-    public int newProcessInProject(Process newProcess, Process template, Project project){
-        if(!(template == null)){
-            newProcess = fillProcess(newProcess, template);
-            newProcess = processRepository.save(newProcess);
-            for(Element e : template.getElements()){
-                var list = e.getPartOfProcess();
-                list.add(newProcess);
-                e.setPartOfProcess(list);
-                elementRepository.save(e);
-            }
-            BPMNfile templateBPMN = template.getWorkflow();
-            if(!(templateBPMN == null))
-            {
-                BPMNfile newBPMN = new BPMNfile();
-                newBPMN.setBpmnContent(templateBPMN.getBpmnContent());
-                newBPMN.setProcess(newProcess);
-                bpmNfileRepository.save(newBPMN);
-            }
-
-        }
-        newProcess.setProject(project);
-        processRepository.save(newProcess);
-        return 1;
     }
 
     public long newVersionOfProcess(Process newProcess, long oldProcess, long userId){

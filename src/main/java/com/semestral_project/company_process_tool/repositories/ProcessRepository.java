@@ -13,13 +13,9 @@ import java.util.List;
 @Repository
 public interface ProcessRepository extends CrudRepository<Process, Long> {
 
-    @Query("SELECT p FROM Process p WHERE p.project = NULL AND (?1 MEMBER p.canEdit OR ?1 MEMBER p.hasAccess)")
+    @Query("SELECT p FROM Process p WHERE (?1 MEMBER p.canEdit OR ?1 MEMBER p.hasAccess)")
     List<Process> findAllTemplatesProcessesForUser(User user);
 
-    @Query("SELECT p FROM Process p WHERE p.project = NULL AND (?1 MEMBER p.canEdit)")
+    @Query("SELECT p FROM Process p WHERE (?1 MEMBER p.canEdit)")
     List<Process> findAllTemplatesProcessesForUserCanEdit(User user);
-
-    @Query("SELECT p FROM Process p WHERE p.project.id = ?1 AND (?2 MEMBER p.canEdit OR ?2 MEMBER p.hasAccess)")
-    List<Process> findAllProcessesInProjectForUser(Long projectId, User user);
-
 }
