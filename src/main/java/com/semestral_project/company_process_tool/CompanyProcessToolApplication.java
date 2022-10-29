@@ -15,9 +15,6 @@ import java.util.stream.Stream;
 @SpringBootApplication
 public class CompanyProcessToolApplication {
 
-    @Value( "${webapp.url}" )
-    private String webAppUrl;
-
     public static void main(String[] args) {
         SpringApplication.run(CompanyProcessToolApplication.class, args);
     }
