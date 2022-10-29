@@ -17,7 +17,7 @@ public class Rasci {
 
     @JsonIgnore
     @ManyToOne
-    private Element element;
+    private Task task;
 
     private char type;
 
@@ -41,11 +41,11 @@ public class Rasci {
     }
 
     public Element getElement() {
-        return element;
+        return task;
     }
 
-    public void setElement(Element element) {
-        this.element = element;
+    public void setElement(Task task) {
+        this.task = task;
     }
 
     public char getType() {

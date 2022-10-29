@@ -27,7 +27,7 @@ public class Process extends Element{
     private List<Element> elements = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "bpmnId")
+    @JoinColumn(name = "bpmn_id")
     private BPMNfile workflow;
 
     @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
@@ -35,6 +35,9 @@ public class Process extends Element{
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<ProcessMetric> metrics = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<Element> usableElements = new ArrayList<>();
 
     public Process() {
     }

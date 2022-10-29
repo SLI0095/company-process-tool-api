@@ -28,12 +28,17 @@ public class Task extends Element{
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "element", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<Rasci> rasciList = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
     private List<WorkItem> guidanceWorkItems = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<Role> usableRoles = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<WorkItem> usableWorkItems = new ArrayList<>();
 
 
 
