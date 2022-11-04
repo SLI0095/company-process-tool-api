@@ -122,14 +122,10 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
                         var listOfUsers = w.getCanEdit();
-                        for(User u : process.getCanEdit()){
-                            listOfUsers.add(u);
-                        }
+                        listOfUsers.addAll(process.getCanEdit());
                         w.setCanEdit(listOfUsers);
                         listOfUsers = w.getHasAccess();
-                        for(User u : process.getHasAccess()){
-                            listOfUsers.add(u);
-                        }
+                        listOfUsers.addAll(process.getHasAccess());
                         w.setHasAccess(listOfUsers);
 
                         WorkItem savedWorkItem = workItemRepository.save(w);

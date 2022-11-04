@@ -113,35 +113,35 @@ public class WorkItemController {
         }
     }
 
-    @PutMapping("/workItems/{id}/addRelation")
-    public ResponseEntity<ResponseMessage> addRelation(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam String relationType, @RequestParam long userId) {
+//    @PutMapping("/workItems/{id}/addRelation")
+//    public ResponseEntity<ResponseMessage> addRelation(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam String relationType, @RequestParam long userId) {
+//
+//        int status = workItemService.addRelationToWorkItem(id, workItem, relationType, userId);
+//        if(status == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+//        } else if(status == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+//        } else if(status == 3){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+//        }else if(status == 4){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " already has relation to work item " + workItem.getId()));
+//        } else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Can not add relation to itself"));
+//        }
+//    }
 
-        int status = workItemService.addRelationToWorkItem(id, workItem, relationType, userId);
-        if(status == 1){
-            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-        } else if(status == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
-        } else if(status == 3){
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
-        }else if(status == 4){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " already has relation to work item " + workItem.getId()));
-        } else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Can not add relation to itself"));
-        }
-    }
-
-    @PutMapping("/workItems/{id}/removeRelation")
-    public ResponseEntity<ResponseMessage> removeRelation(@PathVariable Long id, @RequestBody WorkItemRelation workItemRelation, @RequestParam long userId) {
-
-        int status = workItemService.removeRelationFromWorkItem(id, workItemRelation, userId);
-        if(status == 1){
-            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-        } else if(status == 3){
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
-        }
-    }
+//    @PutMapping("/workItems/{id}/removeRelation")
+//    public ResponseEntity<ResponseMessage> removeRelation(@PathVariable Long id, @RequestBody WorkItemRelation workItemRelation, @RequestParam long userId) {
+//
+//        int status = workItemService.removeRelationFromWorkItem(id, workItemRelation, userId);
+//        if(status == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+//        } else if(status == 3){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+//        }else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+//        }
+//    }
 
     @PutMapping("/workItems/{id}/addAccess")
     public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {

@@ -59,6 +59,7 @@ public class TaskService {
         try {
             if (userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
+                task.setOwner(user);
                 var list = task.getCanEdit();
                 list.add(user);
                 task = taskRepository.save(task);
@@ -102,7 +103,10 @@ public class TaskService {
     }
 
 
-    public int addAccessAutomatic(long taskId, User getAccess){
+    public int addAccessAutomatic(long taskId, UserType getAccess){
+        if(!(getAccess instanceof User)){
+            return 1;
+        }
         Optional<Task> taskData = taskRepository.findById(taskId);
         if(taskData.isPresent()) {
             Task task_ = taskData.get();
@@ -212,7 +216,10 @@ public class TaskService {
         }
     }
 
-    public int addEditAutomatic(long taskId, User getEdit){
+    public int addEditAutomatic(long taskId, UserType getEdit){
+        if(!(getEdit instanceof User)){
+            return 1;
+        }
         Optional<Task> taskData = taskRepository.findById(taskId);
         if(taskData.isPresent()) {
             Task task_ = taskData.get();
@@ -276,25 +283,11 @@ public class TaskService {
                         w.setAsMandatoryInput(list2);
                         workItemRepository.save(w);
                     }
-                    list = task.getOptionalInputs();
-                    for (WorkItem w : list) {
-                        var list2 = w.getAsOptionalInput();
-                        list2.remove(task);
-                        w.setAsOptionalInput(list2);
-                        workItemRepository.save(w);
-                    }
                     list = task.getOutputs();
                     for (WorkItem w : list) {
                         var list2 = w.getAsOutput();
                         list2.remove(task);
                         w.setAsOutput(list2);
-                        workItemRepository.save(w);
-                    }
-                    list = task.getGuidanceWorkItems();
-                    for (WorkItem w : list) {
-                        var list2 = w.getAsGuidanceWorkItem();
-                        list2.remove(task);
-                        w.setAsGuidanceWorkItem(list2);
                         workItemRepository.save(w);
                     }
                     taskRepository.deleteById(id);
@@ -391,59 +384,59 @@ public class TaskService {
         }
     }
 
-    public int addGuidanceWorkItem(long id, WorkItem workItem, long whoEdits){
-        Optional<Task> taskData = taskRepository.findById(id);
-        if(taskData.isPresent()) {
-            Task task_ = taskData.get();
-            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
-            User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(task_.getCanEdit().contains(whoEdits_)) {
-                List<WorkItem> guidanceList = task_.getGuidanceWorkItems();
-                if (guidanceList.contains(item_)) {
-                    return 4;
-                }
-                List<Task> tasksList = item_.getAsGuidanceWorkItem();
-                tasksList.add(task_);
-                item_.setAsGuidanceWorkItem(tasksList);
-                workItemRepository.save(item_);
-                return 1;
-            }
-            return 3;
-        }
-        else
-        {
-            return 2;
-        }
-    }
-
-    public int removeGuidanceWorkItem(long id, WorkItem workItem, long whoEdits){
-        Optional<Task> taskData = taskRepository.findById(id);
-        if(taskData.isPresent()) {
-            Task task_ = taskData.get();
-            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
-            User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(task_.getCanEdit().contains(whoEdits_)) {
-                List<WorkItem> guidanceList = task_.getGuidanceWorkItems();
-                if (guidanceList.contains(item_)) {
-                    guidanceList.remove(item_);
-
-                    List<Task> tasksList = item_.getAsGuidanceWorkItem();
-                    tasksList.remove(task_);
-                    item_.setAsGuidanceWorkItem(tasksList);
-                    workItemRepository.save(item_);
-                    return 1;
-
-                } else {
-                    return 4;
-                }
-            }
-            return 3;
-        }
-        else
-        {
-            return 2;
-        }
-    }
+//    public int addGuidanceWorkItem(long id, WorkItem workItem, long whoEdits){
+//        Optional<Task> taskData = taskRepository.findById(id);
+//        if(taskData.isPresent()) {
+//            Task task_ = taskData.get();
+//            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(task_.getCanEdit().contains(whoEdits_)) {
+//                List<WorkItem> guidanceList = task_.getGuidanceWorkItems();
+//                if (guidanceList.contains(item_)) {
+//                    return 4;
+//                }
+//                List<Task> tasksList = item_.getAsGuidanceWorkItem();
+//                tasksList.add(task_);
+//                item_.setAsGuidanceWorkItem(tasksList);
+//                workItemRepository.save(item_);
+//                return 1;
+//            }
+//            return 3;
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+//    }
+//
+//    public int removeGuidanceWorkItem(long id, WorkItem workItem, long whoEdits){
+//        Optional<Task> taskData = taskRepository.findById(id);
+//        if(taskData.isPresent()) {
+//            Task task_ = taskData.get();
+//            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(task_.getCanEdit().contains(whoEdits_)) {
+//                List<WorkItem> guidanceList = task_.getGuidanceWorkItems();
+//                if (guidanceList.contains(item_)) {
+//                    guidanceList.remove(item_);
+//
+//                    List<Task> tasksList = item_.getAsGuidanceWorkItem();
+//                    tasksList.remove(task_);
+//                    item_.setAsGuidanceWorkItem(tasksList);
+//                    workItemRepository.save(item_);
+//                    return 1;
+//
+//                } else {
+//                    return 4;
+//                }
+//            }
+//            return 3;
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+//    }
 
     public int addMandatoryInput(long id, WorkItem workItem, long whoEdits) {
         Optional<Task> taskData = taskRepository.findById(id);
@@ -519,7 +512,7 @@ public class TaskService {
         }
     }
 
-    public int addOptionalInput(long id, WorkItem workItem, long whoEdits){
+  /*  public int addOptionalInput(long id, WorkItem workItem, long whoEdits){
         Optional<Task> taskData = taskRepository.findById(id);
         if(taskData.isPresent()) {
             Task task_ = taskData.get();
@@ -570,7 +563,7 @@ public class TaskService {
         {
             return 2;
         }
-    }
+    }*/
 
     public int addOutput(long id, WorkItem workItem, long whoEdits){
         Optional<Task> taskData = taskRepository.findById(id);

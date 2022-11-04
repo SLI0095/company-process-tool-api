@@ -223,7 +223,10 @@ public class ProcessService {
         }
     }
 
-    public int addEditAutomatic(long processId, User getEdit){
+    public int addEditAutomatic(long processId, UserType getEdit){
+        if(!(getEdit instanceof User)){
+            return 1;
+        }
         Optional<Process> processData = processRepository.findById(processId);
         if(processData.isPresent()) {
             Process process_ = processData.get();
@@ -255,7 +258,10 @@ public class ProcessService {
         }
     }
 
-    public int addAccessAutomatic(long processId, User getAccess){
+    public int addAccessAutomatic(long processId, UserType getAccess){
+        if(!(getAccess instanceof User)){
+            return 1;
+        }
         Optional<Process> processData = processRepository.findById(processId);
         if(processData.isPresent()) {
             Process process_ = processData.get();
@@ -343,14 +349,14 @@ public class ProcessService {
             element_.setPartOfProcess(isPartOf);
             elementRepository.save(element_);
             //add access and edit from process to element
-            for(User u : process_.getCanEdit()){
+            for(UserType u : process_.getCanEdit()){
                 if(element_.getClass() == Task.class){
                     taskService.addEditAutomatic(element_.getId(), u);
                 } else {
                     this.addEditAutomatic(element_.getId(), u);
                 }
             }
-            for(User u : process_.getHasAccess()){
+            for(UserType u : process_.getHasAccess()){
                 if(element_.getClass() == Task.class){
                     taskService.addAccessAutomatic(element_.getId(), u);
                 } else {

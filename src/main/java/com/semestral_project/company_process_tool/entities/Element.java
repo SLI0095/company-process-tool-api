@@ -24,17 +24,17 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> partOfProcess = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "element_user_access",
-            joinColumns = {@JoinColumn(name = "element_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> hasAccess = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "element_user_edit",
-            joinColumns = {@JoinColumn(name = "element_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> canEdit = new ArrayList<>();
+//    @ManyToMany
+//    @JoinTable(name = "element_user_access",
+//            joinColumns = {@JoinColumn(name = "element_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> hasAccess = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "element_user_edit",
+//            joinColumns = {@JoinColumn(name = "element_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> canEdit = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "element_process_usage",
@@ -43,11 +43,10 @@ public class Element extends Item{
     private List<Process> canBeUsedIn = new ArrayList<>();
 
     @JsonIgnore
-    private Long previousId = -1L;
+    private boolean isTemplate = false;
 
     @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<SnapshotElement> snapshots = new ArrayList<>();
-
 
     public Element() {
     }
@@ -68,27 +67,21 @@ public class Element extends Item{
         this.partOfProcess = partOfProcess;
     }
 
-    public Long getPreviousId() {
-        return previousId;
-    }
+//    public List<User> getHasAccess() {
+//        return hasAccess;
+//    }
+//
+//    public void setHasAccess(List<User> hasAccess) {
+//        this.hasAccess = hasAccess;
+//    }
+//
+//    public List<User> getCanEdit() {
+//        return canEdit;
+//    }
+//
+//    public void setCanEdit(List<User> canEdit) {
+//        this.canEdit = canEdit;
+//    }
 
-    public void setPreviousId(Long previousId) {
-        this.previousId = previousId;
-    }
 
-    public List<User> getHasAccess() {
-        return hasAccess;
-    }
-
-    public void setHasAccess(List<User> hasAccess) {
-        this.hasAccess = hasAccess;
-    }
-
-    public List<User> getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(List<User> canEdit) {
-        this.canEdit = canEdit;
-    }
 }

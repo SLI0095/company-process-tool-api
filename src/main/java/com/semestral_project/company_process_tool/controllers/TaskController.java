@@ -146,34 +146,34 @@ public class TaskController {
 
 
 
-    @PutMapping("/tasks/{id}/addGuidance")
-    public ResponseEntity<ResponseMessage> addGuidance(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
-        int ret = taskService.addGuidanceWorkItem(id, workItem, userId);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Guidance work item added."));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-        } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item already added"));
-        }
-    }
+//    @PutMapping("/tasks/{id}/addGuidance")
+//    public ResponseEntity<ResponseMessage> addGuidance(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
+//        int ret = taskService.addGuidanceWorkItem(id, workItem, userId);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Guidance work item added."));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+//        }else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item already added"));
+//        }
+//    }
 
 
-    @PutMapping("/tasks/{id}/removeGuidance")
-    public ResponseEntity<ResponseMessage> removeGuidance(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
-        int ret = taskService.removeGuidanceWorkItem(id, workItem, userId);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Guidance work item removed."));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-        } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item not in task id: " + id));
-        }
-    }
+//    @PutMapping("/tasks/{id}/removeGuidance")
+//    public ResponseEntity<ResponseMessage> removeGuidance(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
+//        int ret = taskService.removeGuidanceWorkItem(id, workItem, userId);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Guidance work item removed."));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+//        }else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Guidance work item not in task id: " + id));
+//        }
+//    }
 
     @PutMapping("/tasks/{id}/addMandatoryInput")
     public ResponseEntity<ResponseMessage> addMandatoryInput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
@@ -204,34 +204,34 @@ public class TaskController {
         }
     }
 
-    @PutMapping("/tasks/{id}/addOptionalInput")
-    public ResponseEntity<ResponseMessage> addOptionalInput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
-        int ret = taskService.addOptionalInput(id, workItem, userId);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Optional input added."));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-        } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Optional input already added"));
-        }
-    }
-
-
-    @PutMapping("/tasks/{id}/removeOptionalInput")
-    public ResponseEntity<ResponseMessage> removeOptionalInput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
-        int ret = taskService.removeOptionalInput(id, workItem, userId);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Optional input removed."));
-        } else if(ret == 2){
-            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
-        } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Optional input not in task id: " + id));
-        }
-    }
+//    @PutMapping("/tasks/{id}/addOptionalInput")
+//    public ResponseEntity<ResponseMessage> addOptionalInput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
+//        int ret = taskService.addOptionalInput(id, workItem, userId);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Optional input added."));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+//        }else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Optional input already added"));
+//        }
+//    }
+//
+//
+//    @PutMapping("/tasks/{id}/removeOptionalInput")
+//    public ResponseEntity<ResponseMessage> removeOptionalInput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){
+//        int ret = taskService.removeOptionalInput(id, workItem, userId);
+//        if(ret == 1){
+//            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated. Optional input removed."));
+//        } else if(ret == 2){
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+//        } else if(ret == 3) {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+//        }else {
+//            return ResponseEntity.badRequest().body(new ResponseMessage("Optional input not in task id: " + id));
+//        }
+//    }
 
     @PutMapping("/tasks/{id}/addOutput")
     public ResponseEntity<ResponseMessage> addOutput(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam long userId){

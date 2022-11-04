@@ -25,29 +25,29 @@ public class Role extends Item{
     @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE)
     private List<Rasci> rasciList;
 
-    @ManyToMany
-    @JoinTable(name = "role_task_primary",
-            joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asPrimaryPerformer;
-
-    @ManyToMany
-    @JoinTable(name = "role_task_additional",
-            joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asAdditionalPerformer;
-
-    @ManyToMany
-    @JoinTable(name = "role_user_access",
-            joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> hasAccess = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "role_user_edit",
-            joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> canEdit = new ArrayList<>();
+//    @ManyToMany
+//    @JoinTable(name = "role_task_primary",
+//            joinColumns = {@JoinColumn(name = "role_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "element_id")})
+//    private List<Task> asPrimaryPerformer;
+//
+//    @ManyToMany
+//    @JoinTable(name = "role_task_additional",
+//            joinColumns = {@JoinColumn(name = "role_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "element_id")})
+//    private List<Task> asAdditionalPerformer;
+//
+//    @ManyToMany
+//    @JoinTable(name = "role_user_access",
+//            joinColumns = {@JoinColumn(name = "role_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> hasAccess = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "role_user_edit",
+//            joinColumns = {@JoinColumn(name = "role_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> canEdit = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "role_task_usage",
@@ -58,9 +58,9 @@ public class Role extends Item{
     @OneToMany(mappedBy ="originalRole", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<SnapshotRole> snapshots = new ArrayList<>();
 
-
-    @JsonIgnore
-    private Long previousId = -1L;
+//
+//    @JsonIgnore
+//    private Long previousId = -1L;
 
     public Role() {
     }
@@ -97,43 +97,43 @@ public class Role extends Item{
         this.rasciList = rasciList;
     }
 
-    public List<Task> getAsPrimaryPerformer() {
-        return asPrimaryPerformer;
-    }
-
-    public void setAsPrimaryPerformer(List<Task> asPrimaryPerformer) {
-        this.asPrimaryPerformer = asPrimaryPerformer;
-    }
-
-    public List<Task> getAsAdditionalPerformer() {
-        return asAdditionalPerformer;
-    }
-
-    public void setAsAdditionalPerformer(List<Task> asAdditionalPerformer) {
-        this.asAdditionalPerformer = asAdditionalPerformer;
-    }
-
-    public Long getPreviousId() {
-        return previousId;
-    }
-
-    public void setPreviousId(Long previousId) {
-        this.previousId = previousId;
-    }
-
-    public List<User> getHasAccess() {
-        return hasAccess;
-    }
-
-    public void setHasAccess(List<User> hasAccess) {
-        this.hasAccess = hasAccess;
-    }
-
-    public List<User> getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(List<User> canEdit) {
-        this.canEdit = canEdit;
-    }
+//    public List<Task> getAsPrimaryPerformer() {
+//        return asPrimaryPerformer;
+//    }
+//
+//    public void setAsPrimaryPerformer(List<Task> asPrimaryPerformer) {
+//        this.asPrimaryPerformer = asPrimaryPerformer;
+//    }
+//
+//    public List<Task> getAsAdditionalPerformer() {
+//        return asAdditionalPerformer;
+//    }
+//
+//    public void setAsAdditionalPerformer(List<Task> asAdditionalPerformer) {
+//        this.asAdditionalPerformer = asAdditionalPerformer;
+//    }
+//
+//    public Long getPreviousId() {
+//        return previousId;
+//    }
+//
+//    public void setPreviousId(Long previousId) {
+//        this.previousId = previousId;
+//    }
+//
+//    public List<User> getHasAccess() {
+//        return hasAccess;
+//    }
+//
+//    public void setHasAccess(List<User> hasAccess) {
+//        this.hasAccess = hasAccess;
+//    }
+//
+//    public List<User> getCanEdit() {
+//        return canEdit;
+//    }
+//
+//    public void setCanEdit(List<User> canEdit) {
+//        this.canEdit = canEdit;
+//    }
 }

@@ -358,7 +358,7 @@ public class HTMLGenerator {
         returnString.append(taskSteps(task));
         returnString.append(taskInputs(task));
         returnString.append(taskOutputs(task));
-        returnString.append(taskGuidance(task));
+//        returnString.append(taskGuidance(task));
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -511,7 +511,7 @@ public class HTMLGenerator {
         returnString.append("<h2 class='workItemName'>").append(workItem.getName()).append("</h2>");
         returnString.append(workItemDetail(workItem));
         returnString.append(workItemStates(workItem));
-        returnString.append(workItemRelations(workItem));
+//        returnString.append(workItemRelations(workItem));
         returnString.append("</div>");
         return returnString.toString();
     }
@@ -563,33 +563,33 @@ public class HTMLGenerator {
         return returnString.toString();
     }
 
-    private String workItemRelations(WorkItem workItem){
-        StringBuilder returnString = new StringBuilder();
-        returnString.append("<div class='workItemRelations'>");
-        returnString.append("<h3>Relations to other work items</h3>");
-        if(workItem.getRelationsToAnotherWorkItems().size() == 0){
-            returnString.append("<p class='null'>-</p>");
-        } else {
-            returnString.append("<dl>");
-            for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
-                WorkItem wi = relation.getBaseWorkItem();
-                if(workItemsToGenerate.contains(relation.getBaseWorkItem())){
-                    returnString.append("<dt><a href='#workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
-                } else {
-                    returnString.append("<dt>").append(wi.getName()).append("</dt>");
-                }
-                if(wi.getBriefDescription() == null){
-                    returnString.append("<dd>-</dd>");
-                } else {
-                    returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
-                }
-                returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
-            }
-            returnString.append("</dl>");
-        }
-        returnString.append("</div>");
-        return returnString.toString();
-    }
+//    private String workItemRelations(WorkItem workItem){
+//        StringBuilder returnString = new StringBuilder();
+//        returnString.append("<div class='workItemRelations'>");
+//        returnString.append("<h3>Relations to other work items</h3>");
+//        if(workItem.getRelationsToAnotherWorkItems().size() == 0){
+//            returnString.append("<p class='null'>-</p>");
+//        } else {
+//            returnString.append("<dl>");
+//            for(WorkItemRelation relation : workItem.getRelationsToAnotherWorkItems()){
+//                WorkItem wi = relation.getBaseWorkItem();
+//                if(workItemsToGenerate.contains(relation.getBaseWorkItem())){
+//                    returnString.append("<dt><a href='#workItem_").append(wi.getId()).append("'>").append(wi.getName()).append("</a></dt>");
+//                } else {
+//                    returnString.append("<dt>").append(wi.getName()).append("</dt>");
+//                }
+//                if(wi.getBriefDescription() == null){
+//                    returnString.append("<dd>-</dd>");
+//                } else {
+//                    returnString.append("<dd>").append(wi.getBriefDescription()).append("</dd>");
+//                }
+//                returnString.append("<dd>Relation type: ").append(relation.getRelationType()).append("</dd>");
+//            }
+//            returnString.append("</dl>");
+//        }
+//        returnString.append("</div>");
+//        return returnString.toString();
+//    }
 
     private String generatePart(String name, String content){
         StringBuilder returnString = new StringBuilder();

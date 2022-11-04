@@ -6,9 +6,16 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="item_type",
+        discriminatorType = DiscriminatorType.STRING)
 
-@MappedSuperclass
 public class Item {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     private String name;
     @Column(columnDefinition="LONGTEXT")
@@ -21,9 +28,30 @@ public class Item {
     @Column(columnDefinition="LONGTEXT")
     private String changeDescription;
 
+    @ManyToMany
+    @JoinTable(name = "item_user_access",
+            joinColumns = {@JoinColumn(name = "element_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<UserType> hasAccess = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "item_user_edit",
+            joinColumns = {@JoinColumn(name = "element_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+    private List<UserType> canEdit = new ArrayList<>();
+
+    @ManyToOne
+    private User owner;
 
     public Item() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -72,5 +100,29 @@ public class Item {
 
     public void setChangeDescription(String changeDescription) {
         this.changeDescription = changeDescription;
+    }
+
+    public List<UserType> getHasAccess() {
+        return hasAccess;
+    }
+
+    public void setHasAccess(List<UserType> hasAccess) {
+        this.hasAccess = hasAccess;
+    }
+
+    public List<UserType> getCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(List<UserType> canEdit) {
+        this.canEdit = canEdit;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

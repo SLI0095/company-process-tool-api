@@ -10,10 +10,6 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "work_item")
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name="work_item_type",
-//        discriminatorType = DiscriminatorType.STRING)
 public class WorkItem extends Item{
 
     @Id
@@ -44,8 +40,8 @@ public class WorkItem extends Item{
     @Column(columnDefinition="LONGTEXT")
     private String templateText;
 
-    @JsonIgnore
-    private Long previousId = -1L;
+//    @JsonIgnore
+//    private Long previousId = -1L;
 
 
     @JsonIgnore
@@ -55,12 +51,12 @@ public class WorkItem extends Item{
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asMandatoryInput = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(name = "work_item_task_optional_input",
-            joinColumns = {@JoinColumn(name = "work_item_id")},
-            inverseJoinColumns = {@JoinColumn(name = "element_id")})
-    private List<Task> asOptionalInput = new ArrayList<>();
+//    @JsonIgnore
+//    @ManyToMany(cascade = CascadeType.DETACH)
+//    @JoinTable(name = "work_item_task_optional_input",
+//            joinColumns = {@JoinColumn(name = "work_item_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "element_id")})
+//    private List<Task> asOptionalInput = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
@@ -76,24 +72,24 @@ public class WorkItem extends Item{
             inverseJoinColumns = {@JoinColumn(name = "element_id")})
     private List<Task> asGuidanceWorkItem = new ArrayList<>();
 
-    @OneToMany(mappedBy ="relatedWorkItem")
-    private  List<WorkItemRelation> relationsToAnotherWorkItems = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy ="baseWorkItem", cascade = CascadeType.REMOVE)
-    private List<WorkItemRelation> asBase = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "work_item_user_access",
-            joinColumns = {@JoinColumn(name = "work_item_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> hasAccess = new ArrayList<>();
-
-    @ManyToMany
-    @JoinTable(name = "work_item_user_edit",
-            joinColumns = {@JoinColumn(name = "work_item_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> canEdit = new ArrayList<>();
+//    @OneToMany(mappedBy ="relatedWorkItem")
+//    private  List<WorkItemRelation> relationsToAnotherWorkItems = new ArrayList<>();
+//
+//    @JsonIgnore
+//    @OneToMany(mappedBy ="baseWorkItem", cascade = CascadeType.REMOVE)
+//    private List<WorkItemRelation> asBase = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "work_item_user_access",
+//            joinColumns = {@JoinColumn(name = "work_item_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> hasAccess = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "work_item_user_edit",
+//            joinColumns = {@JoinColumn(name = "work_item_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> canEdit = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "work_item_task_usage",
@@ -123,13 +119,13 @@ public class WorkItem extends Item{
         this.asMandatoryInput = asMandatoryInput;
     }
 
-    public List<Task> getAsOptionalInput() {
-        return asOptionalInput;
-    }
-
-    public void setAsOptionalInput(List<Task> asOptionalInput) {
-        this.asOptionalInput = asOptionalInput;
-    }
+//    public List<Task> getAsOptionalInput() {
+//        return asOptionalInput;
+//    }
+//
+//    public void setAsOptionalInput(List<Task> asOptionalInput) {
+//        this.asOptionalInput = asOptionalInput;
+//    }
 
     public List<Task> getAsOutput() {
         return asOutput;
@@ -219,38 +215,37 @@ public class WorkItem extends Item{
         this.workItemStates = workItemStates;
     }
 
-    public List<WorkItemRelation> getRelationsToAnotherWorkItems() {
-        return relationsToAnotherWorkItems;
-    }
-
-    public void setRelationsToAnotherWorkItems(List<WorkItemRelation> relationsToAnotherWorkItems) {
-        this.relationsToAnotherWorkItems = relationsToAnotherWorkItems;
-    }
-
-    public List<WorkItemRelation> getAsBase() {
-        return asBase;
-    }
-
-    public void setAsBase(List<WorkItemRelation> asBase) {
-        this.asBase = asBase;
-    }
-
-    public Long getPreviousId() {
-        return previousId;
-    }
-
-    public void setPreviousId(Long previousId) {
-        this.previousId = previousId;
-    }
-
-    public List<User> getHasAccess() {
-        return hasAccess;
-    }
-
-    public void setHasAccess(List<User> hasAccess) {
-        this.hasAccess = hasAccess;
-    }
-
+//    public List<WorkItemRelation> getRelationsToAnotherWorkItems() {
+//        return relationsToAnotherWorkItems;
+//    }
+//
+//    public void setRelationsToAnotherWorkItems(List<WorkItemRelation> relationsToAnotherWorkItems) {
+//        this.relationsToAnotherWorkItems = relationsToAnotherWorkItems;
+//    }
+//
+//    public List<WorkItemRelation> getAsBase() {
+//        return asBase;
+//    }
+//
+//    public void setAsBase(List<WorkItemRelation> asBase) {
+//        this.asBase = asBase;
+//    }
+//
+//    public Long getPreviousId() {
+//        return previousId;
+//    }
+//
+//    public void setPreviousId(Long previousId) {
+//        this.previousId = previousId;
+//    }
+//    public List<User> getHasAccess() {
+//        return hasAccess;
+//    }
+//
+//    public void setHasAccess(List<User> hasAccess) {
+//        this.hasAccess = hasAccess;
+//    }
+//
     public String getTemplateText() {
         return templateText;
     }
@@ -258,12 +253,12 @@ public class WorkItem extends Item{
     public void setTemplateText(String templateText) {
         this.templateText = templateText;
     }
-
-    public List<User> getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(List<User> canEdit) {
-        this.canEdit = canEdit;
-    }
+//
+//    public List<User> getCanEdit() {
+//        return canEdit;
+//    }
+//
+//    public void setCanEdit(List<User> canEdit) {
+//        this.canEdit = canEdit;
+//    }
 }

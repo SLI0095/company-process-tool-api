@@ -38,9 +38,6 @@ public class SnapshotWorkItem extends SnapshotItem{
     @Column(columnDefinition="LONGTEXT")
     private String templateText;
 
-    @JsonIgnore
-    private Long previousId = -1L;
-
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)

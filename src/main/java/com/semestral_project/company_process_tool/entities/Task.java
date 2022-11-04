@@ -22,8 +22,8 @@ public class Task extends Element{
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<WorkItem> mandatoryInputs = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "asOptionalInput")
-    private List<WorkItem> optionalInputs = new ArrayList<>();
+//    @ManyToMany(mappedBy = "asOptionalInput")
+//    private List<WorkItem> optionalInputs = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs = new ArrayList<>();
@@ -94,13 +94,13 @@ public class Task extends Element{
         this.mandatoryInputs = mandatoryInputs;
     }
 
-    public List<WorkItem> getOptionalInputs() {
-        return optionalInputs;
-    }
-
-    public void setOptionalInputs(List<WorkItem> optionalInputs) {
-        this.optionalInputs = optionalInputs;
-    }
+//    public List<WorkItem> getOptionalInputs() {
+//        return optionalInputs;
+//    }
+//
+//    public void setOptionalInputs(List<WorkItem> optionalInputs) {
+//        this.optionalInputs = optionalInputs;
+//    }
 
     public List<WorkItem> getOutputs() {
         return outputs;

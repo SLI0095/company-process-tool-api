@@ -25,4 +25,47 @@ public class SnapshotRole extends SnapshotItem{
 
     @ManyToOne
     private Role originalRole;
+
+    public SnapshotRole() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
+    }
+
+    public String getAssignmentApproaches() {
+        return assignmentApproaches;
+    }
+
+    public void setAssignmentApproaches(String assignmentApproaches) {
+        this.assignmentApproaches = assignmentApproaches;
+    }
+
+    public List<SnapshotRasci> getRasciList() {
+        return rasciList;
+    }
+
+    public void setRasciList(List<SnapshotRasci> rasciList) {
+        this.rasciList = rasciList;
+    }
+
+    public Role getOriginalRole() {
+        return originalRole;
+    }
+
+    public void setOriginalRole(Role originalRole) {
+        this.originalRole = originalRole;
+    }
 }

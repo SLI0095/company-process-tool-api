@@ -3,7 +3,6 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
-import com.semestral_project.company_process_tool.repositories.WorkItemRelationRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,8 @@ public class WorkItemService {
 
     @Autowired
     WorkItemRepository workItemRepository;
-    @Autowired
-    WorkItemRelationRepository workItemRelationRepository;
+//    @Autowired
+//    WorkItemRelationRepository workItemRelationRepository;
     @Autowired
     StateRepository stateRepository;
     @Autowired
@@ -65,6 +64,7 @@ public class WorkItemService {
         try {
             if(userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
+                workItem.setOwner(user);
                 var list = workItem.getCanEdit();
                 list.add(user);
                 workItem = workItemRepository.save(workItem);
@@ -154,63 +154,63 @@ public class WorkItemService {
         }
     }
 
-    public int addRelationToWorkItem(long id, WorkItem workItem, String relationType, long whoEdits){
-        if(id == workItem.getId())
-            return 5;
-        Optional<WorkItem> workItemData = workItemRepository.findById(id);
-
-        if(workItemData.isPresent()){
-            WorkItem workItem_ = workItemData.get();
-
-            User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)) {
-                List<WorkItemRelation> relations = workItem_.getRelationsToAnotherWorkItems();
-                for (WorkItemRelation relation : relations) {
-                    if (relation.getBaseWorkItem().getId() == workItem.getId()) {
-                        return 4; // already has relation
-                    }
-                }
-                WorkItemRelation relation = new WorkItemRelation();
-                relation.setBaseWorkItem(workItem);
-                relation.setRelatedWorkItem(workItem_);
-                relation.setRelationType(relationType);
-                relation = workItemRelationRepository.save(relation);
-                relations.add(relation);
-                workItem_.setRelationsToAnotherWorkItems(relations);
-                workItemRepository.save(workItem_);
-                return 1;
-            }
-            return 3; //cannot edit
-        }
-        else
-        {
-            return 2;
-        }
-    }
-
-    public int removeRelationFromWorkItem(long id, WorkItemRelation workItemRelation, long whoEdits){
-        Optional<WorkItem> workItemData = workItemRepository.findById(id);
-
-        if(workItemData.isPresent()){
-            WorkItem workItem_ = workItemData.get();
-            WorkItemRelation workItemRelation_ = workItemRelationRepository.findById(workItemRelation.getId()).get();
-            User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)) {
-
-                List<WorkItemRelation> relations = workItem_.getRelationsToAnotherWorkItems();
-                relations.remove(workItemRelation_);
-                workItem_.setRelationsToAnotherWorkItems(relations);
-                workItemRepository.save(workItem_);
-                workItemRelationRepository.delete(workItemRelation_);
-                return 1;
-            }
-            return 3; //cannot edit
-        }
-        else
-        {
-            return 2;
-        }
-    }
+//    public int addRelationToWorkItem(long id, WorkItem workItem, String relationType, long whoEdits){
+//        if(id == workItem.getId())
+//            return 5;
+//        Optional<WorkItem> workItemData = workItemRepository.findById(id);
+//
+//        if(workItemData.isPresent()){
+//            WorkItem workItem_ = workItemData.get();
+//
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(workItem_.getCanEdit().contains(whoEdits_)) {
+//                List<WorkItemRelation> relations = workItem_.getRelationsToAnotherWorkItems();
+//                for (WorkItemRelation relation : relations) {
+//                    if (relation.getBaseWorkItem().getId() == workItem.getId()) {
+//                        return 4; // already has relation
+//                    }
+//                }
+//                WorkItemRelation relation = new WorkItemRelation();
+//                relation.setBaseWorkItem(workItem);
+//                relation.setRelatedWorkItem(workItem_);
+//                relation.setRelationType(relationType);
+//                relation = workItemRelationRepository.save(relation);
+//                relations.add(relation);
+//                workItem_.setRelationsToAnotherWorkItems(relations);
+//                workItemRepository.save(workItem_);
+//                return 1;
+//            }
+//            return 3; //cannot edit
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+//    }
+//
+//    public int removeRelationFromWorkItem(long id, WorkItemRelation workItemRelation, long whoEdits){
+//        Optional<WorkItem> workItemData = workItemRepository.findById(id);
+//
+//        if(workItemData.isPresent()){
+//            WorkItem workItem_ = workItemData.get();
+//            WorkItemRelation workItemRelation_ = workItemRelationRepository.findById(workItemRelation.getId()).get();
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(workItem_.getCanEdit().contains(whoEdits_)) {
+//
+//                List<WorkItemRelation> relations = workItem_.getRelationsToAnotherWorkItems();
+//                relations.remove(workItemRelation_);
+//                workItem_.setRelationsToAnotherWorkItems(relations);
+//                workItemRepository.save(workItem_);
+//                workItemRelationRepository.delete(workItemRelation_);
+//                return 1;
+//            }
+//            return 3; //cannot edit
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+//    }
 
     public List<WorkItem> getAllTemplates(long userId){
         if(userRepository.existsById(userId)) {

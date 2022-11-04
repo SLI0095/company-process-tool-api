@@ -20,7 +20,7 @@ public class SnapshotTask extends SnapshotElement{
 
     private String taskType = "task";
 
-    @ManyToMany(mappedBy = "asInput")
+    @ManyToMany(mappedBy = "asMandatoryInput")
     private List<SnapshotWorkItem> mandatoryInputs = new ArrayList<>();
 
     @ManyToMany(mappedBy = "asOutput")
