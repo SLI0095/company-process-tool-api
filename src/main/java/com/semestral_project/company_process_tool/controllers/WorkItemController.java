@@ -206,4 +206,16 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
         }
     }
+
+    @PutMapping("/workItems/{id}/createSnapshot")
+    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+        int ret = workItemService.createSnapshot(id, userId, description);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " created snapshot"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.*;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ public class TaskService {
     BPMNparser bpmNparser;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    SnapshotTaskService snapshotTaskService;
 
     public Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
@@ -354,7 +357,7 @@ public class TaskService {
                     if (r.getRole().getId() == rasci.getRole().getId())
                         return 4;
                 }
-                rasci.setElement(task_);
+                rasci.setTask(task_);
                 rasciRepository.save(rasci);
 
                 return 1;
@@ -657,4 +660,18 @@ public class TaskService {
     }
 
 
+    public int createSnapshot(Long id, long userId, String description) {
+        Optional<Task> taskData = taskRepository.findById(id);
+        if (taskData.isPresent()) {
+            Task task_ = taskData.get();
+            User whoEdits_ = userRepository.findById(userId).get();
+            if (task_.getCanEdit().contains(whoEdits_)) {
+                snapshotTaskService.createSnapshot(task_, description);
+                return 1;
+            }
+            return 3;
+        } else {
+            return 2;
+        }
+    }
 }

@@ -21,6 +21,7 @@ public class SnapshotElement extends SnapshotItem{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonIgnore
     @ManyToOne
     private Element originalElement;
 
@@ -31,5 +32,30 @@ public class SnapshotElement extends SnapshotItem{
             inverseJoinColumns = {@JoinColumn(name = "snapshot_process_id")})
     private List<SnapshotProcess> partOfProcess = new ArrayList<>();
 
+    public SnapshotElement() {
+    }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Element getOriginalElement() {
+        return originalElement;
+    }
+
+    public void setOriginalElement(Element originalElement) {
+        this.originalElement = originalElement;
+    }
+
+    public List<SnapshotProcess> getPartOfProcess() {
+        return partOfProcess;
+    }
+
+    public void setPartOfProcess(List<SnapshotProcess> partOfProcess) {
+        this.partOfProcess = partOfProcess;
+    }
 }

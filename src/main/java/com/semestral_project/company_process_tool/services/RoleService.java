@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ public class RoleService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    SnapshotRoleService snapshotRoleService;
 
 
     public Role fillRole(Role oldRole, Role updateRole){
@@ -234,5 +238,23 @@ public class RoleService {
             return allTemplates;
         }
         else return null;
+    }
+
+    public int createSnapshot(Long id, long userId, String description) {
+        Optional<Role> roleData = roleRepository.findById(id);
+        if(roleData.isPresent()) {
+            Role role_ = roleData.get();
+            User whoEdits_ = userRepository.findById(userId).get();
+            if(role_.getCanEdit().contains(whoEdits_)){
+                snapshotRoleService.createSnapshotRole(role_,description);
+                return 1;
+            } else {
+                return 3; //cannot edit
+            }
+        }
+        else
+        {
+            return 2;
+        }
     }
 }

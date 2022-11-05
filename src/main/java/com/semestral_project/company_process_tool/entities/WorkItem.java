@@ -261,4 +261,20 @@ public class WorkItem extends Item{
 //    public void setCanEdit(List<User> canEdit) {
 //        this.canEdit = canEdit;
 //    }
+
+    public List<Task> getCanBeUsedIn() {
+        return canBeUsedIn;
+    }
+
+    public void setCanBeUsedIn(List<Task> canBeUsedIn) {
+        this.canBeUsedIn = canBeUsedIn;
+    }
+
+    public List<SnapshotWorkItem> getSnapshots() {
+        return snapshots;
+    }
+
+    public void setSnapshots(List<SnapshotWorkItem> snapshots) {
+        this.snapshots = snapshots;
+    }
 }

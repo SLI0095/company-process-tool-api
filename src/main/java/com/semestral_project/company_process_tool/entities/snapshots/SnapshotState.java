@@ -18,4 +18,39 @@ public class SnapshotState {
     @JsonIgnore
     @ManyToOne
     private SnapshotWorkItem workItem;
+
+    public SnapshotState() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getStateName() {
+        return stateName;
+    }
+
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    public String getStateDescription() {
+        return stateDescription;
+    }
+
+    public void setStateDescription(String stateDescription) {
+        this.stateDescription = stateDescription;
+    }
+
+    public SnapshotWorkItem getWorkItem() {
+        return workItem;
+    }
+
+    public void setWorkItem(SnapshotWorkItem workItem) {
+        this.workItem = workItem;
+    }
 }

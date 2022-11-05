@@ -1,12 +1,13 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotWorkItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class WorkItemService {
 
     @Autowired
     WorkItemRepository workItemRepository;
-//    @Autowired
+    //    @Autowired
 //    WorkItemRelationRepository workItemRelationRepository;
     @Autowired
     StateRepository stateRepository;
@@ -24,8 +25,10 @@ public class WorkItemService {
     BPMNparser bpmNparser;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    SnapshotWorkItemService snapshotWorkItemService;
 
-    public WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem){
+    public WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem) {
         oldWorkItem.setName(updatedWorkItem.getName());
         oldWorkItem.setBriefDescription(updatedWorkItem.getBriefDescription());
         oldWorkItem.setMainDescription(updatedWorkItem.getMainDescription());
@@ -44,7 +47,7 @@ public class WorkItemService {
         return oldWorkItem;
     }
 
-    public List<WorkItem> getAllWorkItems(){
+    public List<WorkItem> getAllWorkItems() {
         try {
             return (List<WorkItem>) workItemRepository.findAll();
         } catch (Exception e) {
@@ -53,91 +56,87 @@ public class WorkItemService {
         }
     }
 
-    public WorkItem getWorkItemById(long id){
+    public WorkItem getWorkItemById(long id) {
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             return workItemData.get();
         } else return null;
     }
 
-    public long addWorkItem(WorkItem workItem, long userId){
+    public long addWorkItem(WorkItem workItem, long userId) {
         try {
-            if(userRepository.existsById(userId)) {
+            if (userRepository.existsById(userId)) {
                 User user = userRepository.findById(userId).get();
                 workItem.setOwner(user);
                 var list = workItem.getCanEdit();
                 list.add(user);
                 workItem = workItemRepository.save(workItem);
                 return workItem.getId();
-            }
-            else return -1;
+            } else return -1;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return -1;
         }
     }
 
-    public boolean deleteWorkItem(long id, long whoEdits){
+    public boolean deleteWorkItem(long id, long whoEdits) {
         try {
             Optional<WorkItem> workItemData = workItemRepository.findById(id);
-            if(workItemData.isPresent()) {
+            if (workItemData.isPresent()) {
                 WorkItem workItem_ = workItemData.get();
                 User whoEdits_ = userRepository.findById(whoEdits).get();
-                    if (workItem_.getCanEdit().contains(whoEdits_)){
-                        if (bpmNparser.removeWorkItemFromAllWorkflows(workItemRepository.findById(id).get())) {
-                            workItemRepository.deleteById(id);
-                            return true;
-                        }
+                if (workItem_.getCanEdit().contains(whoEdits_)) {
+                    if (bpmNparser.removeWorkItemFromAllWorkflows(workItemRepository.findById(id).get())) {
+                        workItemRepository.deleteById(id);
+                        return true;
                     }
                 }
-                return false;
-        }
-        catch (Exception e) {
+            }
+            return false;
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }
     }
 
-    public int updateWorkItem(long id, WorkItem workItem,  long whoEdits) {
+    public int updateWorkItem(long id, WorkItem workItem, long whoEdits) {
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
         if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)){
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 workItem_ = fillWorkItem(workItem_, workItem);
                 workItemRepository.save(workItem_);
-                bpmNparser.updateWorkItemInAllWorkflows(workItem_,true,null);
+                bpmNparser.updateWorkItemInAllWorkflows(workItem_, true, null);
                 return 1;
             }
             return 3; // cannot edit
         } else return 2;
     }
 
-    public int addWorkItemState(long id, State state,  long whoEdits){
+    public int addWorkItemState(long id, State state, long whoEdits) {
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)) {
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 state.setWorkItem(workItem_);
                 stateRepository.save(state);
                 return 1;
             }
             return 3;
 
-        }
-        else
-        {
+        } else {
             return 2;
         }
     }
 
-    public int removeWorkItemState(long id, State state, long whoEdits){
+    public int removeWorkItemState(long id, State state, long whoEdits) {
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)) {
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 State state_ = stateRepository.findById(state.getId()).get();
                 if (state_.getWorkItem().getId() == workItem_.getId()) {
                     stateRepository.delete(state_);
@@ -147,9 +146,7 @@ public class WorkItemService {
                 }
             }
             return 3;
-        }
-        else
-        {
+        } else {
             return 2;
         }
     }
@@ -212,117 +209,109 @@ public class WorkItemService {
 //        }
 //    }
 
-    public List<WorkItem> getAllTemplates(long userId){
-        if(userRepository.existsById(userId)) {
+    public List<WorkItem> getAllTemplates(long userId) {
+        if (userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
             List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplateForUser(user);
             return allTemplates;
-        }
-        else return null;
+        } else return null;
     }
 
-    public List<WorkItem> getAllTemplatesCanEdit(long userId){
-        if(userRepository.existsById(userId)) {
+    public List<WorkItem> getAllTemplatesCanEdit(long userId) {
+        if (userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
             List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplateForUserCanEdit(user);
             return allTemplates;
-        }
-        else return null;
+        } else return null;
     }
 
-    public int addAccess(long workItemId, long whoEdits, User getAccess){
+    public int addAccess(long workItemId, long whoEdits, User getAccess) {
         Optional<WorkItem> workItemData = workItemRepository.findById(workItemId);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)){
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 User getAccess_ = userRepository.findById(getAccess.getId()).get();
-                if(workItem_.getHasAccess().contains(getAccess_)) {
+                if (workItem_.getHasAccess().contains(getAccess_)) {
                     return 3; //already has access
                 }
-                if(workItem_.getCanEdit().contains(getAccess_)){
+                if (workItem_.getCanEdit().contains(getAccess_)) {
                     var list = workItem_.getCanEdit();
-                    if(list.size() == 1){
+                    if (list.size() == 1) {
                         return 6;
                     }
                     list.remove(getAccess_);
                     workItem_.setCanEdit(list);
                 }
-                    var list = workItem_.getHasAccess();
-                    list.add(getAccess_);
-                    workItem_.setHasAccess(list);
-                    workItemRepository.save(workItem_);
-                    return 1; //OK
+                var list = workItem_.getHasAccess();
+                list.add(getAccess_);
+                workItem_.setHasAccess(list);
+                workItemRepository.save(workItem_);
+                return 1; //OK
 
-            }else return 5; //cannot edit
-        }
-        else
-        {
+            } else return 5; //cannot edit
+        } else {
             return 2; //role not found
         }
     }
 
-    public int removeAccess(long workItemId, long whoEdits, User removeAccess){
+    public int removeAccess(long workItemId, long whoEdits, User removeAccess) {
         Optional<WorkItem> workItemData = workItemRepository.findById(workItemId);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)){
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 User getAccess_ = userRepository.findById(removeAccess.getId()).get();
-                if(workItem_.getHasAccess().contains(getAccess_)) {
+                if (workItem_.getHasAccess().contains(getAccess_)) {
                     var list = workItem_.getHasAccess();
                     list.remove(getAccess_);
                     workItem_.setHasAccess(list);
                     workItemRepository.save(workItem_);
                     return 1; //access removed
-                } else{
+                } else {
                     return 3; //nothing to remove
                 }
-            }else return 5; //cannot edit
-        }
-        else
-        {
+            } else return 5; //cannot edit
+        } else {
             return 2; //role not found
         }
     }
 
-    public int removeEdit(long workItemId, long whoEdits, User removeEdit){
+    public int removeEdit(long workItemId, long whoEdits, User removeEdit) {
         Optional<WorkItem> workItemData = workItemRepository.findById(workItemId);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)){
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 User removeEdit_ = userRepository.findById(removeEdit.getId()).get();
-                if(workItem_.getCanEdit().contains(removeEdit_)) {
+                if (workItem_.getCanEdit().contains(removeEdit_)) {
                     var list = workItem_.getCanEdit();
-                    if(list.size() == 1){
+                    if (list.size() == 1) {
                         return 6;
                     }
                     list.remove(removeEdit_);
                     workItem_.setCanEdit(list);
                     workItemRepository.save(workItem_);
                     return 1; //edit removed
-                } else{
+                } else {
                     return 3; //nothing to remove
                 }
-            }else return 5; //cannot edit
-        }
-        else
-        {
+            } else return 5; //cannot edit
+        } else {
             return 2; //role not found
         }
     }
 
-    public int addEdit(long workItemId, long whoEdits, User getEdit){
+    public int addEdit(long workItemId, long whoEdits, User getEdit) {
         Optional<WorkItem> workItemData = workItemRepository.findById(workItemId);
-        if(workItemData.isPresent()) {
+        if (workItemData.isPresent()) {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(workItem_.getCanEdit().contains(whoEdits_)){
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
                 User getEdit_ = userRepository.findById(getEdit.getId()).get();
-                if(workItem_.getCanEdit().contains(getEdit_)){
+                if (workItem_.getCanEdit().contains(getEdit_)) {
                     return 4; //already can edit
-                } else if(workItem_.getHasAccess().contains(getEdit_)) {
+                } else if (workItem_.getHasAccess().contains(getEdit_)) {
                     var list = workItem_.getHasAccess();
                     list.remove(getEdit_);
                     workItem_.setHasAccess(list);
@@ -331,18 +320,29 @@ public class WorkItemService {
                     workItem_.setCanEdit(list);
                     workItemRepository.save(workItem_);
                     return 1; //OK
-                } else{
+                } else {
                     var list = workItem_.getCanEdit();
                     list.add(getEdit_);
                     workItem_.setCanEdit(list);
                     workItemRepository.save(workItem_);
                     return 1; //OK
                 }
-            }else return 5; //cannot edit
-        }
-        else
-        {
+            } else return 5; //cannot edit
+        } else {
             return 2; //role not found
         }
+    }
+
+    public int createSnapshot(Long id, long userId, String description) {
+        Optional<WorkItem> workItemData = workItemRepository.findById(id);
+        if (workItemData.isPresent()) {
+            WorkItem workItem_ = workItemData.get();
+            User whoEdits_ = userRepository.findById(userId).get();
+            if (workItem_.getCanEdit().contains(whoEdits_)) {
+                snapshotWorkItemService.createSnapshot(workItem_, description);
+                return 1;
+            }
+            return 3; // cannot edit
+        } else return 2;
     }
 }

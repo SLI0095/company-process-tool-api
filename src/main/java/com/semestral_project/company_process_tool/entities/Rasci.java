@@ -40,11 +40,11 @@ public class Rasci {
         this.role = role;
     }
 
-    public Element getElement() {
+    public Task getTask() {
         return task;
     }
 
-    public void setElement(Task task) {
+    public void setTask(Task task) {
         this.task = task;
     }
 

@@ -156,4 +156,16 @@ public class RoleController {
         }
     }
 
+    @PutMapping("/roles/{id}/createSnapshot")
+    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+        int ret = roleService.createSnapshot(id, userId, description);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " created snapshot"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+        }
+    }
+
 }

@@ -23,6 +23,7 @@ public class SnapshotRole extends SnapshotItem{
     @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE)
     private List<SnapshotRasci> rasciList;
 
+    @JsonIgnore
     @ManyToOne
     private Role originalRole;
 

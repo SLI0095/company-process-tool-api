@@ -33,7 +33,7 @@ public class SnapshotWorkItem extends SnapshotItem{
     private String urlAddress;
 
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.REMOVE)
-    private List<SnapshotState> workItemStates;
+    private List<SnapshotState> workItemStates = new ArrayList<>();
 
     @Column(columnDefinition="LONGTEXT")
     private String templateText;
@@ -53,6 +53,122 @@ public class SnapshotWorkItem extends SnapshotItem{
             inverseJoinColumns = {@JoinColumn(name = "snapshot_element_id")})
     private List<SnapshotTask> asOutput = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne
     private WorkItem originalWorkItem;
+
+    public SnapshotWorkItem() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getKeyConsiderations() {
+        return keyConsiderations;
+    }
+
+    public void setKeyConsiderations(String keyConsiderations) {
+        this.keyConsiderations = keyConsiderations;
+    }
+
+    public String getBriefOutline() {
+        return briefOutline;
+    }
+
+    public void setBriefOutline(String briefOutline) {
+        this.briefOutline = briefOutline;
+    }
+
+    public String getNotation() {
+        return notation;
+    }
+
+    public void setNotation(String notation) {
+        this.notation = notation;
+    }
+
+    public String getImpactOfNotHaving() {
+        return impactOfNotHaving;
+    }
+
+    public void setImpactOfNotHaving(String impactOfNotHaving) {
+        this.impactOfNotHaving = impactOfNotHaving;
+    }
+
+    public String getReasonForNotNeeding() {
+        return reasonForNotNeeding;
+    }
+
+    public void setReasonForNotNeeding(String reasonForNotNeeding) {
+        this.reasonForNotNeeding = reasonForNotNeeding;
+    }
+
+    public String getWorkItemType() {
+        return workItemType;
+    }
+
+    public void setWorkItemType(String workItemType) {
+        this.workItemType = workItemType;
+    }
+
+    public String getUrlAddress() {
+        return urlAddress;
+    }
+
+    public void setUrlAddress(String urlAddress) {
+        this.urlAddress = urlAddress;
+    }
+
+    public List<SnapshotState> getWorkItemStates() {
+        return workItemStates;
+    }
+
+    public void setWorkItemStates(List<SnapshotState> workItemStates) {
+        this.workItemStates = workItemStates;
+    }
+
+    public String getTemplateText() {
+        return templateText;
+    }
+
+    public void setTemplateText(String templateText) {
+        this.templateText = templateText;
+    }
+
+    public List<SnapshotTask> getAsMandatoryInput() {
+        return asMandatoryInput;
+    }
+
+    public void setAsMandatoryInput(List<SnapshotTask> asMandatoryInput) {
+        this.asMandatoryInput = asMandatoryInput;
+    }
+
+    public List<SnapshotTask> getAsOutput() {
+        return asOutput;
+    }
+
+    public void setAsOutput(List<SnapshotTask> asOutput) {
+        this.asOutput = asOutput;
+    }
+
+    public WorkItem getOriginalWorkItem() {
+        return originalWorkItem;
+    }
+
+    public void setOriginalWorkItem(WorkItem originalWorkItem) {
+        this.originalWorkItem = originalWorkItem;
+    }
 }

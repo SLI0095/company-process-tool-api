@@ -22,4 +22,38 @@ public class SnapshotRasci {
 
     private char type;
 
+    public SnapshotRasci() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public SnapshotRole getRole() {
+        return role;
+    }
+
+    public void setRole(SnapshotRole role) {
+        this.role = role;
+    }
+
+    public SnapshotTask getTask() {
+        return task;
+    }
+
+    public void setTask(SnapshotTask task) {
+        this.task = task;
+    }
+
+    public char getType() {
+        return type;
+    }
+
+    public void setType(char type) {
+        this.type = type;
+    }
 }

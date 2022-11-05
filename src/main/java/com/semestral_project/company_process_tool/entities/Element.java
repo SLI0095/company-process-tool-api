@@ -36,13 +36,13 @@ public class Element extends Item{
 //            inverseJoinColumns = {@JoinColumn(name = "user_id")})
 //    private List<User> canEdit = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "element_process_usage",
             joinColumns = {@JoinColumn(name = "element_id")},
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> canBeUsedIn = new ArrayList<>();
 
-    @JsonIgnore
     private boolean isTemplate = false;
 
     @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH, orphanRemoval = true)
@@ -84,4 +84,27 @@ public class Element extends Item{
 //    }
 
 
+    public List<Process> getCanBeUsedIn() {
+        return canBeUsedIn;
+    }
+
+    public void setCanBeUsedIn(List<Process> canBeUsedIn) {
+        this.canBeUsedIn = canBeUsedIn;
+    }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
+    public List<SnapshotElement> getSnapshots() {
+        return snapshots;
+    }
+
+    public void setSnapshots(List<SnapshotElement> snapshots) {
+        this.snapshots = snapshots;
+    }
 }

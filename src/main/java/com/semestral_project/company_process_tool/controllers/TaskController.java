@@ -325,4 +325,15 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
         }
     }
+    @PutMapping("/tasks/{id}/createSnapshot")
+    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+        int ret = taskService.createSnapshot(id, userId, description);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " created snapshot"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
 }
