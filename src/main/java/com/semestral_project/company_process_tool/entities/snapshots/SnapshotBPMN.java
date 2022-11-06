@@ -18,4 +18,30 @@ public class SnapshotBPMN {
     @OneToOne(mappedBy = "workflow")
     private SnapshotProcess process;
 
+    public SnapshotBPMN() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getBpmnContent() {
+        return bpmnContent;
+    }
+
+    public void setBpmnContent(String bpmnContent) {
+        this.bpmnContent = bpmnContent;
+    }
+
+    public SnapshotProcess getProcess() {
+        return process;
+    }
+
+    public void setProcess(SnapshotProcess process) {
+        this.process = process;
+    }
 }

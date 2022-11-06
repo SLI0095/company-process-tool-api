@@ -8,6 +8,8 @@ import com.semestral_project.company_process_tool.repositories.snapshots.Snapsho
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class SnapshotTaskService {
 
@@ -35,6 +37,8 @@ public class SnapshotTaskService {
         snapshot.setTaskType(original.getTaskType());
 
         snapshot.setOriginalElement(original);
+        snapshot.setSnapshotDescription(snapshotDescription);
+        snapshot.setSnapshotDate(LocalDate.now());
 
         //snapshot = snapshotTaskRepository.save(snapshot);
 

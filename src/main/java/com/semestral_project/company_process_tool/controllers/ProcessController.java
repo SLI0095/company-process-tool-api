@@ -261,5 +261,16 @@ public class ProcessController {
                 .ok()
                 .header("Content-Disposition", "attachment; filename=\"HTML_report.zip\"")
                 .body(out -> processService.generateHTML(id,out));
+    }
+    @PutMapping("/processes/{id}/createSnapshot")
+    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+        int ret = processService.createSnapshot(id, userId, description);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " created snapshot"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
+    }
 }

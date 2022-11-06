@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.*;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotProcessService;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class ProcessService {
     TaskService taskService;
     @Autowired
     HTMLGenerator htmlGenerator;
+    @Autowired
+    SnapshotProcessService snapshotProcessService;
 
     public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -60,10 +63,7 @@ public class ProcessService {
     public Process getProcessById(long id){
         Optional<Process> processData = processRepository.findById(id);
 
-        if(processData.isPresent()) {
-            return processData.get();
-        }
-        else return null;
+        return processData.orElse(null);
     }
 
     public long addProcess(Process process, long userId){
@@ -526,5 +526,20 @@ public class ProcessService {
             return htmlGenerator.generateHTML(id, stream);
         }
         return null;
+    }
+
+    public int createSnapshot(Long id, long userId, String description) {
+        Optional<Process> processData = processRepository.findById(id);
+        if (processData.isPresent()) {
+            Process process_ = processData.get();
+            User whoEdits_ = userRepository.findById(userId).get();
+            if (process_.getCanEdit().contains(whoEdits_)) {
+                snapshotProcessService.createSnapshot(process_, description);
+                return 1;
+            }
+            return 3;
+        } else {
+            return 2;
+        }
     }
 }

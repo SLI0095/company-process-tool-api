@@ -32,4 +32,79 @@ public class SnapshotProcess extends SnapshotElement {
 
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<SnapshotProcessMetric> metrics = new ArrayList<>();
+
+    public SnapshotProcess() {
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    public String getUsageNotes() {
+        return usageNotes;
+    }
+
+    public void setUsageNotes(String usageNotes) {
+        this.usageNotes = usageNotes;
+    }
+
+    public String getAlternatives() {
+        return alternatives;
+    }
+
+    public void setAlternatives(String alternatives) {
+        this.alternatives = alternatives;
+    }
+
+    public String getHowToStaff() {
+        return howToStaff;
+    }
+
+    public void setHowToStaff(String howToStaff) {
+        this.howToStaff = howToStaff;
+    }
+
+    public String getKeyConsiderations() {
+        return keyConsiderations;
+    }
+
+    public void setKeyConsiderations(String keyConsiderations) {
+        this.keyConsiderations = keyConsiderations;
+    }
+
+    public List<SnapshotElement> getElements() {
+        return elements;
+    }
+
+    public void setElements(List<SnapshotElement> elements) {
+        this.elements = elements;
+    }
+
+    public SnapshotBPMN getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(SnapshotBPMN workflow) {
+        this.workflow = workflow;
+    }
+
+    public List<SnapshotProcessMetric> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<SnapshotProcessMetric> metrics) {
+        this.metrics = metrics;
+    }
 }
