@@ -4,6 +4,7 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotTaskService;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -666,7 +667,7 @@ public class TaskService {
             Task task_ = taskData.get();
             User whoEdits_ = userRepository.findById(userId).get();
             if (task_.getCanEdit().contains(whoEdits_)) {
-                snapshotTaskService.createSnapshot(task_, description);
+                snapshotTaskService.createSnapshot(task_, description, new SnapshotsHelper());
                 return 1;
             }
             return 3;

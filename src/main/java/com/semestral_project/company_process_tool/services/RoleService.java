@@ -4,6 +4,7 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -246,7 +247,7 @@ public class RoleService {
             Role role_ = roleData.get();
             User whoEdits_ = userRepository.findById(userId).get();
             if(role_.getCanEdit().contains(whoEdits_)){
-                snapshotRoleService.createSnapshotRole(role_,description);
+                snapshotRoleService.createSnapshotRole(role_,description, new SnapshotsHelper());
                 return 1;
             } else {
                 return 3; //cannot edit

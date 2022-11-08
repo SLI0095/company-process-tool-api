@@ -4,6 +4,7 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotProcessService;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -534,7 +535,7 @@ public class ProcessService {
             Process process_ = processData.get();
             User whoEdits_ = userRepository.findById(userId).get();
             if (process_.getCanEdit().contains(whoEdits_)) {
-                snapshotProcessService.createSnapshot(process_, description);
+                snapshotProcessService.createSnapshot(process_, description, new SnapshotsHelper());
                 return 1;
             }
             return 3;

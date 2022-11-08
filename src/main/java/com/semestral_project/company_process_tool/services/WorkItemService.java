@@ -6,6 +6,7 @@ import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotWorkItemService;
+import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -339,7 +340,7 @@ public class WorkItemService {
             WorkItem workItem_ = workItemData.get();
             User whoEdits_ = userRepository.findById(userId).get();
             if (workItem_.getCanEdit().contains(whoEdits_)) {
-                snapshotWorkItemService.createSnapshot(workItem_, description);
+                snapshotWorkItemService.createSnapshot(workItem_, description, new SnapshotsHelper());
                 return 1;
             }
             return 3; // cannot edit

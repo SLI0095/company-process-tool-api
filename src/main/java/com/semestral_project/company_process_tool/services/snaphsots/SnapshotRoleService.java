@@ -17,8 +17,10 @@ public class SnapshotRoleService {
     @Autowired
     RoleRepository roleRepository;
 
-    public SnapshotRole createSnapshotRole(Role original, String snapshotDescription){
-
+    public SnapshotRole createSnapshotRole(Role original, String snapshotDescription, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
         SnapshotRole snapshot = new SnapshotRole();
         snapshot.setName(original.getName());
         snapshot.setBriefDescription(original.getBriefDescription());
@@ -33,7 +35,9 @@ public class SnapshotRoleService {
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalRole(original);
 
-        return snapshotRoleRepository.save(snapshot);
+        snapshot =  snapshotRoleRepository.save(snapshot);
+        helper.addRole(original.getId(), snapshot);
+        return snapshot;
     }
 
     public Role restoreRoleFromSnapshot(SnapshotRole snapshot){

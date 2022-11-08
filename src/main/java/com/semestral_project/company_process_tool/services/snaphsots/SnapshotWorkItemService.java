@@ -20,7 +20,10 @@ public class SnapshotWorkItemService {
     @Autowired
     SnapshotStateRepository snapshotStateRepository;
 
-    public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription){
+    public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
         SnapshotWorkItem snapshot = new SnapshotWorkItem();
         snapshot.setName(original.getName());
         snapshot.setBriefDescription(original.getBriefDescription());
@@ -52,6 +55,8 @@ public class SnapshotWorkItemService {
             snapshotStateRepository.save(snapshotState);
         }
 
+        snapshot = snapshotWorkItemRepository.save(snapshot);
+        helper.addWorkItem(original.getId(), snapshot);
         return snapshotWorkItemRepository.save(snapshot);
     }
 }

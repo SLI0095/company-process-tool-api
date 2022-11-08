@@ -35,7 +35,10 @@ public class SnapshotProcessService {
     @Autowired
     SnapshotTaskRepository snapshotTaskRepository;
 
-    public SnapshotProcess createSnapshot(Process original, String snapshotDescription){
+    public SnapshotProcess createSnapshot(Process original, String snapshotDescription, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
         SnapshotProcess snapshot = new SnapshotProcess();
         snapshot.setName(original.getName());
         snapshot.setBriefDescription(original.getBriefDescription());
@@ -72,7 +75,10 @@ public class SnapshotProcessService {
 
         for(Element element : original.getElements()){
             if(element instanceof Task){
-                SnapshotTask snapshotTask = snapshotTaskService.createSnapshot((Task)element, snapshotDescription);
+                SnapshotTask snapshotTask = (SnapshotTask) helper.getExistingSnapshotElement(element.getId());
+                if(snapshotTask == null){
+                    snapshotTask = snapshotTaskService.createSnapshot((Task)element, snapshotDescription, helper);
+                }
                 var partOf = snapshotTask.getPartOfProcess();
                 if(!partOf.contains(snapshot)){
                     partOf.add(snapshot);
@@ -80,7 +86,10 @@ public class SnapshotProcessService {
                     snapshotTaskRepository.save(snapshotTask);
                 }
             } else {
-                SnapshotProcess snapshotProcess = this.createSnapshot((Process)element, snapshotDescription);
+                SnapshotProcess snapshotProcess = (SnapshotProcess) helper.getExistingSnapshotElement(element.getId());
+                if(snapshotProcess == null){
+                    snapshotProcess = this.createSnapshot((Process)element, snapshotDescription, helper);
+                }
                 var partOf = snapshotProcess.getPartOfProcess();
                 if(!partOf.contains(snapshot)){
                     partOf.add(snapshot);
@@ -90,6 +99,8 @@ public class SnapshotProcessService {
             }
         }
 
-        return snapshotProcessRepository.save(snapshot);
+        snapshot = snapshotProcessRepository.save(snapshot);
+        helper.addElement(original.getId(), snapshot);
+        return snapshot;
     }
 }
