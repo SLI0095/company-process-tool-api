@@ -2,6 +2,9 @@ package com.semestral_project.company_process_tool.services.snaphsots;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.snapshots.*;
+import com.semestral_project.company_process_tool.repositories.RasciRepository;
+import com.semestral_project.company_process_tool.repositories.TaskRepository;
+import com.semestral_project.company_process_tool.repositories.TaskStepRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotRasciRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskStepRepository;
@@ -23,6 +26,12 @@ public class SnapshotTaskService {
     SnapshotWorkItemService snapshotWorkItemService;
     @Autowired
     SnapshotRoleService snapshotRoleService;
+    @Autowired
+    TaskRepository taskRepository;
+    @Autowired
+    TaskStepRepository taskStepRepository;
+    @Autowired
+    RasciRepository rasciRepository;
 
     public SnapshotTask createSnapshot(Task original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -57,7 +66,7 @@ public class SnapshotTaskService {
 
         //All outputs
         var outputs = snapshot.getOutputs();
-        for(WorkItem workItem : original.getMandatoryInputs()){
+        for(WorkItem workItem : original.getOutputs()){
             SnapshotWorkItem snapshotWorkItem = helper.getExistingSnapshotWorkItem(workItem.getId());
             if(snapshotWorkItem == null){
                 snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDescription, helper);
@@ -90,5 +99,72 @@ public class SnapshotTaskService {
             snapshotRasciRepository.save(snapshotRasci);
         }
         return snapshot;
+    }
+
+    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
+        Task task = new Task();
+        task.setName(snapshotTask.getName());
+        task.setBriefDescription(snapshotTask.getBriefDescription());
+        task.setMainDescription(snapshotTask.getMainDescription());
+        task.setVersion(snapshotTask.getVersion());
+        task.setChangeDate(snapshotTask.getChangeDate());
+        task.setChangeDescription(snapshotTask.getChangeDescription());
+        task.setPurpose(snapshotTask.getPurpose());
+        task.setKeyConsiderations(snapshotTask.getKeyConsiderations());
+        task.setTaskType(snapshotTask.getTaskType());
+
+        //All inputs
+        var inputs = task.getMandatoryInputs();
+        for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getMandatoryInputs()){
+            //Check if was not snapshot already created during snapshotting
+            WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
+            if(workItem == null){
+                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
+            }
+            inputs.add(workItem);
+            //TODO Change id of input in workflow, if necessary
+        }
+        task.setMandatoryInputs(inputs);
+
+        //All outputs
+        var outputs = task.getOutputs();
+        for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getOutputs()){
+            WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
+            if(workItem == null){
+                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
+            }
+            outputs.add(workItem);
+            //TODO Change id of output in workflow, if necessary
+        }
+        task.setOutputs(outputs);
+
+        task = taskRepository.save(task);
+        helper.addElement(snapshotTask.getId(), task);
+
+        for(SnapshotTaskStep snapshotStep : snapshotTask.getSteps()){
+            TaskStep taskStep = new TaskStep();
+            taskStep.setName(snapshotStep.getName());
+            taskStep.setDescription(snapshotStep.getDescription());
+            taskStep.setTask(task);
+            taskStepRepository.save(taskStep);
+        }
+
+        for(SnapshotRasci snapshotRasci : snapshotTask.getRasciList()){
+            SnapshotRole snapshotRole = snapshotRasci.getRole();
+            Role role = helper.getExistingRole(snapshotRole.getId());
+            if(role == null){
+                role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper);
+            }
+            Rasci rasci = new Rasci();
+            rasci.setType(snapshotRasci.getType());
+            rasci.setRole(role);
+            rasci.setTask(task);
+            rasciRepository.save(rasci);
+        }
+        //TODO Change id of task in workflow, if necessary
+        return task;
     }
 }

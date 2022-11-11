@@ -2,9 +2,10 @@ package com.semestral_project.company_process_tool.services.snaphsots;
 
 import com.semestral_project.company_process_tool.entities.State;
 import com.semestral_project.company_process_tool.entities.WorkItem;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotState;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
+import com.semestral_project.company_process_tool.repositories.StateRepository;
+import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotStateRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotWorkItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,10 @@ public class SnapshotWorkItemService {
     SnapshotWorkItemRepository snapshotWorkItemRepository;
     @Autowired
     SnapshotStateRepository snapshotStateRepository;
+    @Autowired
+    WorkItemRepository workItemRepository;
+    @Autowired
+    StateRepository stateRepository;
 
     public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -58,5 +63,40 @@ public class SnapshotWorkItemService {
         snapshot = snapshotWorkItemRepository.save(snapshot);
         helper.addWorkItem(original.getId(), snapshot);
         return snapshotWorkItemRepository.save(snapshot);
+    }
+    
+    public WorkItem restoreFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
+        WorkItem workItem = new WorkItem();
+        workItem.setName(snapshotWorkItem.getName());
+        workItem.setBriefDescription(snapshotWorkItem.getBriefDescription());
+        workItem.setMainDescription(snapshotWorkItem.getMainDescription());
+        workItem.setVersion(snapshotWorkItem.getVersion());
+        workItem.setChangeDate(snapshotWorkItem.getChangeDate());
+        workItem.setChangeDescription(snapshotWorkItem.getChangeDescription());
+        workItem.setPurpose(snapshotWorkItem.getPurpose());
+        workItem.setKeyConsiderations(snapshotWorkItem.getKeyConsiderations());
+        workItem.setBriefOutline(snapshotWorkItem.getBriefOutline());
+        workItem.setNotation(snapshotWorkItem.getNotation());
+        workItem.setImpactOfNotHaving(snapshotWorkItem.getImpactOfNotHaving());
+        workItem.setReasonForNotNeeding(snapshotWorkItem.getReasonForNotNeeding());
+        workItem.setWorkItemType(snapshotWorkItem.getWorkItemType());
+        workItem.setUrlAddress(snapshotWorkItem.getUrlAddress());
+        workItem.setTemplateText(snapshotWorkItem.getTemplateText());
+
+        workItem = workItemRepository.save(workItem);
+
+        for (SnapshotState snapshotState : snapshotWorkItem.getWorkItemStates()){
+            State state = new State();
+            state.setStateName(snapshotState.getStateName());
+            state.setStateDescription(snapshotState.stateDescription);
+            state.setWorkItem(workItem);
+            stateRepository.save(state);
+        }
+        workItem = workItemRepository.save(workItem);
+        helper.addWorkItem(snapshotWorkItem.getId(), workItem);
+        return workItem;
     }
 }

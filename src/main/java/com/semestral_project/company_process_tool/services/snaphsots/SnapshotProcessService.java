@@ -1,13 +1,12 @@
 package com.semestral_project.company_process_tool.services.snaphsots;
 
-import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.ProcessMetric;
-import com.semestral_project.company_process_tool.entities.Task;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotBPMN;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcessMetric;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
+import com.semestral_project.company_process_tool.entities.snapshots.*;
+import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
+import com.semestral_project.company_process_tool.repositories.ProcessMetricRepository;
+import com.semestral_project.company_process_tool.repositories.ProcessRepository;
+import com.semestral_project.company_process_tool.repositories.TaskRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotBPMNRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotProcessMetricRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotProcessRepository;
@@ -34,6 +33,15 @@ public class SnapshotProcessService {
 
     @Autowired
     SnapshotTaskRepository snapshotTaskRepository;
+    @Autowired
+    ProcessRepository processRepository;
+    @Autowired
+    ProcessMetricRepository processMetricRepository;
+    @Autowired
+    BPMNfileRepository bpmnFileRepository;
+    @Autowired
+    TaskRepository taskRepository;
+
 
     public SnapshotProcess createSnapshot(Process original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -102,5 +110,71 @@ public class SnapshotProcessService {
         snapshot = snapshotProcessRepository.save(snapshot);
         helper.addElement(original.getId(), snapshot);
         return snapshot;
+    }
+
+    public Process restoreFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
+        Process process = new Process();
+        process.setName(snapshotProcess.getName());
+        process.setBriefDescription(snapshotProcess.getBriefDescription());
+        process.setMainDescription(snapshotProcess.getMainDescription());
+        process.setVersion(snapshotProcess.getVersion());
+        process.setChangeDate(snapshotProcess.getChangeDate());
+        process.setChangeDescription(snapshotProcess.getChangeDescription());
+        process.setPurpose(snapshotProcess.getPurpose());
+        process.setScope(snapshotProcess.getScope());
+        process.setAlternatives(snapshotProcess.getAlternatives());
+        process.setUsageNotes(snapshotProcess.getUsageNotes());
+        process.setHowToStaff(snapshotProcess.getHowToStaff());
+        process.setKeyConsiderations(snapshotProcess.getKeyConsiderations());
+
+        process = processRepository.save(process);
+
+        BPMNfile workflow = new BPMNfile();
+        workflow.setBpmnContent(snapshotProcess.getWorkflow().getBpmnContent());
+        workflow.setProcess(process);
+        bpmnFileRepository.save(workflow);
+        process.setWorkflow(workflow);
+
+        for(SnapshotProcessMetric snapMetric : snapshotProcess.getMetrics()){
+            ProcessMetric metric = new ProcessMetric();
+            metric.setName(snapMetric.getName());
+            metric.setDescription(snapMetric.getDescription());
+            metric.setProcess(process);
+            processMetricRepository.save(metric);
+        }
+
+        for(SnapshotElement snapshotElement : snapshotProcess.getElements()){
+            if(snapshotElement instanceof SnapshotTask){
+                Task task = (Task) helper.getExistingElement(snapshotElement.getId());
+                if(task == null){
+                    task = snapshotTaskService.restoreFromSnapshot((SnapshotTask) snapshotElement, helper);
+                }
+                var partOf = task.getPartOfProcess();
+                if(!partOf.contains(process)){
+                    partOf.add(process);
+                    task.setPartOfProcess(partOf);
+                    taskRepository.save(task);
+                }
+            } else {
+                Process subProcess = (Process) helper.getExistingElement(snapshotElement.getId());
+                if(subProcess == null){
+                    subProcess = this.restoreFromSnapshot((SnapshotProcess) snapshotElement, helper);
+                }
+                var partOf = subProcess.getPartOfProcess();
+                if(!partOf.contains(process)){
+                    partOf.add(process);
+                    subProcess.setPartOfProcess(partOf);
+                    processRepository.save(subProcess);
+                }
+                //TODO change id in workflow of subprocess
+            }
+        }
+
+        process = processRepository.save(process);
+        helper.addElement(snapshotProcess.getId(), process);
+        return process;
     }
 }

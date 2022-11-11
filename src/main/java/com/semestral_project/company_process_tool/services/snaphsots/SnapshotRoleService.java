@@ -40,9 +40,11 @@ public class SnapshotRoleService {
         return snapshot;
     }
 
-    public Role restoreRoleFromSnapshot(SnapshotRole snapshot){
+    public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
         Role role = new Role();
-
         role.setName(snapshot.getName());
         role.setBriefDescription(snapshot.getBriefDescription());
         role.setMainDescription(snapshot.getMainDescription());
@@ -52,15 +54,9 @@ public class SnapshotRoleService {
         role.setChangeDescription(snapshot.getChangeDescription());
         role.setVersion(snapshot.getVersion());
 
-        return roleRepository.save(role);
-    }
-
-    public void createRasciSnapshot(){
-
-    }
-
-    public void restoreRasciFromSnapshot(){
-
+        role = roleRepository.save(role);
+        helper.addRole(snapshot.getId(), role);
+        return role;
     }
 
 }
