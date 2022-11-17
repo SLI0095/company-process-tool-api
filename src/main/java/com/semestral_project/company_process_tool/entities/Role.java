@@ -11,11 +11,6 @@ import java.util.List;
 @Entity
 public class Role extends Item{
 
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @Column(columnDefinition="LONGTEXT")
     private String skills;
     @Column(columnDefinition="LONGTEXT")
@@ -55,7 +50,7 @@ public class Role extends Item{
             inverseJoinColumns = {@JoinColumn(name = "task_id")})
     private List<Task> canBeUsedIn = new ArrayList<>();
 
-    @OneToMany(mappedBy ="originalRole", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="originalRole", cascade = CascadeType.DETACH)
     private List<SnapshotRole> snapshots = new ArrayList<>();
 
 //
@@ -63,14 +58,6 @@ public class Role extends Item{
 //    private Long previousId = -1L;
 
     public Role() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getSkills() {

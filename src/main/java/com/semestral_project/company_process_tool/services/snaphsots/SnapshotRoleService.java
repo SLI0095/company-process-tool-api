@@ -34,6 +34,7 @@ public class SnapshotRoleService {
         snapshot.setSnapshotDescription(snapshotDescription);
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalRole(original);
+        snapshot.setOriginalId(original.getId());
 
         snapshot =  snapshotRoleRepository.save(snapshot);
         helper.addRole(original.getId(), snapshot);

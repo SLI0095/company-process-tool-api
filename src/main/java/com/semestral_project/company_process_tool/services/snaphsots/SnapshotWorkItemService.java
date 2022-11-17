@@ -49,6 +49,7 @@ public class SnapshotWorkItemService {
         snapshot.setSnapshotDescription(snapshotDescription);
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalWorkItem(original);
+        snapshot.setOriginalId(original.getId());
 
         snapshot = snapshotWorkItemRepository.save(snapshot);
 

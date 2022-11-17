@@ -13,10 +13,6 @@ import java.util.List;
         discriminatorType = DiscriminatorType.STRING)
 public class Element extends Item{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "element_process",
@@ -45,22 +41,14 @@ public class Element extends Item{
 
     private boolean isTemplate = false;
 
-    @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH)
     private List<SnapshotElement> snapshots = new ArrayList<>();
 
     public Element() {
     }
 
-    public long getId() {
-        return id;
-    }
-
     public List<Process> getPartOfProcess() {
         return partOfProcess;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public void setPartOfProcess(List<Process> partOfProcess) {

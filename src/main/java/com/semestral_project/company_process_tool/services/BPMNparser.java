@@ -311,10 +311,7 @@ public class BPMNparser {
     public void updateProcessInAllWorkflows(Process process, boolean nameChanged, Process alreadyChangedProcess) {
 
         var listOfProcesses = process.getPartOfProcess();
-        boolean alreadyChanged = false;
-        if(alreadyChangedProcess != null){
-            alreadyChanged = true;
-        }
+        boolean alreadyChanged = alreadyChangedProcess != null;
         for (Process proc : listOfProcesses) { //Check all processes
             if(alreadyChanged){
                 if (proc.getId() == alreadyChangedProcess.getId()) {
@@ -550,10 +547,7 @@ public class BPMNparser {
     public void updateTaskInAllWorkflows(Task task, boolean nameChanged, boolean typeChanged, String oldTaskType, Process alreadyChangedProcess) {
 
         var listOfProcesses = task.getPartOfProcess();
-        boolean alreadyChanged = false;
-        if(alreadyChangedProcess != null){
-            alreadyChanged = true;
-        }
+        boolean alreadyChanged = alreadyChangedProcess != null;
         for (Process process : listOfProcesses) { //Check all processes
             if(alreadyChanged){
                 if (process.getId() == alreadyChangedProcess.getId()) {
@@ -678,10 +672,7 @@ public class BPMNparser {
     public void updateWorkItemInAllWorkflows(WorkItem workItem, boolean nameChanged, Process alreadyChangedProcess) {
 
         var listOfProcesses = processRepository.findAll();
-        boolean alreadyChanged = false;
-        if(alreadyChangedProcess != null){
-            alreadyChanged = true;
-        }
+        boolean alreadyChanged = alreadyChangedProcess != null;
         for (Process proc : listOfProcesses) { //Check all processes
             if(alreadyChanged){
                 if (proc.getId() == alreadyChangedProcess.getId()) {
@@ -1448,6 +1439,10 @@ public class BPMNparser {
             return "";
         }
         return returnXML;
+    }
+
+    public String replaceIdInSnapshotWorkflow(String content,String originalId, String newId){
+        return content.replaceAll(originalId, newId);
     }
 
 

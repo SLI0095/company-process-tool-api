@@ -12,10 +12,6 @@ import java.util.List;
 @Entity
 public class WorkItem extends Item{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
     @Column(columnDefinition="LONGTEXT")
@@ -97,18 +93,10 @@ public class WorkItem extends Item{
             inverseJoinColumns = {@JoinColumn(name = "task_id")})
     private List<Task> canBeUsedIn = new ArrayList<>();
 
-    @OneToMany(mappedBy ="originalWorkItem", cascade = CascadeType.DETACH, orphanRemoval = true)
+    @OneToMany(mappedBy ="originalWorkItem", cascade = CascadeType.DETACH)
     private List<SnapshotWorkItem> snapshots = new ArrayList<>();
 
     public WorkItem() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public List<Task> getAsMandatoryInput() {

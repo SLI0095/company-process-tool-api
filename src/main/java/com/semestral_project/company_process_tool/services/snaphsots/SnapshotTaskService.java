@@ -8,6 +8,8 @@ import com.semestral_project.company_process_tool.repositories.TaskStepRepositor
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotRasciRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskStepRepository;
+import com.semestral_project.company_process_tool.services.BPMNparser;
+import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,8 @@ public class SnapshotTaskService {
     TaskStepRepository taskStepRepository;
     @Autowired
     RasciRepository rasciRepository;
+    @Autowired
+    BPMNparser bpmNparser;
 
     public SnapshotTask createSnapshot(Task original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -51,6 +55,7 @@ public class SnapshotTaskService {
         snapshot.setOriginalElement(original);
         snapshot.setSnapshotDescription(snapshotDescription);
         snapshot.setSnapshotDate(LocalDate.now());
+        snapshot.setOriginalId(original.getId());
 
         //All inputs
         var inputs = snapshot.getMandatoryInputs();
@@ -101,10 +106,11 @@ public class SnapshotTaskService {
         return snapshot;
     }
 
-    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper){
+    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
+        boolean updateWorkflow = workflow != null;
         Task task = new Task();
         task.setName(snapshotTask.getName());
         task.setBriefDescription(snapshotTask.getBriefDescription());
@@ -125,7 +131,15 @@ public class SnapshotTaskService {
                 workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
             }
             inputs.add(workItem);
-            //TODO Change id of input in workflow, if necessary
+            if(updateWorkflow){
+                //Change old id in workflow
+                String content = workflow.getBpmnContent();
+                String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
+                String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId();
+                content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+                workflow.setBpmnContent(content);
+            }
+
         }
         task.setMandatoryInputs(inputs);
 
@@ -137,7 +151,14 @@ public class SnapshotTaskService {
                 workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
             }
             outputs.add(workItem);
-            //TODO Change id of output in workflow, if necessary
+            if(updateWorkflow){
+                //Change old id in workflow
+                String content = workflow.getBpmnContent();
+                String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
+                String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId();
+                content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+                workflow.setBpmnContent(content);
+            }
         }
         task.setOutputs(outputs);
 
@@ -164,7 +185,14 @@ public class SnapshotTaskService {
             rasci.setTask(task);
             rasciRepository.save(rasci);
         }
-        //TODO Change id of task in workflow, if necessary
+        if(updateWorkflow){
+            //Change old id in workflow
+            String content = workflow.getBpmnContent();
+            String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotTask.getOriginalId().toString();
+            String newId = CompanyProcessToolConst.ELEMENT_ + task.getId();
+            content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+            workflow.setBpmnContent(content);
+        }
         return task;
     }
 }

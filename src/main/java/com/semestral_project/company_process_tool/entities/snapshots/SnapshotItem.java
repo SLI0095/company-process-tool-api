@@ -25,6 +25,8 @@ public class SnapshotItem {
     @Column(columnDefinition="LONGTEXT")
     private String snapshotDescription;
 
+    Long originalId;
+
     public String getName() {
         return name;
     }
@@ -87,5 +89,13 @@ public class SnapshotItem {
 
     public void setSnapshotDescription(String snapshotDescription) {
         this.snapshotDescription = snapshotDescription;
+    }
+
+    public Long getOriginalId() {
+        return originalId;
+    }
+
+    public void setOriginalId(Long originalId) {
+        this.originalId = originalId;
     }
 }
