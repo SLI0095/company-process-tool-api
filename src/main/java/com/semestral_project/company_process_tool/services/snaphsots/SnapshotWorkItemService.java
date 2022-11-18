@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.services.snaphsots;
 
 import com.semestral_project.company_process_tool.entities.State;
+import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.WorkItem;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotState;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class SnapshotWorkItemService {
@@ -66,7 +69,7 @@ public class SnapshotWorkItemService {
         return snapshotWorkItemRepository.save(snapshot);
     }
     
-    public WorkItem restoreFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper){
+    public WorkItem restoreFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -87,6 +90,11 @@ public class SnapshotWorkItemService {
         workItem.setUrlAddress(snapshotWorkItem.getUrlAddress());
         workItem.setTemplateText(snapshotWorkItem.getTemplateText());
 
+        var list = workItem.getCanEdit();
+        list.add(user);
+        workItem.setCanEdit(list);
+        workItem.setOwner(user);
+
         workItem = workItemRepository.save(workItem);
 
         for (SnapshotState snapshotState : snapshotWorkItem.getWorkItemStates()){
@@ -99,5 +107,10 @@ public class SnapshotWorkItemService {
         workItem = workItemRepository.save(workItem);
         helper.addWorkItem(snapshotWorkItem.getId(), workItem);
         return workItem;
+    }
+
+    public SnapshotWorkItem getSnapshotWorkItemById(long id) {
+        Optional<SnapshotWorkItem> workItemData = snapshotWorkItemRepository.findById(id);
+        return workItemData.orElse(null);
     }
 }

@@ -2,6 +2,8 @@ package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotTaskService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
@@ -53,10 +55,7 @@ public class TaskService {
 
     public Task getTaskById(long id){
         Optional<Task> taskData = taskRepository.findById(id);
-        if(taskData.isPresent()) {
-            return taskData.get();
-        }
-        else return null;
+        return taskData.orElse(null);
     }
 
     public long addTask(Task task, long userId) {
@@ -293,6 +292,9 @@ public class TaskService {
                         list2.remove(task);
                         w.setAsOutput(list2);
                         workItemRepository.save(w);
+                    }
+                    for(SnapshotElement snapshot : task.getSnapshots()){
+                        snapshot.setOriginalElement(null);
                     }
                     taskRepository.deleteById(id);
                     return 1;
@@ -647,16 +649,14 @@ public class TaskService {
     public List<Task> getAllTemplates(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Task> allTemplates = taskRepository.findAllTasksTemplatesForUser(user);
-            return allTemplates;
+            return taskRepository.findAllTasksTemplatesForUser(user);
         }else return null;
     }
 
     public List<Task> getAllTemplatesCanEdit(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Task> allTemplates = taskRepository.findAllTasksTemplatesForUserCanEdit(user);
-            return allTemplates;
+            return taskRepository.findAllTasksTemplatesForUserCanEdit(user);
         }else return null;
     }
 
@@ -674,5 +674,14 @@ public class TaskService {
         } else {
             return 2;
         }
+    }
+
+    public Task restoreTask(long userId, SnapshotTask snapshot) {
+        snapshot = snapshotTaskService.getSnapshotTaskById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userRepository.findById(userId).get();
+        return snapshotTaskService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
     }
 }

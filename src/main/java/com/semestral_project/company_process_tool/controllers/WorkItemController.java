@@ -1,6 +1,8 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,7 +210,7 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
         int ret = workItemService.createSnapshot(id, userId, description);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " created snapshot"));
@@ -216,6 +218,16 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/workItems/restore")
+    public ResponseEntity<ResponseMessage> restoreWorkItem(@RequestBody SnapshotWorkItem snapshot, @RequestParam long userId){
+        WorkItem ret = workItemService.restoreWorkItem(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Work item restored, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item not restored"));
         }
     }
 }

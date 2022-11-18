@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
@@ -48,10 +49,7 @@ public class RoleService {
 
     public Role getRoleById(long id){
         Optional<Role> roleData = roleRepository.findById(id);
-        if(roleData.isPresent()) {
-            return roleData.get();
-        }
-        else return null;
+        return roleData.orElse(null);
     }
 
     public long addRole(Role role, long userId){
@@ -211,6 +209,9 @@ public class RoleService {
             Role role_ = roleData.get();
             User whoEdits_ = userRepository.findById(whoEdits).get();
             if(role_.getCanEdit().contains(whoEdits_)){
+                for(SnapshotRole snapshot : role_.getSnapshots()){
+                    snapshot.setBriefDescription(null);
+                }
                 roleRepository.delete(role_);
                 return 1;
             } else {
@@ -226,8 +227,7 @@ public class RoleService {
     public List<Role> getAllTemplatesForUser(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Role> allTemplates = roleRepository.findAllRolesTemplatesForUser(user);
-            return allTemplates;
+            return roleRepository.findAllRolesTemplatesForUser(user);
         }
         else return null;
     }
@@ -235,8 +235,7 @@ public class RoleService {
     public List<Role> getAllTemplatesForUserCanEdit(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Role> allTemplates = roleRepository.findAllTasksTemplatesForUserCanEdit(user);
-            return allTemplates;
+            return roleRepository.findAllTasksTemplatesForUserCanEdit(user);
         }
         else return null;
     }
@@ -257,5 +256,14 @@ public class RoleService {
         {
             return 2;
         }
+    }
+
+    public Role restoreRole(long userId, SnapshotRole snapshot) {
+        snapshot =snapshotRoleService.getSnapshotRoleById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userRepository.findById(userId).get();
+        return snapshotRoleService.restoreRoleFromSnapshot(snapshot,new SnapshotsHelper(), user);
     }
 }

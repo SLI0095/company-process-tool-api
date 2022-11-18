@@ -5,15 +5,18 @@ import com.semestral_project.company_process_tool.entities.snapshots.*;
 import com.semestral_project.company_process_tool.repositories.RasciRepository;
 import com.semestral_project.company_process_tool.repositories.TaskRepository;
 import com.semestral_project.company_process_tool.repositories.TaskStepRepository;
+import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotRasciRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotTaskStepRepository;
+import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotWorkItemRepository;
 import com.semestral_project.company_process_tool.services.BPMNparser;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class SnapshotTaskService {
@@ -36,6 +39,10 @@ public class SnapshotTaskService {
     RasciRepository rasciRepository;
     @Autowired
     BPMNparser bpmNparser;
+    @Autowired
+    SnapshotWorkItemRepository snapshotWorkItemRepository;
+    @Autowired
+    WorkItemRepository workItemRepository;
 
     public SnapshotTask createSnapshot(Task original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -57,31 +64,32 @@ public class SnapshotTaskService {
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalId(original.getId());
 
+        snapshot = snapshotTaskRepository.save(snapshot);
+
         //All inputs
-        var inputs = snapshot.getMandatoryInputs();
         for(WorkItem workItem : original.getMandatoryInputs()){
             //Check if was not snapshot already created during snapshotting
             SnapshotWorkItem snapshotWorkItem = helper.getExistingSnapshotWorkItem(workItem.getId());
             if(snapshotWorkItem == null){
                 snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDescription, helper);
             }
-            inputs.add(snapshotWorkItem);
+            var list = snapshotWorkItem.getAsMandatoryInput();
+            list.add(snapshot);
+            snapshotWorkItem.setAsMandatoryInput(list);
+            snapshotWorkItemRepository.save(snapshotWorkItem);
         }
-        snapshot.setMandatoryInputs(inputs);
 
         //All outputs
-        var outputs = snapshot.getOutputs();
         for(WorkItem workItem : original.getOutputs()){
             SnapshotWorkItem snapshotWorkItem = helper.getExistingSnapshotWorkItem(workItem.getId());
             if(snapshotWorkItem == null){
                 snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDescription, helper);
             }
-            outputs.add(snapshotWorkItem);
+            var list = snapshotWorkItem.getAsOutput();
+            list.add(snapshot);
+            snapshotWorkItem.setAsOutput(list);
+            snapshotWorkItemRepository.save(snapshotWorkItem);
         }
-        snapshot.setOutputs(outputs);
-
-        snapshot = snapshotTaskRepository.save(snapshot);
-        helper.addElement(original.getId(), snapshot);
 
         for(TaskStep step : original.getSteps()){
             SnapshotTaskStep snapshotTaskStep = new SnapshotTaskStep();
@@ -103,10 +111,12 @@ public class SnapshotTaskService {
             snapshotRasci.setTask(snapshot);
             snapshotRasciRepository.save(snapshotRasci);
         }
+        helper.addElement(original.getId(), snapshot);
+
         return snapshot;
     }
 
-    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow){
+    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -122,15 +132,24 @@ public class SnapshotTaskService {
         task.setKeyConsiderations(snapshotTask.getKeyConsiderations());
         task.setTaskType(snapshotTask.getTaskType());
 
+        var list = task.getCanEdit();
+        list.add(user);
+        task.setCanEdit(list);
+        task.setOwner(user);
+
+        task = taskRepository.save(task);
+
         //All inputs
-        var inputs = task.getMandatoryInputs();
         for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getMandatoryInputs()){
             //Check if was not snapshot already created during snapshotting
             WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
             if(workItem == null){
-                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
+                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
             }
-            inputs.add(workItem);
+            var asInput = workItem.getAsMandatoryInput();
+            asInput.add(task);
+            workItem.setAsMandatoryInput(asInput);
+            workItemRepository.save(workItem);
             if(updateWorkflow){
                 //Change old id in workflow
                 String content = workflow.getBpmnContent();
@@ -139,18 +158,18 @@ public class SnapshotTaskService {
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
                 workflow.setBpmnContent(content);
             }
-
         }
-        task.setMandatoryInputs(inputs);
 
         //All outputs
-        var outputs = task.getOutputs();
         for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getOutputs()){
             WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
             if(workItem == null){
-                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper);
+                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
             }
-            outputs.add(workItem);
+            var asOutput = workItem.getAsOutput();
+            asOutput.add(task);
+            workItem.setAsOutput(asOutput);
+            workItemRepository.save(workItem);
             if(updateWorkflow){
                 //Change old id in workflow
                 String content = workflow.getBpmnContent();
@@ -160,10 +179,6 @@ public class SnapshotTaskService {
                 workflow.setBpmnContent(content);
             }
         }
-        task.setOutputs(outputs);
-
-        task = taskRepository.save(task);
-        helper.addElement(snapshotTask.getId(), task);
 
         for(SnapshotTaskStep snapshotStep : snapshotTask.getSteps()){
             TaskStep taskStep = new TaskStep();
@@ -177,7 +192,7 @@ public class SnapshotTaskService {
             SnapshotRole snapshotRole = snapshotRasci.getRole();
             Role role = helper.getExistingRole(snapshotRole.getId());
             if(role == null){
-                role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper);
+                role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper, user);
             }
             Rasci rasci = new Rasci();
             rasci.setType(snapshotRasci.getType());
@@ -193,6 +208,12 @@ public class SnapshotTaskService {
             content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
             workflow.setBpmnContent(content);
         }
+        helper.addElement(snapshotTask.getId(), task);
         return task;
+    }
+
+    public SnapshotTask getSnapshotTaskById(long id) {
+        Optional<SnapshotTask> taskData = snapshotTaskRepository.findById(id);
+        return taskData.orElse(null);
     }
 }

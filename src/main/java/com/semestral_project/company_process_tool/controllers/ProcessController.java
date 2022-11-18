@@ -2,20 +2,18 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.repositories.ElementRepository;
-import com.semestral_project.company_process_tool.repositories.ProcessRepository;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.services.RasciMatrixService;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
-import com.semestral_project.company_process_tool.utils.WebConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -263,7 +261,7 @@ public class ProcessController {
                 .body(out -> processService.generateHTML(id,out));
     }
     @PutMapping("/processes/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
         int ret = processService.createSnapshot(id, userId, description);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " created snapshot"));
@@ -271,6 +269,16 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/processes/restore")
+    public ResponseEntity<ResponseMessage> restoreProcess(@RequestBody SnapshotProcess snapshot, @RequestParam long userId){
+        Process ret = processService.restoreProcess(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Process restored, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process not restored"));
         }
     }
 }

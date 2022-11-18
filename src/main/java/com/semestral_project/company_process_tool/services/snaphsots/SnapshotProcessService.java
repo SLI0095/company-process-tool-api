@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class SnapshotProcessService {
@@ -116,7 +117,7 @@ public class SnapshotProcessService {
         return snapshot;
     }
 
-    public Process restoreFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, SnapshotBPMN snapshotWorkflow){
+    public Process restoreFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, SnapshotBPMN snapshotWorkflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -134,6 +135,11 @@ public class SnapshotProcessService {
         process.setHowToStaff(snapshotProcess.getHowToStaff());
         process.setKeyConsiderations(snapshotProcess.getKeyConsiderations());
 
+        var list = process.getCanEdit();
+        list.add(user);
+        process.setCanEdit(list);
+        process.setOwner(user);
+
         process = processRepository.save(process);
 
         SnapshotBPMN snapshotBPMN = snapshotProcess.getWorkflow();
@@ -150,7 +156,7 @@ public class SnapshotProcessService {
             if(snapshotElement instanceof SnapshotTask){
                 Task task = (Task) helper.getExistingElement(snapshotElement.getId());
                 if(task == null){
-                    task = snapshotTaskService.restoreFromSnapshot((SnapshotTask) snapshotElement, helper, snapshotBPMN);
+                    task = snapshotTaskService.restoreFromSnapshot((SnapshotTask) snapshotElement, helper, snapshotBPMN, user);
                 }
                 var partOf = task.getPartOfProcess();
                 if(!partOf.contains(process)){
@@ -161,7 +167,7 @@ public class SnapshotProcessService {
             } else {
                 Process subProcess = (Process) helper.getExistingElement(snapshotElement.getId());
                 if(subProcess == null){
-                    subProcess = this.restoreFromSnapshot((SnapshotProcess) snapshotElement, helper, snapshotBPMN);
+                    subProcess = this.restoreFromSnapshot((SnapshotProcess) snapshotElement, helper, snapshotBPMN, user);
                 }
                 var partOf = subProcess.getPartOfProcess();
                 if(!partOf.contains(process)){
@@ -187,5 +193,10 @@ public class SnapshotProcessService {
         process = processRepository.save(process);
         helper.addElement(snapshotProcess.getId(), process);
         return process;
+    }
+
+    public SnapshotProcess getSnapshotProcessById(long id) {
+        Optional<SnapshotProcess> processData = snapshotProcessRepository.findById(id);
+        return processData.orElse(null);
     }
 }

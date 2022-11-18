@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.services.TaskService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -326,7 +326,7 @@ public class TaskController {
         }
     }
     @PutMapping("/tasks/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
+    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
         int ret = taskService.createSnapshot(id, userId, description);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " created snapshot"));
@@ -334,6 +334,16 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/tasks/restore")
+    public ResponseEntity<ResponseMessage> restoreTask(@RequestBody SnapshotTask snapshot, @RequestParam long userId){
+        Task ret = taskService.restoreTask(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Task restored, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task not restored"));
         }
     }
 }

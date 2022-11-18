@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.controllers;
 import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.RoleService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,16 @@ public class RoleController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+        }
+    }
+
+    @PutMapping("/roles/restore")
+    public ResponseEntity<ResponseMessage> restoreRole(@RequestBody SnapshotRole snapshot, @RequestParam long userId){
+        Role ret = roleService.restoreRole(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Role restored, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role not restored"));
         }
     }
 

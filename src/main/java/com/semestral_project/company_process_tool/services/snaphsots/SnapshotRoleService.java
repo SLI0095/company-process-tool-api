@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services.snaphsots;
 
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotRoleRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class SnapshotRoleService {
@@ -41,7 +43,7 @@ public class SnapshotRoleService {
         return snapshot;
     }
 
-    public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper){
+    public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -55,9 +57,19 @@ public class SnapshotRoleService {
         role.setChangeDescription(snapshot.getChangeDescription());
         role.setVersion(snapshot.getVersion());
 
+        var list = role.getCanEdit();
+        list.add(user);
+        role.setCanEdit(list);
+        role.setOwner(user);
+
         role = roleRepository.save(role);
         helper.addRole(snapshot.getId(), role);
         return role;
+    }
+
+    public SnapshotRole getSnapshotRoleById(long id){
+        Optional<SnapshotRole> roleData = snapshotRoleRepository.findById(id);
+        return roleData.orElse(null);
     }
 
 }

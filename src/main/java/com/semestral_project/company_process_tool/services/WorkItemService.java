@@ -59,9 +59,7 @@ public class WorkItemService {
 
     public WorkItem getWorkItemById(long id) {
         Optional<WorkItem> workItemData = workItemRepository.findById(id);
-        if (workItemData.isPresent()) {
-            return workItemData.get();
-        } else return null;
+        return workItemData.orElse(null);
     }
 
     public long addWorkItem(WorkItem workItem, long userId) {
@@ -88,6 +86,9 @@ public class WorkItemService {
                 User whoEdits_ = userRepository.findById(whoEdits).get();
                 if (workItem_.getCanEdit().contains(whoEdits_)) {
                     if (bpmNparser.removeWorkItemFromAllWorkflows(workItemRepository.findById(id).get())) {
+                        for(SnapshotWorkItem snapshot : workItem_.getSnapshots()){
+                            snapshot.setOriginalWorkItem(null);
+                        }
                         workItemRepository.deleteById(id);
                         return true;
                     }
@@ -213,16 +214,14 @@ public class WorkItemService {
     public List<WorkItem> getAllTemplates(long userId) {
         if (userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplateForUser(user);
-            return allTemplates;
+            return workItemRepository.findAllWorkItemTemplateForUser(user);
         } else return null;
     }
 
     public List<WorkItem> getAllTemplatesCanEdit(long userId) {
         if (userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<WorkItem> allTemplates = workItemRepository.findAllWorkItemTemplateForUserCanEdit(user);
-            return allTemplates;
+            return workItemRepository.findAllWorkItemTemplateForUserCanEdit(user);
         } else return null;
     }
 
@@ -345,5 +344,14 @@ public class WorkItemService {
             }
             return 3; // cannot edit
         } else return 2;
+    }
+
+    public WorkItem restoreWorkItem(long userId, SnapshotWorkItem snapshot) {
+        snapshot = snapshotWorkItemService.getSnapshotWorkItemById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userRepository.findById(userId).get();
+        return snapshotWorkItemService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), user);
     }
 }

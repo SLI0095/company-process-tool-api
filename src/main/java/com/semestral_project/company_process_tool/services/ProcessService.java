@@ -2,6 +2,8 @@ package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
 import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotProcessService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
@@ -309,6 +311,9 @@ public class ProcessService {
                     e.setPartOfProcess(list);
                     elementRepository.save(e);
                 }
+                for(SnapshotElement snapshot : process_.getSnapshots()){
+                    snapshot.setOriginalElement(null);
+                }
                 processRepository.deleteById(id);
                 return 1;
             }
@@ -454,16 +459,14 @@ public class ProcessService {
     public List<Process> getAllTemplates(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Process> allTemplates = processRepository.findAllTemplatesProcessesForUser(user);
-             return allTemplates;
+            return processRepository.findAllTemplatesProcessesForUser(user);
         }else return null;
     }
 
     public List<Process> getAllTemplatesCanEdit(long userId){
         if(userRepository.existsById(userId)) {
             User user = userRepository.findById(userId).get();
-            List<Process> allTemplates = processRepository.findAllTemplatesProcessesForUserCanEdit(user);
-            return allTemplates;
+            return processRepository.findAllTemplatesProcessesForUserCanEdit(user);
         }else return null;
     }
 
@@ -542,5 +545,14 @@ public class ProcessService {
         } else {
             return 2;
         }
+    }
+
+    public Process restoreProcess(long userId, SnapshotProcess snapshot) {
+        snapshot = snapshotProcessService.getSnapshotProcessById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userRepository.findById(userId).get();
+        return snapshotProcessService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
     }
 }
