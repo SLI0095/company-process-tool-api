@@ -19,11 +19,36 @@ public class UserGroup extends UserType{
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     List<User> users = new ArrayList<>();
 
+    public UserGroup() {
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     public User getCreator() {
         return creator;
     }
 
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    public List<User> getAllMembers(){
+        List<User> allMembers = new ArrayList<>(this.getUsers());
+        allMembers.add(this.getCreator());
+        return allMembers;
     }
 }

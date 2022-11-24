@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipOutputStream;
 
 @Service
@@ -37,6 +39,9 @@ public class ProcessService {
     HTMLGenerator htmlGenerator;
     @Autowired
     SnapshotProcessService snapshotProcessService;
+
+    @Autowired
+    UserService userService;
 
     public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -533,18 +538,46 @@ public class ProcessService {
     }
 
     public int createSnapshot(Long id, long userId, String description) {
-        Optional<Process> processData = processRepository.findById(id);
-        if (processData.isPresent()) {
-            Process process_ = processData.get();
-            User whoEdits_ = userRepository.findById(userId).get();
-            if (process_.getCanEdit().contains(whoEdits_)) {
-                snapshotProcessService.createSnapshot(process_, description, new SnapshotsHelper());
-                return 1;
-            }
-            return 3;
-        } else {
+        //TODO test method for testing user groups
+        Process process = this.getProcessById(id);
+        if(process == null){
             return 2;
         }
+        User whoEdits = userService.getUserById(userId);
+        if(whoEdits == null){
+            return 3;
+        }
+        var canEdit = process.getCanEdit();
+        var allUsers = new HashSet<User>();
+        //add solo users
+        allUsers.addAll(canEdit.stream()
+                .filter(User.class::isInstance)
+                .map(User.class::cast)
+                .collect(Collectors.toSet()));
+
+        //add all users from group
+        allUsers.addAll(canEdit.stream()
+                .filter(UserGroup.class::isInstance)
+                .flatMap(list -> ((UserGroup) list).getAllMembers().stream())
+                .collect(Collectors.toSet()));
+
+        if(!allUsers.contains(whoEdits)){
+            return 3;
+        }
+        snapshotProcessService.createSnapshot(process, description, new SnapshotsHelper());
+        return 1;
+//        Optional<Process> processData = processRepository.findById(id);
+//        if (processData.isPresent()) {
+//            Process process_ = processData.get();
+//            User whoEdits_ = userRepository.findById(userId).get();
+//            if (process_.getCanEdit().contains(whoEdits_)) {
+//                snapshotProcessService.createSnapshot(process_, description, new SnapshotsHelper());
+//                return 1;
+//            }
+//            return 3;
+//        } else {
+//            return 2;
+//        }
     }
 
     public Process restoreProcess(long userId, SnapshotProcess snapshot) {

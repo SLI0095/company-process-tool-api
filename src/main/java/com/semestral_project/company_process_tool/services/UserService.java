@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,6 +61,11 @@ public class UserService {
 
     public List<User> getAllUser(){
         return (List<User>) userRepository.findAll();
+    }
+
+    public User getUserById(long id){
+        Optional<User> user = userRepository.findById(id);
+        return user.orElse(null);
     }
 
 }
