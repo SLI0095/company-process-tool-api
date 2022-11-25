@@ -1,7 +1,11 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.UserGroup;
+import com.semestral_project.company_process_tool.entities.UserType;
+import com.semestral_project.company_process_tool.services.UserGroupService;
 import com.semestral_project.company_process_tool.services.UserService;
+import com.semestral_project.company_process_tool.services.UserTypeService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,10 @@ public class UserController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    UserGroupService userGroupService;
+    @Autowired
+    UserTypeService userTypeService;
 
     @PostMapping("/login")
     public ResponseEntity<Long> login(@RequestBody User user) {
@@ -34,6 +42,40 @@ public class UserController {
             return ResponseEntity.ok(users);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/userGroups")
+    public ResponseEntity<List<UserGroup>> getGroups() {
+        List<UserGroup> groups = userGroupService.getAllGroups();
+        if(groups != null) {
+            return ResponseEntity.ok(groups);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/userGroups")
+    public ResponseEntity<ResponseMessage> createGroup(@RequestBody UserGroup group, @RequestParam long userId) {
+        long ret = userGroupService.addUserGroup(group,userId);
+        if(ret != -1){
+            return ResponseEntity.ok(new ResponseMessage("Group created"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Group could not be created"));
+        }
+    }
+
+    @PutMapping("/userGroups/{id}/addUser")
+    public ResponseEntity<ResponseMessage> addUser(@RequestBody User user, @RequestParam long userId, @PathVariable long id) {
+        int ret = userGroupService.addUserToGroup(id, user, userId);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("User added to group."));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Group id: " + id + " does not exist"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User already in group."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit group."));
         }
     }
 

@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.controllers;
 import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.User;
+import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.RoleService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -94,7 +95,7 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}/addAccess")
-    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = roleService.addAccess(id, userId, getAccess);
         if(status == 1){
@@ -111,7 +112,7 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}/removeAccess")
-    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = roleService.removeAccess(id, userId, getAccess);
         if(status == 1){
@@ -126,7 +127,7 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}/addEdit")
-    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = roleService.addEdit(id, userId, getEdit);
         if(status == 1){
@@ -141,7 +142,7 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}/removeEdit")
-    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = roleService.removeEdit(id, userId, getEdit);
         if(status == 1){

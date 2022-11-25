@@ -4,6 +4,7 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,10 +12,28 @@ import java.util.List;
 @Repository
 public interface RoleRepository extends CrudRepository<Role, Long> {
 
-    @Query("SELECT r FROM Role r WHERE (?1 MEMBER r.canEdit OR ?1 MEMBER r.hasAccess)")
-    List<Role> findAllRolesTemplatesForUser(User user);
+    @Query("SELECT r FROM Role r " +
+            "WHERE :user MEMBER r.canEdit OR :user MEMBER r.hasAccess OR :user = r.owner")
+    List<Role> findAllRolesTemplatesForUser(@Param("user") User user);
 
-    @Query("SELECT r FROM Role r WHERE (?1 MEMBER r.canEdit)")
+    @Query("SELECT r FROM Role r " +
+            "JOIN r.canEdit ce ON TYPE(ce) = UserGroup " +
+            "JOIN r.hasAccess ha ON TYPE(ha) = UserGroup " +
+            "WHERE :user MEMBER ce.users OR :user = ce.creator " +
+            "OR :user MEMBER ha.users OR :user = ha.creator")
+    List<Role> findAllInGroup(@Param("user") User user);
+
+    //@Query("SELECT DISTINCT(r) FROM Role,  r WHERE (?1 MEMBER r.canEdit OR ?1 MEMBER r.hasAccess OR ?1 = r.owner)")
+//    @Query("SELECT r FROM Role r " +
+//            "JOIN r.canEdit ce ON TYPE(ce) = 'UserGroup'  " +
+//            "JOIN r.hasAccess ha ON TYPE(ce) = 'UserGroup' " +
+//            "WHERE (:user MEMBER r.canEdit OR :user MEMBER r.hasAccess " +
+//            "OR :user = r.owner " +
+//            "OR :user MEMBER ce.users OR :user = ce.creator " +
+//            "OR  :user MEMBER ha.users OR :user = ha.creator)")
+
+    @Query("SELECT r FROM Role r " +
+            "WHERE :user MEMBER r.canEdit OR :user = r.owner")
     List<Role> findAllTasksTemplatesForUserCanEdit(User user);
 
 }

@@ -44,30 +44,31 @@ public class UserGroupService {
         return group.orElse(null);
     }
 
-    public void addUserToGroup(long groupId ,User user, long creatorId){
+    public int addUserToGroup(long groupId ,User user, long creatorId){
         UserGroup group = getGroupById(groupId);
         if(group == null){
-            return;
+            return 2;
         }
        User creator = userService.getUserById(creatorId);
 
         //TODO test if comparing works
        if(group.getCreator() != creator){
-           return;
+           return 5;
        }
 
        user = userService.getUserById(user.getId());
        if(user == null){
-           return;
+           return 5;
        }
 
        var users = group.getUsers();
        if(users.contains(user)){
-           return;
+           return 3;
        }
        users.add(user);
        group.setUsers(users);
        userGroupRepository.save(group);
+       return 1;
     }
 
     public void removeUserFromGroup(long groupId ,User user, long creatorId){

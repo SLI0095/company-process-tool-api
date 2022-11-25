@@ -21,6 +21,7 @@ public class User extends UserType {
     @OneToMany(mappedBy = "creator")
     private List<UserGroup> isCreator = new ArrayList<>();
 
+    @JsonIgnore // TODO only show when needed
     @ManyToMany(mappedBy = "users", cascade = CascadeType.DETACH)
     private List<UserGroup> groups = new ArrayList<>();
 
