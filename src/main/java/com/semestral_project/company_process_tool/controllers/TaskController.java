@@ -29,7 +29,7 @@ public class TaskController {
 
     @GetMapping("/tasks/templates")
     public ResponseEntity<List<Task>> getTasksTemplates(@RequestParam long userId) {
-        List<Task> tasks = taskService.getAllTemplates(userId);
+        List<Task> tasks = taskService.getAllUserCanView(userId);
         if(tasks != null){
             return ResponseEntity.ok(tasks);
         } else {
@@ -39,7 +39,7 @@ public class TaskController {
 
     @GetMapping("/tasks/templatesCanEdit")
     public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
-        List<Task> tasks = taskService.getAllTemplatesCanEdit(userId);
+        List<Task> tasks = taskService.getAllUserCanEdit(userId);
         if(tasks != null){
             return ResponseEntity.ok(tasks);
         } else {

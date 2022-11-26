@@ -1,7 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.*;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -31,7 +30,7 @@ public class WorkItemController {
 
     @GetMapping("/workItems/templates")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId) {
-        List<WorkItem> workItems = workItemService.getAllTemplates(userId);
+        List<WorkItem> workItems = workItemService.getAllUserCanView(userId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -41,7 +40,7 @@ public class WorkItemController {
 
     @GetMapping("/workItems/templatesCanEdit")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
-        List<WorkItem> workItems = workItemService.getAllTemplatesCanEdit(userId);
+        List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -146,7 +145,7 @@ public class WorkItemController {
 //    }
 
     @PutMapping("/workItems/{id}/addAccess")
-    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = workItemService.addAccess(id, userId, getAccess);
         if(status == 1){
@@ -163,7 +162,7 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/removeAccess")
-    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = workItemService.removeAccess(id, userId, getAccess);
         if(status == 1){
@@ -178,7 +177,7 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/addEdit")
-    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = workItemService.addEdit(id, userId, getEdit);
         if(status == 1){
@@ -193,7 +192,7 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/removeEdit")
-    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = workItemService.removeEdit(id, userId, getEdit);
         if(status == 1){

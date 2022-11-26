@@ -3,7 +3,6 @@ package com.semestral_project.company_process_tool.controllers;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.services.RasciMatrixService;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
@@ -37,7 +36,7 @@ public class ProcessController {
 
     @GetMapping("/processes/templates")
     public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId) {
-        List<Process> processes = processService.getAllTemplates(userId);
+        List<Process> processes = processService.getAllUserCanView(userId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {
@@ -47,7 +46,7 @@ public class ProcessController {
 
     @GetMapping("/processes/templatesCanEdit")
     public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId) {
-        List<Process> processes = processService.getAllTemplatesCanEdit(userId);
+        List<Process> processes = processService.getAllUserCanEdit(userId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {
@@ -190,7 +189,7 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}/addAccess")
-    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = processService.addAccess(id, userId, getAccess);
         if(status == 1){
@@ -207,7 +206,7 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}/removeAccess")
-    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody User getAccess, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
         int status = processService.removeAccess(id, userId, getAccess);
         if(status == 1){
@@ -222,7 +221,7 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}/addEdit")
-    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> addEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = processService.addEdit(id, userId, getEdit);
         if(status == 1){
@@ -237,7 +236,7 @@ public class ProcessController {
     }
 
     @PutMapping("/processes/{id}/removeEdit")
-    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody User getEdit, @RequestParam long userId) {
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody UserType getEdit, @RequestParam long userId) {
 
         int status = processService.removeEdit(id, userId, getEdit);
         if(status == 1){

@@ -1,8 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.semestral_project.company_process_tool.entities.Role;
-import com.semestral_project.company_process_tool.entities.Task;
-import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.RoleService;
@@ -32,7 +30,7 @@ public class RoleController {
 
     @GetMapping("/roles/templates")
     public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
-        List<Role> roles = roleService.getAllTemplatesForUser(userId);
+        List<Role> roles = roleService.getAllUserCanView(userId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -42,7 +40,7 @@ public class RoleController {
 
     @GetMapping("/roles/templatesCanEdit")
     public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
-        List<Role> roles = roleService.getAllTemplatesForUserCanEdit(userId);
+        List<Role> roles = roleService.getAllUserCanEdit(userId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {

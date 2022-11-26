@@ -27,7 +27,7 @@ public class ElementController {
 
     @GetMapping("/elements/templates")
     public ResponseEntity<List<Element>> getElementsTemplates(@RequestParam Long userId) {
-        List<Element> elements = elementService.getAllTemplatesForUser(userId);
+        List<Element> elements = elementService.getAllUserCanView(userId);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {
@@ -37,7 +37,7 @@ public class ElementController {
 
     @GetMapping("/elements/templatesCanEdit")
     public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId) {
-        List<Element> elements = elementService.getAllTemplatesForUserCanEdit(userId);
+        List<Element> elements = elementService.getAllUserCanEdit(userId);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {

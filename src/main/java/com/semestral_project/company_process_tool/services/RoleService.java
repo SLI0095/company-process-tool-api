@@ -3,23 +3,19 @@ package com.semestral_project.company_process_tool.services;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
-import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
+import com.semestral_project.company_process_tool.utils.ItemUsersUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleService {
 
     @Autowired
     RoleRepository roleRepository;
-
-    @Autowired
-    UserRepository userRepository;
 
     @Autowired
     SnapshotRoleService snapshotRoleService;
@@ -86,7 +82,7 @@ public class RoleService {
             return 2; //role not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 5; //cannot edit
         }
         UserType access = userTypeService.getUserTypeById(getAccess.getId());
@@ -144,7 +140,7 @@ public class RoleService {
             return 2; //role not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 5; //cannot edit
         }
         UserType access = userTypeService.getUserTypeById(removeAccess.getId());
@@ -190,7 +186,7 @@ public class RoleService {
             return 2; //role not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 5; //cannot edit
         }
         UserType edit = userTypeService.getUserTypeById(removeEdit.getId());
@@ -202,7 +198,7 @@ public class RoleService {
         }
         var list = role.getCanEdit();
         list.remove(edit);
-        role.setHasAccess(list);
+        role.setCanEdit(list);
         roleRepository.save(role);
         return  1; //OK
 
@@ -239,7 +235,7 @@ public class RoleService {
             return 2; //role not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 5; //cannot edit
         }
         UserType edit = userTypeService.getUserTypeById(getEdit.getId());
@@ -294,11 +290,11 @@ public class RoleService {
 
     public int updateRole(long id, Role role, long whoEdits){
         Role mainRole = getRoleById(id);
-        if (role == null){
+        if (mainRole == null){
             return  2;
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(mainRole).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainRole).contains(editor)){
             return 3;
         }
         mainRole = fillRole(mainRole, role);
@@ -329,7 +325,7 @@ public class RoleService {
             return  2; //role not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)){
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 3; //cannot edit
         }
         roleRepository.delete(role);
@@ -357,40 +353,34 @@ public class RoleService {
 //        }
     }
 
-    public List<Role> getAllTemplatesForUser(long userId){
+    public List<Role> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
         HashSet<Role> ret = new HashSet<>();
-        var l = user.getIsCreator();
-        l.addAll(user.getGroups());
         List<Role> roles = (List<Role>) roleRepository.findAll();
         for(Role r : roles){
-            if(r.getCanEdit().contains(user)
-                    || !Collections.disjoint(l, r.getCanEdit())
-                    || r.getHasAccess().contains(user)
-                    || !Collections.disjoint(l, r.getHasAccess())
-                    || r.getOwner() == user){
+            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
                 ret.add(r);
             }
         }
         return new ArrayList<>(ret);
-
-//        List<Role> query1 = roleRepository.findAllRolesTemplatesForUser(userService.getUserById(userId));
-//        List<Role> query2 = roleRepository.findAllInGroup(userService.getUserById(userId));
-//        return roleRepository.findAllRolesTemplatesForUser(userService.getUserById(userId));
-
-//        if(userRepository.existsById(userId)) {
-//            User user = userRepository.findById(userId).get();
-//            return roleRepository.findAllRolesTemplatesForUser(user);
-//        }
-//        else return null;
     }
 
-    public List<Role> getAllTemplatesForUserCanEdit(long userId){
-        if(userRepository.existsById(userId)) {
-            User user = userRepository.findById(userId).get();
-            return roleRepository.findAllTasksTemplatesForUserCanEdit(user);
+    public List<Role> getAllUserCanEdit(long userId){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
         }
-        else return null;
+        HashSet<Role> ret = new HashSet<>();
+        List<Role> roles = (List<Role>) roleRepository.findAll();
+        for(Role r : roles){
+            if(ItemUsersUtil.getAllUsersCanEdit(r).contains(user)){
+                ret.add(r);
+            }
+        }
+        return new ArrayList<>(ret);
     }
 
     public int createSnapshot(Long id, long userId, String description) {
@@ -399,31 +389,15 @@ public class RoleService {
             return 2;
         }
         User editor = userService.getUserById(userId);
-        if(editor == null || !getAllUsersCanEdit(role).contains(editor)) {
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)) {
             return 3;
         }
         snapshotRoleService.createSnapshotRole(role,description, new SnapshotsHelper());
         return 1;
-
-//        Optional<Role> roleData = roleRepository.findById(id);
-//        if(roleData.isPresent()) {
-//            Role role_ = roleData.get();
-//            User whoEdits_ = userRepository.findById(userId).get();
-//            if(role_.getCanEdit().contains(whoEdits_)){
-//                snapshotRoleService.createSnapshotRole(role_,description, new SnapshotsHelper());
-//                return 1;
-//            } else {
-//                return 3; //cannot edit
-//            }
-//        }
-//        else
-//        {
-//            return 2;
-//        }
     }
 
     public Role restoreRole(long userId, SnapshotRole snapshot) {
-        snapshot =snapshotRoleService.getSnapshotRoleById(snapshot.getId());
+        snapshot = snapshotRoleService.getSnapshotRoleById(snapshot.getId());
         if(snapshot == null){
             return null;
         }
@@ -432,34 +406,5 @@ public class RoleService {
             return null;
         }
         return snapshotRoleService.restoreRoleFromSnapshot(snapshot,new SnapshotsHelper(), user);
-    }
-    private HashSet<UserType> getAllCanEdit(Role role){
-        var ret = new HashSet<>(role.getCanEdit());
-        ret.add(role.getOwner());
-        return ret;
-    }
-    private HashSet<UserType> getAllHasAccess(Role role){
-        var ret = new HashSet<>(role.getHasAccess());
-        ret.add(role.getOwner());
-        return ret;
-    }
-    private HashSet<User> getAllUsersCanEdit(Role role){
-        var allUsers = new HashSet<User>();
-        //add solo users
-        allUsers.addAll(role.getCanEdit().stream()
-                .filter(User.class::isInstance)
-                .map(User.class::cast)
-                .collect(Collectors.toSet()));
-
-        //add all users from group
-        allUsers.addAll(role.getCanEdit().stream()
-                .filter(UserGroup.class::isInstance)
-                .flatMap(list -> ((UserGroup) list).getAllMembers().stream())
-                .collect(Collectors.toSet()));
-        allUsers.add(role.getOwner());
-        return allUsers;
-    }
-    private HashSet<User> getAllUsersHasAccess(Role role){
-        return new HashSet<>();
     }
 }

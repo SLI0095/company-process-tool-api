@@ -1,9 +1,11 @@
 package com.semestral_project.company_process_tool.services;
 
+import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.State;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
+import com.semestral_project.company_process_tool.utils.ItemUsersUtil;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ public class StateService {
     @Autowired
     StateRepository stateRepository;
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     public List<State> getAllStates(){
         try {
@@ -40,32 +42,40 @@ public class StateService {
 
     public State getStateById(long id){
         Optional<State> stateData = stateRepository.findById(id);
-
-        if(stateData.isPresent()) {
-            return stateData.get();
-        }
-        else return null;
+        return stateData.orElse(null);
     }
 
     public int updateState(long id, State state, long whoEdits){
-        Optional<State> stateData = stateRepository.findById(id);
-
-        if(stateData.isPresent()){
-            State state_ = stateData.get();
-            User whoEdits_ = userRepository.findById(whoEdits).get();
-            if(state_.getWorkItem().getCanEdit().contains(whoEdits_)) {
-                state_.setStateName(state.getStateName());
-                state_.setStateDescription(state.getStateDescription());
-
-                stateRepository.save(state_);
-                return 1;
-            }
+        State mainState = getStateById(id);
+        if (mainState == null){
+            return  2;
+        }
+        User editor = userService.getUserById(whoEdits);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainState.getWorkItem()).contains(editor)){
             return 3;
         }
-        else
-        {
-            return 2;
-        }
+        mainState.setStateName(state.getStateName());
+        mainState.setStateDescription(state.getStateDescription());
+        stateRepository.save(mainState);
+        return 1;
+//        Optional<State> stateData = stateRepository.findById(id);
+//
+//        if(stateData.isPresent()){
+//            State state_ = stateData.get();
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(state_.getWorkItem().getCanEdit().contains(whoEdits_)) {
+//                state_.setStateName(state.getStateName());
+//                state_.setStateDescription(state.getStateDescription());
+//
+//                stateRepository.save(state_);
+//                return 1;
+//            }
+//            return 3;
+//        }
+//        else
+//        {
+//            return 2;
+//        }
     }
 
 }
