@@ -1,8 +1,10 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Rasci;
 import com.semestral_project.company_process_tool.entities.TaskStep;
 import com.semestral_project.company_process_tool.entities.WorkItem;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,21 +13,28 @@ import java.util.List;
 @Entity
 public class SnapshotTask extends SnapshotElement{
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<SnapshotTaskStep> steps = new ArrayList<>();
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    @JsonView(Views.Basic.class)
     private String taskType = "task";
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<SnapshotWorkItem> mandatoryInputs = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asOutput")
     private List<SnapshotWorkItem> outputs = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<SnapshotRasci> rasciList = new ArrayList<>();
 

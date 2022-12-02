@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -39,8 +41,10 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> canBeUsedIn = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     private boolean isTemplate = false;
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH)
     private List<SnapshotElement> snapshots = new ArrayList<>();
 

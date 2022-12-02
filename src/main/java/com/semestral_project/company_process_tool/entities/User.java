@@ -1,6 +1,8 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.List;
 @DiscriminatorValue("user")
 public class User extends UserType {
 
+    @JsonView(Views.Basic.class)
     private String username;
     private String password;
 
@@ -17,11 +20,13 @@ public class User extends UserType {
     @OneToMany(mappedBy = "owner")
     private List<Item> isOwner = new ArrayList<>();
 
-    @JsonIgnore
+
+    @JsonView(Views.UsersGroups.class)
     @OneToMany(mappedBy = "creator")
     private List<UserGroup> isCreator = new ArrayList<>();
 
-    @JsonIgnore // TODO only show when needed
+
+    @JsonView(Views.UsersGroups.class)
     @ManyToMany(mappedBy = "users", cascade = CascadeType.DETACH)
     private List<UserGroup> groups = new ArrayList<>();
 
@@ -59,6 +64,7 @@ public class User extends UserType {
     public void setIsCreator(List<UserGroup> isCreator) {
         this.isCreator = isCreator;
     }
+
 
     public List<UserGroup> getGroups() {
         return groups;

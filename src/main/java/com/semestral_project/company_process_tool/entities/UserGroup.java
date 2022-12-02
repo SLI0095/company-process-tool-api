@@ -1,5 +1,8 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +11,14 @@ import java.util.List;
 @DiscriminatorValue("group")
 public class UserGroup extends UserType{
 
+    @JsonView(Views.Basic.class)
     String groupName;
 
+    @JsonView(Views.Default.class)
     @ManyToOne
     User creator;
 
+    @JsonView(Views.Default.class)
     @ManyToMany
     @JoinTable(name = "group_user",
             joinColumns = {@JoinColumn(name = "group_id")},

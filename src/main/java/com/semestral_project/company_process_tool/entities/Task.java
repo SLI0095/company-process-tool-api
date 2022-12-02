@@ -1,6 +1,8 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,33 +12,43 @@ import java.util.List;
 @DiscriminatorValue("task")
 public class Task extends Element{
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<TaskStep> steps = new ArrayList<>();
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    @JsonView(Views.Basic.class)
     private String taskType = "task";
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<WorkItem> mandatoryInputs = new ArrayList<>();
 
 //    @ManyToMany(mappedBy = "asOptionalInput")
 //    private List<WorkItem> optionalInputs = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
     private List<Rasci> rasciList = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
     private List<WorkItem> guidanceWorkItems = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<Role> usableRoles = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<WorkItem> usableWorkItems = new ArrayList<>();
 

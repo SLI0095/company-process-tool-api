@@ -1,9 +1,11 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.services.TaskService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ public class TaskController {
     @Autowired
     TaskService taskService;
 
+    @JsonView(Views.Default.class)
     @GetMapping("/tasks")
     public ResponseEntity<List<Task>> getTasks() {
         List<Task> tasks = taskService.getAllTasks();
@@ -27,6 +30,7 @@ public class TaskController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/tasks/templates")
     public ResponseEntity<List<Task>> getTasksTemplates(@RequestParam long userId) {
         List<Task> tasks = taskService.getAllUserCanView(userId);
@@ -37,6 +41,7 @@ public class TaskController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/tasks/templatesCanEdit")
     public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
         List<Task> tasks = taskService.getAllUserCanEdit(userId);
@@ -47,6 +52,7 @@ public class TaskController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/tasks/{id}")
     public ResponseEntity<Task> taskById(@PathVariable Long id){
 

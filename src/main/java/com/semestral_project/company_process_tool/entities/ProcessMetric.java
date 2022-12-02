@@ -1,12 +1,15 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 
 @Entity
 public class ProcessMetric {
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -15,8 +18,10 @@ public class ProcessMetric {
     @ManyToOne
     private Process process;
 
+    @JsonView(Views.Basic.class)
     private String name;
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String description;
 

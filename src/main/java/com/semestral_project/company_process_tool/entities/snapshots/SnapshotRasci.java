@@ -1,18 +1,22 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 
 @Entity
 public class SnapshotRasci {
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(Views.Basic.class)
     @ManyToOne
     private SnapshotRole role;
 
@@ -20,6 +24,7 @@ public class SnapshotRasci {
     @ManyToOne
     private SnapshotTask task;
 
+    @JsonView(Views.Basic.class)
     private char type;
 
     public SnapshotRasci() {

@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
@@ -7,6 +8,7 @@ import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.services.RasciMatrixService;
 import com.semestral_project.company_process_tool.utils.ProcessAndBpmnHolder;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ public class ProcessController {
     @Autowired
     RasciMatrixService rasciMatrixService;
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes")
     public ResponseEntity<List<Process>> getProcesses() {
         List<Process> processes = processService.getAllProcesses();
@@ -34,6 +37,7 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes/templates")
     public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId) {
         List<Process> processes = processService.getAllUserCanView(userId);
@@ -44,6 +48,7 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes/templatesCanEdit")
     public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId) {
         List<Process> processes = processService.getAllUserCanEdit(userId);
@@ -54,6 +59,7 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes/{id}")
     public ResponseEntity<Process> processById(@PathVariable Long id) {
         Process process = processService.getProcessById(id);
@@ -167,6 +173,7 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes/{id}/rasci")
     public ResponseEntity<String[][]> processRasci(@PathVariable Long id) {
         Process process = processService.getProcessById(id);
@@ -252,6 +259,7 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/processes/{id}/generateHTML")
     public ResponseEntity<StreamingResponseBody> processHTML(@PathVariable Long id) {
         return ResponseEntity

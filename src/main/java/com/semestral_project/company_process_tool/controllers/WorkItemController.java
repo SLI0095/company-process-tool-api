@@ -1,9 +1,11 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ public class WorkItemController {
     WorkItemService workItemService;
 
 
+    @JsonView(Views.Default.class)
     @GetMapping("/workItems")
     public ResponseEntity<List<WorkItem>> getWorkItems() {
         List<WorkItem> workItems = workItemService.getAllWorkItems();
@@ -28,6 +31,7 @@ public class WorkItemController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/workItems/templates")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId) {
         List<WorkItem> workItems = workItemService.getAllUserCanView(userId);
@@ -38,6 +42,7 @@ public class WorkItemController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/workItems/templatesCanEdit")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
         List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId);
@@ -48,6 +53,7 @@ public class WorkItemController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/workItems/{id}")
     public ResponseEntity<WorkItem> workItemById(@PathVariable Long id) {
         WorkItem workItem = workItemService.getWorkItemById(id);

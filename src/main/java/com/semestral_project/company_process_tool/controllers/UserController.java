@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.UserGroup;
 import com.semestral_project.company_process_tool.entities.UserType;
@@ -7,6 +8,7 @@ import com.semestral_project.company_process_tool.services.UserGroupService;
 import com.semestral_project.company_process_tool.services.UserService;
 import com.semestral_project.company_process_tool.services.UserTypeService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,7 @@ public class UserController {
         else return ResponseEntity.ok(ret);
     }
 
+    @JsonView(Views.UsersGroups.class)
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers() {
         List<User> users = userService.getAllUser();
@@ -45,6 +48,7 @@ public class UserController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/userGroups")
     public ResponseEntity<List<UserGroup>> getGroups() {
         List<UserGroup> groups = userGroupService.getAllGroups();

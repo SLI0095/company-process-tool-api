@@ -1,8 +1,10 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,27 +14,37 @@ import java.util.List;
 @Entity
 public class WorkItem extends Item{
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String briefOutline;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String notation;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String impactOfNotHaving;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String reasonForNotNeeding;
 
+    @JsonView(Views.Basic.class)
     private String workItemType = "";
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String urlAddress;
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "workItem", cascade = CascadeType.REMOVE)
     private  List<State> workItemStates;
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String templateText;
 
@@ -87,12 +99,14 @@ public class WorkItem extends Item{
 //            inverseJoinColumns = {@JoinColumn(name = "user_id")})
 //    private List<User> canEdit = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany
     @JoinTable(name = "work_item_task_usage",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "task_id")})
     private List<Task> canBeUsedIn = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="originalWorkItem", cascade = CascadeType.DETACH)
     private List<SnapshotWorkItem> snapshots = new ArrayList<>();
 

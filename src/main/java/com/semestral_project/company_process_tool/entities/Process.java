@@ -1,6 +1,8 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,32 +12,43 @@ import java.util.List;
 @DiscriminatorValue("process")
 public class Process extends Element{
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String scope;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String usageNotes;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String alternatives;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String howToStaff;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "partOfProcess", cascade = CascadeType.DETACH)
     private List<Element> elements = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "bpmn_id")
     private BPMNfile workflow;
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
     private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<ProcessMetric> metrics = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<Element> usableElements = new ArrayList<>();
 

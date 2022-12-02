@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,26 +12,35 @@ import java.util.List;
 @Entity
 public class SnapshotProcess extends SnapshotElement {
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String scope;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String usageNotes;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String alternatives;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String howToStaff;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "partOfProcess", cascade = CascadeType.DETACH)
     private List<SnapshotElement> elements = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "snapshot_bpmn_id")
     private SnapshotBPMN workflow;
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<SnapshotProcessMetric> metrics = new ArrayList<>();
 

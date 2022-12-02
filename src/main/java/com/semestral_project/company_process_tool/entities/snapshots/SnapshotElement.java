@@ -1,9 +1,11 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.Task;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -17,6 +19,7 @@ import java.util.List;
         discriminatorType = DiscriminatorType.STRING)
 public class SnapshotElement extends SnapshotItem{
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

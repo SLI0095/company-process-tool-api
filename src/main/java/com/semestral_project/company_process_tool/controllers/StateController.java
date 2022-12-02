@@ -1,9 +1,11 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.services.StateService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ public class StateController {
     @Autowired
     StateService stateService;
 
+    @JsonView(Views.Default.class)
     @GetMapping("/states")
     public ResponseEntity<List<State>> getStates() {
         List<State> states = stateService.getAllStates();
@@ -38,6 +41,7 @@ public class StateController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/states/{id}")
     public ResponseEntity<State> getStateById(@PathVariable Long id) {
         State state = stateService.getStateById(id);

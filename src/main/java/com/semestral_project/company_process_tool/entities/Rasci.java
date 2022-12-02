@@ -1,6 +1,8 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,10 +10,12 @@ import java.util.List;
 @Entity
 public class Rasci {
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(Views.Basic.class)
     @ManyToOne
     private Role role;
 
@@ -19,6 +23,7 @@ public class Rasci {
     @ManyToOne
     private Task task;
 
+    @JsonView(Views.Basic.class)
     private char type;
 
     public Rasci() {

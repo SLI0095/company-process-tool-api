@@ -1,10 +1,12 @@
 package com.semestral_project.company_process_tool.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.RoleService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
+import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ public class RoleController {
     @Autowired
     RoleService roleService;
 
+    @JsonView(Views.Default.class)
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getRoles() {
         List<Role> roles = roleService.getAllRoles();
@@ -28,6 +31,7 @@ public class RoleController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/roles/templates")
     public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
         List<Role> roles = roleService.getAllUserCanView(userId);
@@ -38,6 +42,7 @@ public class RoleController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/roles/templatesCanEdit")
     public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
         List<Role> roles = roleService.getAllUserCanEdit(userId);
@@ -48,6 +53,7 @@ public class RoleController {
         }
     }
 
+    @JsonView(Views.Default.class)
     @GetMapping("/roles/{id}")
     public ResponseEntity<Role> roleById(@PathVariable Long id){
         Role role = roleService.getRoleById(id);

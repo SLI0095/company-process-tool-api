@@ -1,8 +1,10 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Rasci;
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,12 +12,15 @@ import java.util.List;
 @Entity
 public class SnapshotRole extends SnapshotItem{
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String skills;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String assignmentApproaches;
 

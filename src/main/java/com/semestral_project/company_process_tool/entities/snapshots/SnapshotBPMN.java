@@ -1,16 +1,20 @@
 package com.semestral_project.company_process_tool.entities.snapshots;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
 @Entity
 public class SnapshotBPMN {
 
-    @Id
+
+    @JsonView(Views.Basic.class)@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(Views.Basic.class)
     @Lob
     private String bpmnContent;
 
