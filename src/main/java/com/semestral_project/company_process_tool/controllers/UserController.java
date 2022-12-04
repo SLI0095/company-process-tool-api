@@ -47,6 +47,16 @@ public class UserController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+    @JsonView(Views.UsersGroups.class)
+    @GetMapping("/users/{id}")
+    public ResponseEntity<User> getUser(@PathVariable long id) {
+        User user = userService.getUserById(id);
+        if(user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 
     @JsonView(Views.Default.class)
     @GetMapping("/userGroups")
@@ -54,6 +64,17 @@ public class UserController {
         List<UserGroup> groups = userGroupService.getAllGroups();
         if(groups != null) {
             return ResponseEntity.ok(groups);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/userGroups/{id}")
+    public ResponseEntity<UserGroup> getGroup(@PathVariable long id) {
+        UserGroup group = userGroupService.getGroupById(id);
+        if(group != null) {
+            return ResponseEntity.ok(group);
         } else {
             return ResponseEntity.badRequest().body(null);
         }
@@ -78,6 +99,20 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Group id: " + id + " does not exist"));
         } else if(ret == 3) {
             return ResponseEntity.badRequest().body(new ResponseMessage("User already in group."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit group."));
+        }
+    }
+
+    @PutMapping("/userGroups/{id}/removeUser")
+    public ResponseEntity<ResponseMessage> removeUser(@RequestBody User user, @RequestParam long userId, @PathVariable long id) {
+        int ret = userGroupService.removeUserFromGroup(id, user, userId);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("User removed from group."));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Group id: " + id + " does not exist"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User not in group."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit group."));
         }
