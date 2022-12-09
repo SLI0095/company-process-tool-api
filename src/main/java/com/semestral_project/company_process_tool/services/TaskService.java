@@ -103,7 +103,7 @@ public class TaskService {
         if(access == null){
             return 5;
         }
-        if(task.getHasAccess().contains(access)){
+        if(task.getHasAccess().contains(access) || task.getOwner() == access){
             return 3; //already has access
         }
         var list = task.getCanEdit();
@@ -159,7 +159,7 @@ public class TaskService {
         if(access == null){
             return;
         }
-        if(task.getHasAccess().contains(access)){
+        if(task.getHasAccess().contains(access) || task.getOwner() == access){
             return; //already has access
         }
         var list = task.getCanEdit();

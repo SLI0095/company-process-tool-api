@@ -89,7 +89,7 @@ public class RoleService {
         if(access == null){
             return 5;
         }
-        if(role.getHasAccess().contains(access)){
+        if(role.getHasAccess().contains(access) || role.getOwner() == access){
             return 3; //already has access
         }
         var list = role.getCanEdit();
@@ -353,6 +353,7 @@ public class RoleService {
 //        }
     }
 
+    //TODO create query that will filter the result OR at least call multiple queries and combine the result OR order list by id
     public List<Role> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
         if(user == null){
@@ -366,6 +367,7 @@ public class RoleService {
             }
         }
         return new ArrayList<>(ret);
+       // return roleRepository.findAllCanUserView(user);
     }
 
     public List<Role> getAllUserCanEdit(long userId){

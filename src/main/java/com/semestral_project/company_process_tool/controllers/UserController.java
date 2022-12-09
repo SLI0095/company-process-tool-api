@@ -118,6 +118,17 @@ public class UserController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @GetMapping("/userTypes")
+    public ResponseEntity<List<UserType>> getAll() {
+        List<UserType> all = userTypeService.getAllUsersAndGroups();
+        if(all != null) {
+            return ResponseEntity.ok(all);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<ResponseMessage> registerUser(@RequestBody User user){
         int ret = userService.registerUser(user);

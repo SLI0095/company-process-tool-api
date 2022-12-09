@@ -16,12 +16,23 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "WHERE :user MEMBER r.canEdit OR :user MEMBER r.hasAccess OR :user = r.owner")
     List<Role> findAllRolesTemplatesForUser(@Param("user") User user);
 
-    @Query("SELECT r FROM Role r " +
+
+
+    /*@Query("SELECT r FROM Role r " +
             "JOIN r.canEdit ce ON TYPE(ce) = UserGroup " +
             "JOIN r.hasAccess ha ON TYPE(ha) = UserGroup " +
             "WHERE :user MEMBER ce.users OR :user = ce.creator " +
-            "OR :user MEMBER ha.users OR :user = ha.creator")
-    List<Role> findAllInGroup(@Param("user") User user);
+            "OR :user MEMBER ha.users OR :user = ha.creator " +
+            "UNION " +
+            "FROM Role r2 " +
+            "JOIN r2.canEdit ce2 ON TYPE(ce2) = User " +
+            "JOIN r2.hasAccess ha2 ON TYPE(ha2) = User " +
+            "WHERE :user = ce2 OR " +
+            ":user = ha2 " +
+            "UNION " +
+            "FROM Role r3 " +
+            "WHERE :user = r3.owner")
+    List<Role> findAllCanUserView(@Param("user") User user);*/
 
     //@Query("SELECT DISTINCT(r) FROM Role,  r WHERE (?1 MEMBER r.canEdit OR ?1 MEMBER r.hasAccess OR ?1 = r.owner)")
 //    @Query("SELECT r FROM Role r " +

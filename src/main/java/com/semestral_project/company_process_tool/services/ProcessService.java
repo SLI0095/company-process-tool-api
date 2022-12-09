@@ -129,7 +129,7 @@ public class ProcessService {
         if(access == null){
             return 5;
         }
-        if(process.getHasAccess().contains(access)){
+        if(process.getHasAccess().contains(access) || process.getOwner() == access){
             return 3; //already has access
         }
         var list = process.getCanEdit();
@@ -296,7 +296,7 @@ public class ProcessService {
         if(edit == null){
             return 5;
         }
-        if(process.getCanEdit().contains(edit)){
+        if(process.getCanEdit().contains(edit) || process.getOwner() == edit){
             return 3; //already has access
         }
         var list = process.getHasAccess();
@@ -363,7 +363,7 @@ public class ProcessService {
         if(edit == null){
             return;
         }
-        if(process.getCanEdit().contains(edit)){
+        if(process.getCanEdit().contains(edit) || process.getOwner() == edit){
             return; //already has access
         }
         var list = process.getHasAccess();
@@ -428,7 +428,7 @@ public class ProcessService {
         if(access == null){
             return;
         }
-        if(process.getHasAccess().contains(access)){
+        if(process.getHasAccess().contains(access) || process.getOwner() == access){
             return; //already has access
         }
         var list = process.getCanEdit();

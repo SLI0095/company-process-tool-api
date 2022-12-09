@@ -323,7 +323,7 @@ public class WorkItemService {
         if(access == null){
             return 5;
         }
-        if(workItem.getHasAccess().contains(access)){
+        if(workItem.getHasAccess().contains(access) || workItem.getOwner() == access){
             return 3; //already has access
         }
         var list = workItem.getCanEdit();
