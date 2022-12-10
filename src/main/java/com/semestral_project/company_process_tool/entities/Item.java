@@ -55,6 +55,9 @@ public class Item {
     @ManyToOne
     private User owner;
 
+    @JsonView(Views.Basic.class)
+    private boolean isTemplate = false;
+
     public Item() {
     }
 
@@ -137,4 +140,13 @@ public class Item {
     public void setOwner(User owner) {
         this.owner = owner;
     }
+
+    public boolean isTemplate() {
+        return isTemplate;
+    }
+
+    public void setTemplate(boolean template) {
+        isTemplate = template;
+    }
+
 }

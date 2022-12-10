@@ -94,6 +94,19 @@ public class WorkItemController {
         }
     }
 
+    @PutMapping("/workItems/{id}/setTemplate")
+    public ResponseEntity<ResponseMessage> updateWorkItemIsTemplate(@PathVariable Long id, @RequestParam boolean isTemplate, @RequestParam long userId) {
+
+        int status = workItemService.updateIsTemplate(id, isTemplate, userId);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+        }else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
+
     @PutMapping("/workItems/{id}/addState")
     public ResponseEntity<ResponseMessage> addWorkItemState(@PathVariable Long id, @RequestBody State state, @RequestParam long userId){
         int ret = workItemService.addWorkItemState(id, state, userId);

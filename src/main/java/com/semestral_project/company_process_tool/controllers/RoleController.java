@@ -86,6 +86,18 @@ public class RoleController {
         }
     }
 
+    @PutMapping("/roles/{id}/setTemplate")
+    public ResponseEntity<ResponseMessage> updateRoleTemplate(@PathVariable Long id, @RequestParam boolean isTemplate, @RequestParam long userId){
+        int ret = roleService.updateIsTemplate(id, isTemplate, userId);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " is updated"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+        }
+    }
+
     @DeleteMapping("/roles/{id}")
     public ResponseEntity<ResponseMessage> removeRole(@PathVariable Long id, @RequestParam long userId) {
         int ret = roleService.removeRoleById(id, userId);

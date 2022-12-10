@@ -132,19 +132,20 @@ public class WorkItemService {
         workItemMain = workItemRepository.save(workItemMain);
         bpmNparser.updateWorkItemInAllWorkflows(workItemMain, true, null);
         return 1;
+    }
 
-//        Optional<WorkItem> workItemData = workItemRepository.findById(id);
-//        if (workItemData.isPresent()) {
-//            WorkItem workItem_ = workItemData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if (workItem_.getCanEdit().contains(whoEdits_)) {
-//                workItem_ = fillWorkItem(workItem_, workItem);
-//                workItemRepository.save(workItem_);
-//                bpmNparser.updateWorkItemInAllWorkflows(workItem_, true, null);
-//                return 1;
-//            }
-//            return 3; // cannot edit
-//        } else return 2;
+    public int updateIsTemplate(long id, boolean isTemplate, long whoEdits) {
+        WorkItem workItemMain = getWorkItemById(id);
+        if (workItemMain == null) {
+            return 2;
+        }
+        User editor = userService.getUserById(whoEdits);
+        if (editor == null || !ItemUsersUtil.getAllUsersCanEdit(workItemMain).contains(editor)) {
+            return 3;
+        }
+        workItemMain.setTemplate(isTemplate);
+        workItemRepository.save(workItemMain);
+        return 1;
     }
 
     public int addWorkItemState(long id, State state, long whoEdits) {

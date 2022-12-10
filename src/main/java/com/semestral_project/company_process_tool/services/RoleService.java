@@ -319,6 +319,20 @@ public class RoleService {
 //        }
     }
 
+    public int updateIsTemplate(long id, boolean isTemplate, long whoEdits) {
+        Role mainRole = getRoleById(id);
+        if (mainRole == null) {
+            return 2;
+        }
+        User editor = userService.getUserById(whoEdits);
+        if (editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainRole).contains(editor)) {
+            return 3;
+        }
+        mainRole.setTemplate(isTemplate);
+        roleRepository.save(mainRole);
+        return 1;
+    }
+
     public int removeRoleById(long id, long whoEdits){
         Role role = getRoleById(id);
         if (role == null){

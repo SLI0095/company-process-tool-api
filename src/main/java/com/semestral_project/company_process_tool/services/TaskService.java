@@ -441,6 +441,20 @@ public class TaskService {
 //        }
     }
 
+    public int updateIsTemplate(long id, boolean isTemplate, long whoEdits) {
+        Task mainTask = getTaskById(id);
+        if (mainTask == null) {
+            return 2;
+        }
+        User editor = userService.getUserById(whoEdits);
+        if (editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainTask).contains(editor)) {
+            return 3;
+        }
+        mainTask.setTemplate(isTemplate);
+        taskRepository.save(mainTask);
+        return 1;
+    }
+
     public int removeTaskById(long id, long whoEdits){
         Task task = getTaskById(id);
         if (task == null){

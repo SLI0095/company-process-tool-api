@@ -144,6 +144,18 @@ public class ProcessController {
         }
     }
 
+    @PutMapping("/processes/{id}/setTemplate")
+    public ResponseEntity<ResponseMessage> updateProcessIsTemplate(@PathVariable Long id, @RequestParam boolean isTemplate, @RequestParam long userId) {
+        int ret = processService.updateIsTemplate(id, isTemplate, userId);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
+
 
     @PutMapping("/processes/{id}/saveBPMN")
     public ResponseEntity<ResponseMessage> saveBPMN(@PathVariable Long id, @RequestBody BPMNfile bpmn, @RequestParam long userId){

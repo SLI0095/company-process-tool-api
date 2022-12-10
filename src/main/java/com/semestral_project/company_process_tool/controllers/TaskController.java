@@ -86,6 +86,18 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/tasks/{id}/setTemplate")
+    public ResponseEntity<ResponseMessage> updateTaskIsTemplate(@PathVariable Long id, @RequestParam boolean isTemplate, @RequestParam long userId){
+        int ret = taskService.updateIsTemplate(id, isTemplate, userId);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated"));
+        } else if(ret == 3) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this task."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
+
     @DeleteMapping("/tasks/{id}")
     public ResponseEntity<ResponseMessage> removeTask(@PathVariable Long id, @RequestParam long userId) {
         int ret = taskService.removeTaskById(id, userId);

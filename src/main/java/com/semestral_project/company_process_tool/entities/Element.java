@@ -42,9 +42,6 @@ public class Element extends Item{
     private List<Process> canBeUsedIn = new ArrayList<>();
 
     @JsonView(Views.Basic.class)
-    private boolean isTemplate = false;
-
-    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH)
     private List<SnapshotElement> snapshots = new ArrayList<>();
 
@@ -82,14 +79,6 @@ public class Element extends Item{
 
     public void setCanBeUsedIn(List<Process> canBeUsedIn) {
         this.canBeUsedIn = canBeUsedIn;
-    }
-
-    public boolean isTemplate() {
-        return isTemplate;
-    }
-
-    public void setTemplate(boolean template) {
-        isTemplate = template;
     }
 
     public List<SnapshotElement> getSnapshots() {

@@ -563,6 +563,20 @@ public class ProcessService {
 //        }
     }
 
+    public int updateIsTemplate(long id, boolean isTemplate, long whoEdits) {
+        Process mainProcess = getProcessById(id);
+        if (mainProcess == null) {
+            return 2;
+        }
+        User editor = userService.getUserById(whoEdits);
+        if (editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainProcess).contains(editor)) {
+            return 3;
+        }
+        mainProcess.setTemplate(isTemplate);
+        processRepository.save(mainProcess);
+        return 1;
+    }
+
     public void addElementToProcess(long id, Element element){
         Process process = getProcessById(id);
         if (process == null){
