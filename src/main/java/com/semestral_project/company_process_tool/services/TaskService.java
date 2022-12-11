@@ -1077,6 +1077,21 @@ public class TaskService {
 //        }else return null;
     }
 
+    public List<Task> getAllUserCanViewFiltered(long userId, boolean isTemplate) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        HashSet<Task> ret = new HashSet<>();
+        List<Task> roles = taskRepository.findByIsTemplate(isTemplate);
+        for (Task t : roles) {
+            if (ItemUsersUtil.getAllUsersCanView(t).contains(user)) {
+                ret.add(t);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
 
     public int createSnapshot(Long id, long userId, String description) {
         Task task = getTaskById(id);

@@ -784,6 +784,21 @@ public class ProcessService {
         return new ArrayList<>(ret);
     }
 
+    public List<Process> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        HashSet<Process> ret = new HashSet<>();
+        List<Process> processes = processRepository.findByIsTemplate(isTemplate);
+        for(Process p : processes){
+            if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
+                ret.add(p);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
     public boolean addProcessFromFile(ProcessAndBpmnHolder holder, long whoEdits){
         Process newProcess = holder.getProcess();
         long id = this.addProcess(newProcess, whoEdits);

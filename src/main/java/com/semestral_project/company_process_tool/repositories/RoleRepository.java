@@ -16,6 +16,10 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "WHERE :user MEMBER r.canEdit OR :user MEMBER r.hasAccess OR :user = r.owner")
     List<Role> findAllRolesTemplatesForUser(@Param("user") User user);
 
+    @Query("SELECT r FROM Role r " +
+            "WHERE r.isTemplate = :isTemplate")
+    List<Role> findByIsTemplate(@Param("isTemplate") boolean isTemplate);
+
 
 
     /*@Query("SELECT r FROM Role r " +

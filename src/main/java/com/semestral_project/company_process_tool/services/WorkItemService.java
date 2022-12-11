@@ -311,6 +311,21 @@ public class WorkItemService {
         return new ArrayList<>(ret);
     }
 
+    public List<WorkItem> getAllUserCanViewByTemplate(long userId, boolean isTemplate) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        HashSet<WorkItem> ret = new HashSet<>();
+        List<WorkItem> workItems = workItemRepository.findByIsTemplate(isTemplate);
+        for (WorkItem w : workItems) {
+            if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
+                ret.add(w);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
     public int addAccess(long workItemId, long whoEdits, UserType getAccess) {
         WorkItem workItem = getWorkItemById(workItemId);
         if(workItem == null){

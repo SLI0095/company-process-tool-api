@@ -43,6 +43,17 @@ public class RoleController {
     }
 
     @JsonView(Views.Default.class)
+    @GetMapping("/roles/isTemplate")
+    public ResponseEntity<List<Role>> getRolesByTemplates(@RequestParam long userId, @RequestParam boolean isTemplate) {
+        List<Role> roles = roleService.getAllUserCanViewByTemplate(userId, isTemplate);
+        if(roles != null){
+            return ResponseEntity.ok(roles);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
     @GetMapping("/roles/templatesCanEdit")
     public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
         List<Role> roles = roleService.getAllUserCanEdit(userId);

@@ -42,6 +42,17 @@ public class TaskController {
     }
 
     @JsonView(Views.Default.class)
+    @GetMapping("/tasks/isTemplate")
+    public ResponseEntity<List<Task>> getTasksByTemplate(@RequestParam long userId, @RequestParam boolean isTemplate) {
+        List<Task> tasks = taskService.getAllUserCanViewFiltered(userId, isTemplate);
+        if(tasks != null){
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
     @GetMapping("/tasks/templatesCanEdit")
     public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
         List<Task> tasks = taskService.getAllUserCanEdit(userId);

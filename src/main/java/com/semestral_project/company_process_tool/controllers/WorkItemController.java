@@ -43,6 +43,17 @@ public class WorkItemController {
     }
 
     @JsonView(Views.Default.class)
+    @GetMapping("/workItems/isTemplate")
+    public ResponseEntity<List<WorkItem>> getWorkItemsIsTemplate(@RequestParam long userId, @RequestParam boolean isTemplate) {
+        List<WorkItem> workItems = workItemService.getAllUserCanViewByTemplate(userId, isTemplate);
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
     @GetMapping("/workItems/templatesCanEdit")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
         List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId);

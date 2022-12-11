@@ -399,6 +399,22 @@ public class RoleService {
         return new ArrayList<>(ret);
     }
 
+    public List<Role> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        HashSet<Role> ret = new HashSet<>();
+        List<Role> roles = roleRepository.findByIsTemplate(isTemplate);
+        for(Role r : roles){
+            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
+                ret.add(r);
+            }
+        }
+        return new ArrayList<>(ret);
+        // return roleRepository.findAllCanUserView(user);
+    }
+
     public int createSnapshot(Long id, long userId, String description) {
         Role role = getRoleById(id);
         if(role == null){
