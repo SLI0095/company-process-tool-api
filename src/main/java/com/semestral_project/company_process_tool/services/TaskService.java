@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.repositories.*;
@@ -38,6 +39,8 @@ public class TaskService {
     TaskStepService taskStepService;
     @Autowired
     WorkItemService workItemService;
+    @Autowired
+    ProcessService processService;
 
     public Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
@@ -1090,6 +1093,67 @@ public class TaskService {
             }
         }
         return new ArrayList<>(ret);
+    }
+
+    public List<Task> getUsableInForUser(long userId, Process process){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        HashSet<Task> ret = new HashSet<>();
+        List<Task> tasks =  taskRepository.usableInProcessForUser(process);
+        for(Task t : tasks){
+            if(ItemUsersUtil.getAllUsersCanEdit(t).contains(user)){
+                ret.add(t);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
+    public int addUsableIn(long taskId, long user,  Process process) {
+        Task task = getTaskById(taskId);
+        if(task == null){
+            return 2; //task not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)){
+            return 5; //cannot edit
+        }
+        process = processService.getProcessById(process.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 5;
+        }
+        var list =  task.getCanBeUsedIn();
+        if(list.contains(process)){
+            return 3;
+        }
+        list.add(process);
+        task.setCanBeUsedIn(list);
+        taskRepository.save(task);
+        return 1;
+    }
+
+    public int removeUsableIn(long taskId, long user,  Process process) {
+        Task task = getTaskById(taskId);
+        if(task == null){
+            return 2; //task not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)){
+            return 5; //cannot edit
+        }
+        process = processService.getProcessById(process.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 5;
+        }
+        var list =  task.getCanBeUsedIn();
+        if(!list.contains(process)){
+            return 3;
+        }
+        list.remove(process);
+        task.setCanBeUsedIn(list);
+        taskRepository.save(task);
+        return 1;
     }
 
 

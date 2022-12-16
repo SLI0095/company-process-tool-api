@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.services.ElementService;
 import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,17 @@ public class ElementController {
     @GetMapping("/elements/templatesCanEdit")
     public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId) {
         List<Element> elements = elementService.getAllUserCanEdit(userId);
+        if(elements != null){
+            return ResponseEntity.ok(elements);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/elements/forProcess")
+    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId, @RequestBody Process process) {
+        List<Element> elements = elementService.getUsableInProcessForUser(userId, process);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {

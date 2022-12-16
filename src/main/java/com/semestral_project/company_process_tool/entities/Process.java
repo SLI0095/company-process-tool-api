@@ -52,6 +52,10 @@ public class Process extends Element{
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<Element> usableElements = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
+    @ManyToMany(mappedBy = "canBeUsedInProcesses", cascade = CascadeType.DETACH)
+    private List<WorkItem> usableWorkItems = new ArrayList<>();
+
     public Process() {
     }
 

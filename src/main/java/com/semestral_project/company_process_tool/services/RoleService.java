@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
@@ -25,6 +26,9 @@ public class RoleService {
 
     @Autowired
     UserTypeService userTypeService;
+
+    @Autowired
+    TaskService taskService;
 
 
     public Role fillRole(Role oldRole, Role updateRole){
@@ -413,6 +417,67 @@ public class RoleService {
         }
         return new ArrayList<>(ret);
         // return roleRepository.findAllCanUserView(user);
+    }
+
+    public List<Role> getUsableInForUser(long userId, Task task){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        HashSet<Role> ret = new HashSet<>();
+        List<Role> roles = roleRepository.usableInTaskForUser(task);
+        for(Role r : roles){
+            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
+                ret.add(r);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
+    public int addUsableIn(long taskId, long user,  Task task) {
+        Role role = getRoleById(taskId);
+        if(role == null){
+            return 2; //role not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
+            return 5; //cannot edit
+        }
+        task = taskService.getTaskById(task.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)){
+            return 5;
+        }
+        var list =  role.getCanBeUsedIn();
+        if(list.contains(task)){
+            return 3;
+        }
+        list.add(task);
+        role.setCanBeUsedIn(list);
+        roleRepository.save(role);
+        return 1;
+    }
+
+    public int removeUsableIn(long taskId, long user,  Task task) {
+        Role role = getRoleById(taskId);
+        if(role == null){
+            return 2; //role not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
+            return 5; //cannot edit
+        }
+        task = taskService.getTaskById(task.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)){
+            return 5;
+        }
+        var list =  role.getCanBeUsedIn();
+        if(!list.contains(task)){
+            return 3;
+        }
+        list.remove(task);
+        role.setCanBeUsedIn(list);
+        roleRepository.save(role);
+        return 1;
     }
 
     public int createSnapshot(Long id, long userId, String description) {

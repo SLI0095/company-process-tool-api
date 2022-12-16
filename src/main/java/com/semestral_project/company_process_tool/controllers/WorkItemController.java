@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -61,6 +62,56 @@ public class WorkItemController {
             return ResponseEntity.ok(workItems);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/workItems/forProcess")
+    public ResponseEntity<List<WorkItem>> getWorkItemsForProcess(@RequestParam long userId, @RequestBody Process process) {
+        List<WorkItem> workItems = workItemService.getUsableInProcessForUser(userId, process);
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/workItems/forTask")
+    public ResponseEntity<List<WorkItem>> getWorkItemsForTask(@RequestParam long userId, @RequestBody Task task) {
+        List<WorkItem> workItems = workItemService.getUsableInTaskForUser(userId, task);
+        if(workItems != null){
+            return ResponseEntity.ok(workItems);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PutMapping("/workItems/{id}/addElement")
+    public ResponseEntity<ResponseMessage> addUsableTask(@PathVariable Long id, @RequestBody Element element, @RequestParam long userId){
+        int ret = workItemService.addUsableIn(id, userId, element);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Already usable in element"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " could not be updated."));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/removeElement")
+    public ResponseEntity<ResponseMessage> removeUsableTask(@PathVariable Long id, @RequestBody Element element, @RequestParam long userId){
+        int ret = workItemService.removeUsableIn(id, userId, element);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Not usable in element"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " could not be updated."));
         }
     }
 

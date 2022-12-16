@@ -107,6 +107,34 @@ public class ProcessController {
         }
     }
 
+    @PutMapping("/processes/{id}/addProcess")
+    public ResponseEntity<ResponseMessage> addUsableProcess(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId){
+        int ret = processService.addUsableIn(id, userId, process);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Already usable in process"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " could not be updated."));
+        }
+    }
+
+    @PutMapping("/processes/{id}/removeProcess")
+    public ResponseEntity<ResponseMessage> removeUsableProcess(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId){
+        int ret = processService.removeUsableIn(id, userId, process);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Not usable in process"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " could not be updated."));
+        }
+    }
+
     @PostMapping("/processes")
     public ResponseEntity<ResponseMessage> addProcess(@RequestBody Process process, @RequestParam long userId){
         long ret = processService.addProcess(process, userId);

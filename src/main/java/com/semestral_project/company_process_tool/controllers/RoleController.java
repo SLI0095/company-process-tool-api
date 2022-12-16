@@ -1,7 +1,9 @@
 package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Role;
+import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.services.RoleService;
@@ -61,6 +63,45 @@ public class RoleController {
             return ResponseEntity.ok(roles);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/roles/forTask")
+    public ResponseEntity<List<Role>> getRolesForTask(@RequestParam long userId, @RequestBody Task task) {
+        List<Role> roles = roleService.getUsableInForUser(userId, task);
+        if(roles != null){
+            return ResponseEntity.ok(roles);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PutMapping("/roles/{id}/addTask")
+    public ResponseEntity<ResponseMessage> addUsableTask(@PathVariable Long id, @RequestBody Task task, @RequestParam long userId){
+        int ret = roleService.addUsableIn(id, userId, task);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Already usable in task"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " could not be updated."));
+        }
+    }
+
+    @PutMapping("/roles/{id}/removeTask")
+    public ResponseEntity<ResponseMessage> removeUsableTask(@PathVariable Long id, @RequestBody Task task, @RequestParam long userId){
+        int ret = roleService.removeUsableIn(id, userId, task);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Not usable in task"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " could not be updated."));
         }
     }
 

@@ -676,7 +676,7 @@ public class ProcessService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
             return 5; //cannot edit
         }
-        bpmnParser.saveBPMN(bpmn, process);
+        bpmnParser.saveBPMN(bpmn, process, editor);
         return 1;
 
 //        Optional<Process> processData = processRepository.findById(id);
@@ -711,7 +711,7 @@ public class ProcessService {
         BPMNfile file = new BPMNfile();
         file.setProcess(process);
         file.setBpmnContent(bpmn.getBpmnContent());
-        bpmnParser.saveBPMN(file, process);
+        bpmnParser.saveBPMN(file, process, editor);
         return 1;
 
 //        if(processRepository.existsById(id)){
@@ -748,7 +748,7 @@ public class ProcessService {
             if(old.getWorkflow() != null){
                 BPMNfile newFile = new BPMNfile();
                 newFile.setBpmnContent(old.getWorkflow().getBpmnContent());
-                bpmnParser.saveBPMN(newFile, newProcess);
+                bpmnParser.saveBPMN(newFile, newProcess, user);
             }
             return newProcess.getId();
         }else return -1;
@@ -791,6 +791,21 @@ public class ProcessService {
         }
         HashSet<Process> ret = new HashSet<>();
         List<Process> processes = processRepository.findByIsTemplate(isTemplate);
+        for(Process p : processes){
+            if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
+                ret.add(p);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
+    public List<Process> getUsableInProcessForUser(long userId, Process process){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        HashSet<Process> ret = new HashSet<>();
+        List<Process> processes = processRepository.usableInProcessForUser(process);
         for(Process p : processes){
             if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
                 ret.add(p);
@@ -891,6 +906,51 @@ public class ProcessService {
             return htmlGenerator.generateHTML(id, stream);
         }
         return null;
+    }
+    public int addUsableIn(long processId, long user,  Process process) {
+        Process thisProcess = getProcessById(processId);
+        if(thisProcess == null){
+            return 2; //process not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(thisProcess).contains(editor)){
+            return 5; //cannot edit
+        }
+        process = getProcessById(process.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 5;
+        }
+        var list =  thisProcess.getCanBeUsedIn();
+        if(list.contains(process)){
+            return 3;
+        }
+        list.add(process);
+        thisProcess.setCanBeUsedIn(list);
+        processRepository.save(thisProcess);
+        return 1;
+    }
+
+    public int removeUsableIn(long processId, long user,  Process process) {
+        Process thisProcess = getProcessById(processId);
+        if(thisProcess == null){
+            return 2; //process not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(thisProcess).contains(editor)){
+            return 5; //cannot edit
+        }
+        process = getProcessById(process.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 5;
+        }
+        var list =  thisProcess.getCanBeUsedIn();
+        if(!list.contains(process)){
+            return 3;
+        }
+        list.remove(process);
+        thisProcess.setCanBeUsedIn(list);
+        processRepository.save(thisProcess);
+        return 1;
     }
 
     public int createSnapshot(Long id, long userId, String description) {

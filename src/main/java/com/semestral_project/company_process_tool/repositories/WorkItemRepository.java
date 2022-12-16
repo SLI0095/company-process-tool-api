@@ -22,4 +22,10 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
 
     @Query("SELECT w FROM WorkItem w WHERE (?1 MEMBER w.canEdit)")
     List<WorkItem> findAllWorkItemTemplateForUserCanEdit(User user);
+
+    @Query("SELECT w FROM WorkItem w WHERE w.isTemplate = true OR :task MEMBER w.canBeUsedIn")
+    List<WorkItem> usableInTaskForUser(@Param("task") Task task);
+
+    @Query("SELECT w FROM WorkItem w WHERE w.isTemplate = true OR :process MEMBER w.canBeUsedInProcesses")
+    List<WorkItem> usableInProcessForUser(@Param("process") Process process);
 }

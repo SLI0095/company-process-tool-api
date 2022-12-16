@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
@@ -33,6 +34,9 @@ public class WorkItemService {
     SnapshotWorkItemService snapshotWorkItemService;
     @Autowired
     UserTypeService userTypeService;
+    @Autowired
+    ElementService elementService;
+
 
 
     public WorkItem fillWorkItem(WorkItem oldWorkItem, WorkItem updatedWorkItem) {
@@ -326,6 +330,36 @@ public class WorkItemService {
         return new ArrayList<>(ret);
     }
 
+    public List<WorkItem> getUsableInProcessForUser(long userId, Process process){
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        HashSet<WorkItem> ret = new HashSet<>();
+        List<WorkItem> workItems = workItemRepository.usableInProcessForUser(process);
+        for (WorkItem w : workItems) {
+            if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
+                ret.add(w);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
+    public List<WorkItem> getUsableInTaskForUser(long userId, Task task){
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        HashSet<WorkItem> ret = new HashSet<>();
+        List<WorkItem> workItems = workItemRepository.usableInTaskForUser(task);
+        for (WorkItem w : workItems) {
+            if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
+                ret.add(w);
+            }
+        }
+        return new ArrayList<>(ret);
+    }
+
     public int addAccess(long workItemId, long whoEdits, UserType getAccess) {
         WorkItem workItem = getWorkItemById(workItemId);
         if(workItem == null){
@@ -530,6 +564,76 @@ public class WorkItemService {
 //        } else {
 //            return 2; //role not found
 //        }
+    }
+
+    public int addUsableIn(long workItemId, long user,  Element element) {
+        WorkItem workItem = getWorkItemById(workItemId);
+        if(workItem == null){
+            return 2; //workItem not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(workItem).contains(editor)){
+            return 5; //cannot edit
+        }
+        element = elementService.getElementById(element.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(element).contains(editor)){
+            return 5;
+        }
+        if(element instanceof Task){
+           var list =  workItem.getCanBeUsedIn();
+           if(list.contains(element)){
+               return 3;
+           }
+           list.add((Task) element);
+           workItem.setCanBeUsedIn(list);
+           workItemRepository.save(workItem);
+           return 1;
+        } else if (element instanceof Process) {
+            var list =  workItem.getCanBeUsedInProcesses();
+            if(list.contains(element)){
+                return 3;
+            }
+            list.add((Process) element);
+            workItem.setCanBeUsedInProcesses(list);
+            workItemRepository.save(workItem);
+            return 1; //OK
+        }
+        return  5;
+    }
+
+    public int removeUsableIn(long workItemId, long user,  Element element) {
+        WorkItem workItem = getWorkItemById(workItemId);
+        if(workItem == null){
+            return 2; //workItem not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(workItem).contains(editor)){
+            return 5; //cannot edit
+        }
+        element = elementService.getElementById(element.getId());
+        if(!ItemUsersUtil.getAllUsersCanEdit(element).contains(editor)){
+            return 5;
+        }
+        if(element instanceof Task){
+            var list =  workItem.getCanBeUsedIn();
+            if(!list.contains(element)){
+                return 3;
+            }
+            list.remove((Task) element);
+            workItem.setCanBeUsedIn(list);
+            workItemRepository.save(workItem);
+            return 1;
+        } else if (element instanceof Process) {
+            var list =  workItem.getCanBeUsedInProcesses();
+            if(!list.contains(element)){
+                return 3;
+            }
+            list.remove((Process) element);
+            workItem.setCanBeUsedInProcesses(list);
+            workItemRepository.save(workItem);
+            return 1; //OK
+        }
+        return  5;
     }
 
     public int createSnapshot(Long id, long userId, String description) {

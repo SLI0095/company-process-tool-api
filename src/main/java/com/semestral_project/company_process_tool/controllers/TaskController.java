@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.services.TaskService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -72,6 +73,34 @@ public class TaskController {
             return ResponseEntity.ok(task);
         } else {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PutMapping("/tasks/{id}/addProcess")
+    public ResponseEntity<ResponseMessage> addUsableProcess(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId){
+        int ret = taskService.addUsableIn(id, userId, process);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Already usable in process"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " could not be updated."));
+        }
+    }
+
+    @PutMapping("/tasks/{id}/removeProcess")
+    public ResponseEntity<ResponseMessage> removeUsableTask(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId){
+        int ret = taskService.removeUsableIn(id, userId, process);
+        if(ret == 1){
+            return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " is updated"));
+        } else if(ret == 2){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task  id: " + id + " does not exist"));
+        } else if(ret == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Not usable in process"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " could not be updated."));
         }
     }
 

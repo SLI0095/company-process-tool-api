@@ -107,6 +107,13 @@ public class WorkItem extends Item{
     private List<Task> canBeUsedIn = new ArrayList<>();
 
     @JsonView(Views.Basic.class)
+    @ManyToMany
+    @JoinTable(name = "work_item_process_usage",
+            joinColumns = {@JoinColumn(name = "work_item_id")},
+            inverseJoinColumns = {@JoinColumn(name = "process_id")})
+    private List<Process> canBeUsedInProcesses = new ArrayList<>();
+
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="originalWorkItem", cascade = CascadeType.DETACH)
     private List<SnapshotWorkItem> snapshots = new ArrayList<>();
 
@@ -270,6 +277,14 @@ public class WorkItem extends Item{
 
     public void setCanBeUsedIn(List<Task> canBeUsedIn) {
         this.canBeUsedIn = canBeUsedIn;
+    }
+
+    public List<Process> getCanBeUsedInProcesses() {
+        return canBeUsedInProcesses;
+    }
+
+    public void setCanBeUsedInProcesses(List<Process> canBeUsedInProcesses) {
+        this.canBeUsedInProcesses = canBeUsedInProcesses;
     }
 
     public List<SnapshotWorkItem> getSnapshots() {

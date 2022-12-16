@@ -1,5 +1,7 @@
 package com.semestral_project.company_process_tool.repositories;
 
+import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.User;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +22,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t WHERE (?1 MEMBER t.canEdit)")
     List<Task> findAllTasksTemplatesForUserCanEdit(User user);
+
+    @Query("SELECT t FROM Task t WHERE t.isTemplate = true OR :process MEMBER t.canBeUsedIn")
+    List<Task> usableInProcessForUser(@Param("process") Process process);
 }
