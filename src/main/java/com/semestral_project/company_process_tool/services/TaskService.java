@@ -93,6 +93,14 @@ public class TaskService {
 //        }
     }
 
+    public List<Process> getUsableIn(long id){
+        Task task = getTaskById(id);
+        if(task == null){
+            return null;
+        }
+        return task.getCanBeUsedIn();
+    }
+
     public int addAccess(long taskId, long whoEdits, UserType getAccess){
         Task task = getTaskById(taskId);
         if(task == null){

@@ -80,6 +80,14 @@ public class RoleService {
 //        }
     }
 
+    public List<Task> getUsableIn(long id){
+        Role role = getRoleById(id);
+        if(role == null){
+            return null;
+        }
+        return role.getCanBeUsedIn();
+    }
+
     public int addAccess(long roleId, long whoEdits, UserType getAccess){
         Role role = getRoleById(roleId);
         if(role == null){

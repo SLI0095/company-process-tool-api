@@ -44,11 +44,10 @@ public class Task extends Element{
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
     private List<WorkItem> guidanceWorkItems = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
+
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<Role> usableRoles = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
     private List<WorkItem> usableWorkItems = new ArrayList<>();
 

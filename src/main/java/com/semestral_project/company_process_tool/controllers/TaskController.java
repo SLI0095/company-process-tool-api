@@ -90,6 +90,17 @@ public class TaskController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @GetMapping("/tasks/{id}/usableIn")
+    public ResponseEntity<List<Process>> getUsableIn(@PathVariable Long id) {
+        List<Process> processes = taskService.getUsableIn(id);
+        if (processes != null) {
+            return ResponseEntity.ok(processes);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/tasks/{id}/removeProcess")
     public ResponseEntity<ResponseMessage> removeUsableTask(@PathVariable Long id, @RequestBody Process process, @RequestParam long userId){
         int ret = taskService.removeUsableIn(id, userId, process);

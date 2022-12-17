@@ -87,6 +87,28 @@ public class WorkItemController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @GetMapping("/workItems/{id}/usableInProcesses")
+    public ResponseEntity<List<Process>> getUsableInProcesses(@PathVariable Long id) {
+        List<Process> processes = workItemService.getUsableInProcesses(id);
+        if (processes != null) {
+            return ResponseEntity.ok(processes);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/workItems/{id}/usableInTasks")
+    public ResponseEntity<List<Task>> getUsableInTasks(@PathVariable Long id) {
+        List<Task> tasks = workItemService.getUsableInTasks(id);
+        if (tasks != null) {
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/workItems/{id}/addElement")
     public ResponseEntity<ResponseMessage> addUsableTask(@PathVariable Long id, @RequestBody Element element, @RequestParam long userId){
         int ret = workItemService.addUsableIn(id, userId, element);

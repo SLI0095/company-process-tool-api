@@ -81,6 +81,17 @@ public class ProcessController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @GetMapping("/processes/{id}/usableIn")
+    public ResponseEntity<List<Process>> getUsableIn(@PathVariable Long id) {
+        List<Process> processes = processService.getUsableIn(id);
+        if (processes != null) {
+            return ResponseEntity.ok(processes);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/processes/{id}/addMetric")
     public ResponseEntity<ResponseMessage> addTaskStep(@PathVariable Long id, @RequestParam long userId, @RequestBody ProcessMetric metric){
         int ret = processService.addMetric(id, metric, userId);

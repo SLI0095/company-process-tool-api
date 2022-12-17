@@ -660,4 +660,20 @@ public class WorkItemService {
         }
         return snapshotWorkItemService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), user);
     }
+
+    public List<Process> getUsableInProcesses(Long id) {
+        WorkItem workItem = getWorkItemById(id);
+        if(workItem == null){
+            return null;
+        }
+        return workItem.getCanBeUsedInProcesses();
+    }
+
+    public List<Task> getUsableInTasks(Long id) {
+        WorkItem workItem = getWorkItemById(id);
+        if(workItem == null){
+            return null;
+        }
+        return workItem.getCanBeUsedIn();
+    }
 }

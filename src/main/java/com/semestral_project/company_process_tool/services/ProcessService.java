@@ -78,6 +78,14 @@ public class ProcessService {
         return processData.orElse(null);
     }
 
+    public List<Process> getUsableIn(long id){
+        Process process = getProcessById(id);
+        if(process == null){
+            return null;
+        }
+        return process.getCanBeUsedIn();
+    }
+
     public long addProcess(Process process, long userId){
         User owner = userService.getUserById(userId);
         if(owner == null){

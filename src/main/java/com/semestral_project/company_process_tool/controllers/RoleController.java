@@ -91,6 +91,17 @@ public class RoleController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @GetMapping("/roles/{id}/usableIn")
+    public ResponseEntity<List<Task>> getUsableIn(@PathVariable Long id){
+        List<Task> tasks = roleService.getUsableIn(id);
+        if(tasks != null){
+            return ResponseEntity.ok(tasks);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PutMapping("/roles/{id}/removeTask")
     public ResponseEntity<ResponseMessage> removeUsableTask(@PathVariable Long id, @RequestBody Task task, @RequestParam long userId){
         int ret = roleService.removeUsableIn(id, userId, task);

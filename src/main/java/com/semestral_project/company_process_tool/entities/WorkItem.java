@@ -99,14 +99,12 @@ public class WorkItem extends Item{
 //            inverseJoinColumns = {@JoinColumn(name = "user_id")})
 //    private List<User> canEdit = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
     @ManyToMany
     @JoinTable(name = "work_item_task_usage",
             joinColumns = {@JoinColumn(name = "work_item_id")},
             inverseJoinColumns = {@JoinColumn(name = "task_id")})
     private List<Task> canBeUsedIn = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
     @ManyToMany
     @JoinTable(name = "work_item_process_usage",
             joinColumns = {@JoinColumn(name = "work_item_id")},
