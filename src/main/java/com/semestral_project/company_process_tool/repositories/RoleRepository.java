@@ -51,8 +51,10 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "WHERE :user MEMBER r.canEdit OR :user = r.owner")
     List<Role> findAllTasksTemplatesForUserCanEdit(User user);
 
-    @Query("SELECT r FROM Role r WHERE r.isTemplate = true OR :task MEMBER r.canBeUsedIn")
-    List<Role> usableInTaskForUser(@Param("task") Task task);
+    @Query("SELECT r FROM Role r " +
+            "LEFT JOIN r.canBeUsedIn AS t " +
+            "WHERE r.isTemplate = true OR :id = t.id")
+    List<Role> usableInTaskForUser(@Param("id") Long id);
 
 
 }

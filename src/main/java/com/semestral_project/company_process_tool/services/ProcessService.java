@@ -924,6 +924,9 @@ public class ProcessService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(thisProcess).contains(editor)){
             return 5; //cannot edit
         }
+        if (processId == process.getId() ){
+            return 5;
+        }
         process = getProcessById(process.getId());
         if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
             return 5;

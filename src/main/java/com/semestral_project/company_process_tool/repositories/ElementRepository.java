@@ -20,6 +20,8 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
     @Query("SELECT e FROM Element e WHERE (?1 MEMBER e.canEdit)")
     List<Element> findAllElementsTemplateForUserCanEdit(User user);
 
-    @Query("SELECT e FROM Element e WHERE e.isTemplate = true OR :process MEMBER e.canBeUsedIn")
-    List<Element> usableInProcessForUser(@Param("process") Process process);
+    @Query("SELECT e FROM Element e " +
+            "LEFT JOIN e.canBeUsedIn AS elem " +
+            "WHERE e.isTemplate = true OR :id = elem.id")
+    List<Element> usableInProcessForUser(@Param("id") Long id);
 }

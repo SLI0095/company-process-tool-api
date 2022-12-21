@@ -433,7 +433,7 @@ public class RoleService {
             return new ArrayList<>();
         }
         HashSet<Role> ret = new HashSet<>();
-        List<Role> roles = roleRepository.usableInTaskForUser(task);
+        List<Role> roles = roleRepository.usableInTaskForUser(task.getId());
         for(Role r : roles){
             if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
                 ret.add(r);

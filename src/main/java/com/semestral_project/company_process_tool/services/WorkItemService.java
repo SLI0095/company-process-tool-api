@@ -36,6 +36,8 @@ public class WorkItemService {
     UserTypeService userTypeService;
     @Autowired
     ElementService elementService;
+    @Autowired
+    ProcessService processService;
 
 
 
@@ -335,8 +337,12 @@ public class WorkItemService {
         if (user == null) {
             return new ArrayList<>();
         }
+        process = processService.getProcessById(process.getId());
+        if(process == null){
+            return new ArrayList<>();
+        }
         HashSet<WorkItem> ret = new HashSet<>();
-        List<WorkItem> workItems = workItemRepository.usableInProcessForUser(process);
+        List<WorkItem> workItems = workItemRepository.usableInProcessForUser(process.getId());
         for (WorkItem w : workItems) {
             if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
                 ret.add(w);
@@ -351,7 +357,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         HashSet<WorkItem> ret = new HashSet<>();
-        List<WorkItem> workItems = workItemRepository.usableInTaskForUser(task);
+        List<WorkItem> workItems = workItemRepository.usableInTaskForUser(task.getId());
         for (WorkItem w : workItems) {
             if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
                 ret.add(w);

@@ -1109,7 +1109,7 @@ public class TaskService {
             return new ArrayList<>();
         }
         HashSet<Task> ret = new HashSet<>();
-        List<Task> tasks =  taskRepository.usableInProcessForUser(process);
+        List<Task> tasks =  taskRepository.usableInProcessForUser(process.getId());
         for(Task t : tasks){
             if(ItemUsersUtil.getAllUsersCanEdit(t).contains(user)){
                 ret.add(t);

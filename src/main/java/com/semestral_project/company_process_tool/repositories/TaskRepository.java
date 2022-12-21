@@ -23,6 +23,8 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
     @Query("SELECT t FROM Task t WHERE (?1 MEMBER t.canEdit)")
     List<Task> findAllTasksTemplatesForUserCanEdit(User user);
 
-    @Query("SELECT t FROM Task t WHERE t.isTemplate = true OR :process MEMBER t.canBeUsedIn")
-    List<Task> usableInProcessForUser(@Param("process") Process process);
+    @Query("SELECT t FROM Task t " +
+            "LEFT JOIN t.canBeUsedIn AS p " +
+            "WHERE t.isTemplate = true OR :id = p.id")
+    List<Task> usableInProcessForUser(@Param("id") Long id);
 }

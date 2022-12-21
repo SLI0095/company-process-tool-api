@@ -23,6 +23,9 @@ public class ElementService {
     ElementRepository elementRepository;
     @Autowired
     UserService userService;
+    @Autowired
+    ProcessService processService;
+
 
 
     public List<Element> getAllElements(){
@@ -94,8 +97,12 @@ public class ElementService {
         if(user == null){
             return new ArrayList<>();
         }
+        process = processService.getProcessById(process.getId());
+        if(process == null){
+            return new ArrayList<>();
+        }
         HashSet<Element> ret = new HashSet<>();
-        List<Element> elements = elementRepository.usableInProcessForUser(process);
+        List<Element> elements = elementRepository.usableInProcessForUser(process.getId());
         for(Element e : elements){
             if(ItemUsersUtil.getAllCanEdit(e).contains(user)){
                 ret.add(e);
