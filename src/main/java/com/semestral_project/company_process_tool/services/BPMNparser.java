@@ -284,15 +284,6 @@ public class BPMNparser {
 
                             processService.addElementToProcess(process.getId(),process1);
 
-//                            var isPartOf = process1.getPartOfProcess();
-//                            if(isPartOf == null){
-//                                isPartOf = new ArrayList<>();
-//                            }
-//                            if(!isPartOf.contains(process)){ //Check if is sub process already part of Process
-//                                isPartOf.add(process);
-//                                process1.setPartOfProcess(isPartOf);
-//                                needToSave = true;
-//                            }
                             if(needToSave){
                                 elementRepository.save(process1);
                             }
@@ -306,14 +297,19 @@ public class BPMNparser {
             }
 
             List<Element> allElementsOfProcess = process.getElements();
+            var orderList = process.getElementsOrder();
             for(Element e : allElementsOfProcess){
                 if(! inXML.contains(e)){
                     var list1 = e.getPartOfProcess();
                     list1.remove(process);
                     e.setPartOfProcess(list1);
+
+                    orderList.remove(e.getId());
+
                     elementRepository.save(e);
                 }
             }
+            processRepository.save(process);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }

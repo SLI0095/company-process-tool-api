@@ -5,6 +5,7 @@ import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotRoleRepository;
+import com.semestral_project.company_process_tool.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,8 @@ public class SnapshotRoleService {
 
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    RoleService roleService;
 
     public SnapshotRole createSnapshotRole(Role original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
@@ -70,6 +73,23 @@ public class SnapshotRoleService {
     public SnapshotRole getSnapshotRoleById(long id){
         Optional<SnapshotRole> roleData = snapshotRoleRepository.findById(id);
         return roleData.orElse(null);
+    }
+
+    public Role revertRoleFromSnapshot(SnapshotRole snapshotRole){
+        Role role = roleService.getRoleById(snapshotRole.getOriginalId());
+        if(role == null){
+            //TODO restoreRole??
+        }
+        role.setName(snapshotRole.getName());
+        role.setBriefDescription(snapshotRole.getBriefDescription());
+        role.setMainDescription(snapshotRole.getMainDescription());
+        role.setAssignmentApproaches(snapshotRole.getAssignmentApproaches());
+        role.setSkills(snapshotRole.getSkills());
+        role.setChangeDate(snapshotRole.getChangeDate());
+        role.setChangeDescription(snapshotRole.getChangeDescription());
+        role.setVersion(snapshotRole.getVersion());
+        role = roleRepository.save(role);
+        return role;
     }
 
 }

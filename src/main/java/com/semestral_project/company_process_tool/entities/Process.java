@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.LongListConverter;
 import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
@@ -53,6 +54,9 @@ public class Process extends Element{
 
     @ManyToMany(mappedBy = "canBeUsedInProcesses", cascade = CascadeType.DETACH)
     private List<WorkItem> usableWorkItems = new ArrayList<>();
+
+    @Convert(converter = LongListConverter.class)
+    private List<Long> elementsOrder = new ArrayList<>();
 
     public Process() {
     }
@@ -135,5 +139,29 @@ public class Process extends Element{
 
     public void setMetrics(List<ProcessMetric> metrics) {
         this.metrics = metrics;
+    }
+
+    public List<Element> getUsableElements() {
+        return usableElements;
+    }
+
+    public void setUsableElements(List<Element> usableElements) {
+        this.usableElements = usableElements;
+    }
+
+    public List<WorkItem> getUsableWorkItems() {
+        return usableWorkItems;
+    }
+
+    public void setUsableWorkItems(List<WorkItem> usableWorkItems) {
+        this.usableWorkItems = usableWorkItems;
+    }
+
+    public List<Long> getElementsOrder() {
+        return elementsOrder;
+    }
+
+    public void setElementsOrder(List<Long> elementsOrder) {
+        this.elementsOrder = elementsOrder;
     }
 }

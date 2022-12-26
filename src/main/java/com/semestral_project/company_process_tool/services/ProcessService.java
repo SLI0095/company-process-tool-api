@@ -600,6 +600,11 @@ public class ProcessService {
         var isPartOf = element.getPartOfProcess();
         isPartOf.add(process);
         element.setPartOfProcess(isPartOf);
+
+        var orderList = process.getElementsOrder();
+        orderList.add(element.getId());
+        process.setElementsOrder(orderList);
+
         elementRepository.save(process);
         //add access and edit from process to element
         for(UserType u : process.getCanEdit()){
