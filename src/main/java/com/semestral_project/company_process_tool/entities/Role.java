@@ -54,6 +54,7 @@ public class Role extends Item{
             inverseJoinColumns = {@JoinColumn(name = "task_id")})
     private List<Task> canBeUsedIn = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy ="originalRole", cascade = CascadeType.DETACH)
     private List<SnapshotRole> snapshots = new ArrayList<>();
 

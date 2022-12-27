@@ -667,6 +667,25 @@ public class WorkItemService {
         return snapshotWorkItemService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), user);
     }
 
+    public WorkItem revertWorkItem(long userId, SnapshotWorkItem snapshot) {
+        snapshot = snapshotWorkItemService.getSnapshotWorkItemById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return null;
+        }
+        WorkItem workItem = getWorkItemById(snapshot.getOriginalId());
+        if(workItem == null){
+            return null;
+        }
+        if(!ItemUsersUtil.getAllUsersCanEdit(workItem).contains(user)){
+            return null;
+        }
+        return snapshotWorkItemService.revertFromSnapshot(snapshot,new SnapshotsHelper());
+    }
+
     public List<Process> getUsableInProcesses(Long id) {
         WorkItem workItem = getWorkItemById(id);
         if(workItem == null){
@@ -681,5 +700,12 @@ public class WorkItemService {
             return null;
         }
         return workItem.getCanBeUsedIn();
+    }
+
+    public void deleteAllStates(long id){
+        WorkItem workItem = getWorkItemById(id);
+        for(State state : workItem.getWorkItemStates()){
+            stateRepository.deleteById(state.getId());
+        }
     }
 }

@@ -994,4 +994,30 @@ public class ProcessService {
         }
         return snapshotProcessService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
     }
+
+    public Process revertProcess(long userId, SnapshotProcess snapshot) {
+        snapshot = snapshotProcessService.getSnapshotProcessById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return null;
+        }
+        Process process = getProcessById(snapshot.getOriginalId());
+        if(process == null){
+            return null;
+        }
+        if(!ItemUsersUtil.getAllUsersCanEdit(process).contains(user)){
+            return null;
+        }
+        return snapshotProcessService.revertFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
+    }
+
+    public void deleteAllMetrics(long id){
+        Process process = getProcessById(id);
+        for(ProcessMetric metric : process.getMetrics()){
+            processMetricRepository.delete(metric);
+        }
+    }
 }

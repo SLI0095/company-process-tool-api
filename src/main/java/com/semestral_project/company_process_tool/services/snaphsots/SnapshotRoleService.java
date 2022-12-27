@@ -75,11 +75,12 @@ public class SnapshotRoleService {
         return roleData.orElse(null);
     }
 
-    public Role revertRoleFromSnapshot(SnapshotRole snapshotRole){
-        Role role = roleService.getRoleById(snapshotRole.getOriginalId());
-        if(role == null){
-            //TODO restoreRole??
+
+    public Role revertRoleFromSnapshot(SnapshotRole snapshotRole, SnapshotsHelper helper){
+        if(helper == null){
+            helper = new SnapshotsHelper();
         }
+        Role role = roleService.getRoleById(snapshotRole.getOriginalId());
         role.setName(snapshotRole.getName());
         role.setBriefDescription(snapshotRole.getBriefDescription());
         role.setMainDescription(snapshotRole.getMainDescription());
@@ -89,7 +90,12 @@ public class SnapshotRoleService {
         role.setChangeDescription(snapshotRole.getChangeDescription());
         role.setVersion(snapshotRole.getVersion());
         role = roleRepository.save(role);
+        helper.addRole(snapshotRole.getId(), role);
         return role;
+    }
+
+    public boolean existRole(long id){
+        return roleRepository.existsById(id);
     }
 
 }

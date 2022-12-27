@@ -512,4 +512,23 @@ public class RoleService {
         }
         return snapshotRoleService.restoreRoleFromSnapshot(snapshot,new SnapshotsHelper(), user);
     }
+
+    public Role revertRole(long userId, SnapshotRole snapshot) {
+        snapshot = snapshotRoleService.getSnapshotRoleById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return null;
+        }
+        Role role = getRoleById(snapshot.getOriginalId());
+        if(role == null){
+            return null;
+        }
+        if(!ItemUsersUtil.getAllUsersCanEdit(role).contains(user)){
+            return null;
+        }
+        return snapshotRoleService.revertRoleFromSnapshot(snapshot,new SnapshotsHelper());
+    }
 }

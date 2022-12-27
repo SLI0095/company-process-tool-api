@@ -332,4 +332,14 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item not restored"));
         }
     }
+
+    @PutMapping("/workItems/revert")
+    public ResponseEntity<ResponseMessage> revertWorkItem(@RequestBody SnapshotWorkItem snapshot, @RequestParam long userId){
+        WorkItem ret = workItemService.revertWorkItem(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Work item reverted"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item not reverted"));
+        }
+    }
 }

@@ -415,4 +415,14 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task not restored"));
         }
     }
+
+    @PutMapping("/tasks/revert")
+    public ResponseEntity<ResponseMessage> revertTask(@RequestBody SnapshotTask snapshot, @RequestParam long userId){
+        Task ret = taskService.revertTask(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Task reverted"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task not reverted"));
+        }
+    }
 }

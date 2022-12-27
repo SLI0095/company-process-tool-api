@@ -350,4 +350,14 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process not restored"));
         }
     }
+
+    @PutMapping("/processes/revert")
+    public ResponseEntity<ResponseMessage> revertProcess(@RequestBody SnapshotProcess snapshot, @RequestParam long userId){
+        Process ret = processService.revertProcess(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Process reverted" ));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process not reverted"));
+        }
+    }
 }

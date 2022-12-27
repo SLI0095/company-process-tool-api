@@ -259,4 +259,14 @@ public class RoleController {
         }
     }
 
+    @PutMapping("/roles/revert")
+    public ResponseEntity<ResponseMessage> revertRole(@RequestBody SnapshotRole snapshot, @RequestParam long userId){
+        Role ret = roleService.revertRole(userId, snapshot);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Role reverted"));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Role not reverted"));
+        }
+    }
+
 }

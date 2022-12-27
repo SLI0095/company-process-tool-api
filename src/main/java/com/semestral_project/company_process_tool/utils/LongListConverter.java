@@ -25,6 +25,9 @@ public class LongListConverter implements AttributeConverter<List<Long>, String>
     @Override
     public List<Long> convertToEntityAttribute(String s) {
         List<Long> longs = new ArrayList<>();
+        if(s == null){
+            return longs;
+        }
         for(String value : s.split(SPLIT_CHAR)){
             try{
                 long number = Long.parseLong(value);

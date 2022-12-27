@@ -655,7 +655,7 @@ public class TaskService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)){
             return 3; //cannot edit
         }
-        rasciRepository.delete(rasci);
+        rasciRepository.deleteById(rasci.getId());
         return 1;
 
 //        Optional<Task> taskData = taskRepository.findById(id);
@@ -865,6 +865,27 @@ public class TaskService {
 //        }
     }
 
+    public int removeMandatoryInputWithoutUser(long id, WorkItem workItem){
+        Task task = getTaskById(id);
+        if (task == null){
+            return  2; //task not found
+        }
+        WorkItem item = workItemService.getWorkItemById(workItem.getId());
+        if(item == null){
+            return 3;
+        }
+        if (!task.getMandatoryInputs().contains(item)) {
+            return 4; // not in inputs
+        }
+        bpmNparser.removeInputConnectionFromAllWorkflows(task, item);
+        List<Task> tasksList = item.getAsMandatoryInput();
+        tasksList.remove(task);
+        item.setAsMandatoryInput(tasksList);
+        workItemRepository.save(item);
+        return 1;
+
+    }
+
   /*  public int addOptionalInput(long id, WorkItem workItem, long whoEdits){
         Optional<Task> taskData = taskRepository.findById(id);
         if(taskData.isPresent()) {
@@ -1046,6 +1067,52 @@ public class TaskService {
 //            return 2;
 //        }
     }
+    public int removeOutputWithoutUser(long id, WorkItem workItem){
+        Task task = getTaskById(id);
+        if (task == null){
+            return  2; //task not found
+        }
+        WorkItem item = workItemService.getWorkItemById(workItem.getId());
+        if(item == null){
+            return 3;
+        }
+        if (!task.getOutputs().contains(item)) {
+            return 4; // not in inputs
+        }
+        bpmNparser.removeOutputConnectionFromAllWorkflows(task, item);
+        List<Task> tasksList = item.getAsOutput();
+        tasksList.remove(task);
+        item.setAsOutput(tasksList);
+        workItemRepository.save(item);
+        return 1;
+
+//        Optional<Task> taskData = taskRepository.findById(id);
+//        if(taskData.isPresent()) {
+//            Task task_ = taskData.get();
+//            WorkItem item_ = workItemRepository.findById(workItem.getId()).get();
+//            User whoEdits_ = userRepository.findById(whoEdits).get();
+//            if(task_.getCanEdit().contains(whoEdits_)) {
+//                List<WorkItem> outputList = task_.getOutputs();
+//                if (outputList.contains(item_)) {
+//                    bpmNparser.removeOutputConnectionFromAllWorkflows(task_, item_);
+//                    List<Task> tasksList = item_.getAsOutput();
+//                    tasksList.remove(task_);
+//                    item_.setAsOutput(tasksList);
+//                    workItemRepository.save(item_);
+//                    return 1;
+//
+//                } else {
+//                    return 4;
+//                }
+//            }
+//            return 3;
+//        }
+//        else
+//        {
+//            return 2;
+//        }
+    }
+
 
     public List<Task> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
@@ -1188,5 +1255,38 @@ public class TaskService {
             return null;
         }
         return snapshotTaskService.restoreFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
+    }
+
+    public Task revertTask(long userId, SnapshotTask snapshot) {
+        snapshot = snapshotTaskService.getSnapshotTaskById(snapshot.getId());
+        if(snapshot == null){
+            return null;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return null;
+        }
+        Task task = getTaskById(snapshot.getOriginalId());
+        if(task == null){
+            return null;
+        }
+        if(!ItemUsersUtil.getAllUsersCanEdit(task).contains(user)){
+            return null;
+        }
+        return snapshotTaskService.revertExistingFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
+    }
+
+    public void deleteAllSteps(long id){
+        Task task = getTaskById(id);
+        for(TaskStep step : task.getSteps()){
+            taskStepRepository.deleteById(step.getId());
+        }
+    }
+
+    public void deleteAllRasci(long id) {
+        Task task = getTaskById(id);
+        for(Rasci r : task.getRasciList()){
+            rasciRepository.delete(r);
+        }
     }
 }

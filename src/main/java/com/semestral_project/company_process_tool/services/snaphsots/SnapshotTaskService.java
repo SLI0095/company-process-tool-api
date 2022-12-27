@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -220,15 +222,14 @@ public class SnapshotTaskService {
         return taskData.orElse(null);
     }
 
-    public Task revertFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
+    public Task revertExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
         boolean updateWorkflow = workflow != null;
         Task task = taskService.getTaskById(snapshotTask.getOriginalId());
-        if(task == null){
-            //TODO
-        }
+        String oldTaskType = task.getTaskType();
+
         task.setName(snapshotTask.getName());
         task.setBriefDescription(snapshotTask.getBriefDescription());
         task.setMainDescription(snapshotTask.getMainDescription());
@@ -249,18 +250,168 @@ public class SnapshotTaskService {
         // PLUS check helper for recreated and reverted work items first
         // if some input is removed need to remove link in workflows - only when not getting any workflow
         // when get workflow update id of workItem when is workItem recreated
-
+        List<WorkItem> allInputs = new ArrayList<>();
         for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getMandatoryInputs()){
             //Check if was not snapshot already created during snapshotting
+            boolean changeIdInWorkflow = false;
             WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
             if(workItem == null){
-                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                if(snapshotWorkItemService.existsWorkItem(snapshotWorkItem.getOriginalId())){
+                    workItem = snapshotWorkItemService.revertFromSnapshot(snapshotWorkItem, helper);
+                } else {
+                    workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                    changeIdInWorkflow = true;
+                }
             }
+            allInputs.add(workItem);
+            if(!task.getMandatoryInputs().contains(workItem)){
+                var asInput = workItem.getAsMandatoryInput();
+                asInput.add(task);
+                workItem.setAsMandatoryInput(asInput);
+                workItemRepository.save(workItem);
+            }
+            if(updateWorkflow && changeIdInWorkflow){
+                //Change old id in workflow
+                String content = workflow.getBpmnContent();
+                String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
+                String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId();
+                content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+                workflow.setBpmnContent(content);
+            }
+        }
+        task = taskService.getTaskById(task.getId());
+        for(WorkItem w : task.getMandatoryInputs()){
+            if(!allInputs.contains(w)){
+                taskService.removeMandatoryInputWithoutUser(task.getId(), w);
+            }
+        }
+
+
+        //All outputs
+        List<WorkItem> allOutputs = new ArrayList<>();
+        for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getOutputs()){
+            boolean changeIdInWorkflow = false;
+            WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
+            if(workItem == null){
+                if(snapshotWorkItemService.existsWorkItem(snapshotWorkItem.getOriginalId())){
+                    workItem = snapshotWorkItemService.revertFromSnapshot(snapshotWorkItem, helper);
+                } else {
+                    workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                    changeIdInWorkflow = true;
+                }
+            }
+            allOutputs.add(workItem);
+            if(!task.getOutputs().contains(workItem)){
+                var asOutput = workItem.getAsOutput();
+                asOutput.add(task);
+                workItem.setAsOutput(asOutput);
+                workItemRepository.save(workItem);
+            }
+            if(updateWorkflow && changeIdInWorkflow){
+                //Change old id in workflow
+                String content = workflow.getBpmnContent();
+                String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
+                String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId();
+                content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+                workflow.setBpmnContent(content);
+            }
+        }
+        task = taskService.getTaskById(task.getId());
+        for(WorkItem w : task.getOutputs()){
+            if(!allOutputs.contains(w)){
+                taskService.removeOutputWithoutUser(task.getId(), w);
+            }
+        }
+
+
+        //Remove all task steps and then use this to recreate them
+        taskService.deleteAllSteps(task.getId());
+        for(SnapshotTaskStep snapshotStep : snapshotTask.getSteps()){
+            TaskStep taskStep = new TaskStep();
+            taskStep.setName(snapshotStep.getName());
+            taskStep.setDescription(snapshotStep.getDescription());
+            taskStep.setTask(task);
+            taskStepRepository.save(taskStep);
+        }
+
+        //Check existence of role - revert or recreate
+        //Need to found rasci based on role id then if necessary change type
+        //Also remove rasci that are not in re
+
+        for(SnapshotRasci snapshotRasci : snapshotTask.getRasciList()){
+            SnapshotRole snapshotRole = snapshotRasci.getRole();
+            Role role = helper.getExistingRole(snapshotRole.getId());
+            if(role == null) {
+                if (snapshotRoleService.existRole(snapshotRole.getId())) {
+                    role = snapshotRoleService.revertRoleFromSnapshot(snapshotRole, helper);
+                } else {
+                    role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper, user);
+                }
+            }
+            //delete all rasci from task
+            taskService.deleteAllRasci(task.getId());
+            Rasci rasci = new Rasci();
+            rasci.setType(snapshotRasci.getType());
+            rasci.setRole(role);
+            rasci.setTask(task);
+            rasciRepository.save(rasci);
+        }
+        boolean typeChanged = !oldTaskType.equals(snapshotTask.getTaskType());
+        bpmNparser.updateTaskInAllWorkflows(task, true, typeChanged, oldTaskType,null);
+        helper.addElement(snapshotTask.getId(), task);
+        return task;
+    }
+
+    public Task revertNonExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
+        if(helper == null){
+            helper = new SnapshotsHelper();
+        }
+        boolean updateWorkflow = workflow != null;
+        Task task = new Task();
+        task.setName(snapshotTask.getName());
+        task.setBriefDescription(snapshotTask.getBriefDescription());
+        task.setMainDescription(snapshotTask.getMainDescription());
+        task.setVersion(snapshotTask.getVersion());
+        task.setChangeDate(snapshotTask.getChangeDate());
+        task.setChangeDescription(snapshotTask.getChangeDescription());
+        task.setPurpose(snapshotTask.getPurpose());
+        task.setKeyConsiderations(snapshotTask.getKeyConsiderations());
+        task.setTaskType(snapshotTask.getTaskType());
+
+        var list = task.getCanEdit();
+        list.add(user);
+        task.setCanEdit(list);
+        task.setOwner(user);
+
+        task = taskRepository.save(task);
+
+        //All inputs
+
+        // check if work item from snapshot exists - then just revert values based on snapshot - then check if is already as input - if not add
+        // if work it does not exist then recreate the new one - in this case always add as input
+        // then remove inputs that are not in snapshot
+        // PLUS check helper for recreated and reverted work items first
+        // if some input is removed need to remove link in workflows - only when not getting any workflow
+        // when get workflow update id of workItem when is workItem recreated
+        for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getMandatoryInputs()){
+            //Check if was not snapshot already created during snapshotting
+            boolean changeIdInWorkflow = false;
+            WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
+            if(workItem == null){
+                if(snapshotWorkItemService.existsWorkItem(snapshotWorkItem.getOriginalId())){
+                    workItem = snapshotWorkItemService.revertFromSnapshot(snapshotWorkItem, helper);
+                } else {
+                    workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                    changeIdInWorkflow = true;
+                }
+            }
+
             var asInput = workItem.getAsMandatoryInput();
             asInput.add(task);
             workItem.setAsMandatoryInput(asInput);
             workItemRepository.save(workItem);
-            if(updateWorkflow){
+
+            if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
                 String content = workflow.getBpmnContent();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
@@ -272,15 +423,22 @@ public class SnapshotTaskService {
 
         //All outputs
         for(SnapshotWorkItem snapshotWorkItem : snapshotTask.getOutputs()){
+            boolean changeIdInWorkflow = false;
             WorkItem workItem = helper.getExistingWorkItem(snapshotWorkItem.getId());
             if(workItem == null){
-                workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                if(snapshotWorkItemService.existsWorkItem(snapshotWorkItem.getOriginalId())){
+                    workItem = snapshotWorkItemService.revertFromSnapshot(snapshotWorkItem, helper);
+                } else {
+                    workItem = snapshotWorkItemService.restoreFromSnapshot(snapshotWorkItem, helper, user);
+                    changeIdInWorkflow = true;
+                }
             }
             var asOutput = workItem.getAsOutput();
             asOutput.add(task);
             workItem.setAsOutput(asOutput);
             workItemRepository.save(workItem);
-            if(updateWorkflow){
+
+            if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
                 String content = workflow.getBpmnContent();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString();
@@ -290,7 +448,6 @@ public class SnapshotTaskService {
             }
         }
 
-        //Remove all task steps and then use this to recreate them
         for(SnapshotTaskStep snapshotStep : snapshotTask.getSteps()){
             TaskStep taskStep = new TaskStep();
             taskStep.setName(snapshotStep.getName());
@@ -298,6 +455,7 @@ public class SnapshotTaskService {
             taskStep.setTask(task);
             taskStepRepository.save(taskStep);
         }
+
         //Check existence of role - revert or recreate
         //Need to found rasci based on role id then if necessary change type
         //Also remove rasci that are not in re
@@ -305,8 +463,12 @@ public class SnapshotTaskService {
         for(SnapshotRasci snapshotRasci : snapshotTask.getRasciList()){
             SnapshotRole snapshotRole = snapshotRasci.getRole();
             Role role = helper.getExistingRole(snapshotRole.getId());
-            if(role == null){
-                role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper, user);
+            if(role == null) {
+                if (snapshotRoleService.existRole(snapshotRole.getId())) {
+                    role = snapshotRoleService.revertRoleFromSnapshot(snapshotRole, helper);
+                } else {
+                    role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper, user);
+                }
             }
             Rasci rasci = new Rasci();
             rasci.setType(snapshotRasci.getType());
@@ -324,5 +486,9 @@ public class SnapshotTaskService {
         }
         helper.addElement(snapshotTask.getId(), task);
         return task;
+    }
+
+    public boolean existsTask(long id){
+        return taskRepository.existsById(id);
     }
 }
