@@ -14,6 +14,7 @@ import com.semestral_project.company_process_tool.services.BPMNparser;
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class SnapshotWorkItemService {
     @Autowired
     BPMNparser bpmNparser;
 
+    @Transactional
     public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -74,7 +76,8 @@ public class SnapshotWorkItemService {
         helper.addWorkItem(original.getId(), snapshot);
         return snapshotWorkItemRepository.save(snapshot);
     }
-    
+
+    @Transactional
     public WorkItem restoreFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -115,6 +118,7 @@ public class SnapshotWorkItemService {
         return workItem;
     }
 
+    @Transactional
     public WorkItem revertFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();

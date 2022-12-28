@@ -8,6 +8,7 @@ import com.semestral_project.company_process_tool.repositories.snapshots.Snapsho
 import com.semestral_project.company_process_tool.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class SnapshotRoleService {
     @Autowired
     RoleService roleService;
 
+    @Transactional
     public SnapshotRole createSnapshotRole(Role original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -46,6 +48,7 @@ public class SnapshotRoleService {
         return snapshot;
     }
 
+    @Transactional
     public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -76,6 +79,7 @@ public class SnapshotRoleService {
     }
 
 
+    @Transactional
     public Role revertRoleFromSnapshot(SnapshotRole snapshotRole, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();

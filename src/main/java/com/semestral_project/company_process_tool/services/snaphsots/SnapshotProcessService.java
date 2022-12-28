@@ -52,6 +52,7 @@ public class SnapshotProcessService {
     @Autowired
     ElementRepository elementRepository;
 
+    @Transactional
     public SnapshotProcess createSnapshot(Process original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -77,11 +78,14 @@ public class SnapshotProcessService {
 
         snapshot = snapshotProcessRepository.save(snapshot);
 
-        SnapshotBPMN workflow = new SnapshotBPMN();
-        workflow.setBpmnContent(original.getWorkflow().getBpmnContent());
-        workflow.setProcess(snapshot);
-        snapshotBPMNRepository.save(workflow);
-        snapshot.setWorkflow(workflow);
+
+        if(original.getWorkflow() != null){
+            SnapshotBPMN workflow = new SnapshotBPMN();
+            workflow.setBpmnContent(original.getWorkflow().getBpmnContent());
+            workflow.setProcess(snapshot);
+            snapshotBPMNRepository.save(workflow);
+            snapshot.setWorkflow(workflow);
+        }
 
         for(ProcessMetric metric : original.getMetrics()){
             SnapshotProcessMetric snapshotMetric = new SnapshotProcessMetric();
@@ -122,6 +126,7 @@ public class SnapshotProcessService {
         return snapshot;
     }
 
+    @Transactional
     public Process restoreFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, SnapshotBPMN snapshotWorkflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -181,20 +186,23 @@ public class SnapshotProcessService {
                     subProcess = processRepository.save(subProcess);
 
                     //Change old id in workflow
-                    String content = snapshotWorkflow.getBpmnContent();
-                    String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotElement.getOriginalId().toString();
-                    String newId = CompanyProcessToolConst.ELEMENT_ + subProcess.getId();
-                    content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                    snapshotBPMN.setBpmnContent(content);
+                    if(snapshotBPMN != null){
+                        String content = snapshotWorkflow.getBpmnContent();
+                        String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotElement.getOriginalId().toString() + "_";
+                        String newId = CompanyProcessToolConst.ELEMENT_ + subProcess.getId() + "_";
+                        content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
+                        snapshotBPMN.setBpmnContent(content);
+                    }
                 }
             }
         }
-        BPMNfile workflow = new BPMNfile();
-        workflow.setBpmnContent(snapshotBPMN.getBpmnContent());
-        workflow.setProcess(process);
-        workflow = bpmnFileRepository.save(workflow);
-        process.setWorkflow(workflow);
-
+        if(snapshotBPMN != null) {
+            BPMNfile workflow = new BPMNfile();
+            workflow.setBpmnContent(snapshotBPMN.getBpmnContent());
+            workflow.setProcess(process);
+            workflow = bpmnFileRepository.save(workflow);
+            process.setWorkflow(workflow);
+        }
         process = processRepository.save(process);
         helper.addElement(snapshotProcess.getId(), process);
         return process;
@@ -257,19 +265,6 @@ public class SnapshotProcessService {
 
         SnapshotBPMN snapshotBPMN = snapshotProcess.getWorkflow();
 
-        if(existing){
-           processService.deleteAllMetrics(process.getId());
-        }
-        for(SnapshotProcessMetric snapMetric : snapshotProcess.getMetrics()){
-            ProcessMetric metric = new ProcessMetric();
-            metric.setName(snapMetric.getName());
-            metric.setDescription(snapMetric.getDescription());
-            metric.setProcess(process);
-            processMetricRepository.save(metric);
-        }
-
-        process = processService.getProcessById(process.getId());
-
         List<Element> allElements = new ArrayList<>();
         for(SnapshotElement snapshotElement : snapshotProcess.getElements()){
             if(snapshotElement instanceof SnapshotTask){
@@ -300,11 +295,11 @@ public class SnapshotProcessService {
                     subProcess.setPartOfProcess(partOf);
                     subProcess = processRepository.save(subProcess);
 
-                    if(subProcess.getId() != snapshotElement.getOriginalId()){
+                    if(subProcess.getId() != snapshotElement.getOriginalId() && snapshotBPMN != null){
                         //Change old id in workflow
                         String content = snapshotWorkflow.getBpmnContent();
-                        String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotElement.getOriginalId().toString();
-                        String newId = CompanyProcessToolConst.ELEMENT_ + subProcess.getId();
+                        String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotElement.getOriginalId().toString() + "_";
+                        String newId = CompanyProcessToolConst.ELEMENT_ + subProcess.getId() + "_";
                         content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
                         snapshotBPMN.setBpmnContent(content);
                     }
@@ -325,14 +320,27 @@ public class SnapshotProcessService {
         if(existing){
             bpmNparser.updateProcessInAllWorkflows(process,true,null);
         }
-        BPMNfile workflow = new BPMNfile();
-        workflow.setBpmnContent(snapshotBPMN.getBpmnContent());
-        workflow.setProcess(process);
-        workflow = bpmnFileRepository.save(workflow);
-        process.setWorkflow(workflow);
-
+        if(snapshotBPMN != null){
+            BPMNfile workflow = new BPMNfile();
+            workflow.setBpmnContent(snapshotBPMN.getBpmnContent());
+            workflow.setProcess(process);
+            workflow = bpmnFileRepository.save(workflow);
+            process.setWorkflow(workflow);
+        }
         process = processRepository.save(process);
         helper.addElement(snapshotProcess.getId(), process);
+
+        if(existing){
+            processService.deleteAllMetrics(process.getId());
+        }
+        for(SnapshotProcessMetric snapMetric : snapshotProcess.getMetrics()){
+            ProcessMetric metric = new ProcessMetric();
+            metric.setName(snapMetric.getName());
+            metric.setDescription(snapMetric.getDescription());
+            metric.setProcess(process);
+            processMetricRepository.save(metric);
+        }
+
         return process;
     }
 
