@@ -360,4 +360,18 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process not reverted"));
         }
     }
+
+    @PutMapping("/processes/{id}/changeOrder")
+    public ResponseEntity<ResponseMessage> removeEdit(@PathVariable Long id, @RequestBody List<Long> order, @RequestParam long userId) {
+        int status = processService.changeElementOrder(id, userId, order);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Order changed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("Bad order."));
+        }else if(status == 5){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
+        }
+    }
 }

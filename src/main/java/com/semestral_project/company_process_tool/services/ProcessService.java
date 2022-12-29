@@ -1020,4 +1020,22 @@ public class ProcessService {
             processMetricRepository.delete(metric);
         }
     }
+
+    public int changeElementOrder(long processId, long user,  List<Long> order) {
+        Process process = getProcessById(processId);
+        if(process == null){
+            return 2; //process not found
+        }
+        User editor = userService.getUserById(user);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 5; //cannot edit
+        }
+        var list =  process.getElementsOrder();
+        if(list.size() != order.size()){
+            return 3;
+        }
+        process.setElementsOrder(order);
+        processRepository.save(process);
+        return 1;
+    }
 }

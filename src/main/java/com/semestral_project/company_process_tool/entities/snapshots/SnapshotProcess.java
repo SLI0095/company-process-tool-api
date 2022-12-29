@@ -3,6 +3,7 @@ package com.semestral_project.company_process_tool.entities.snapshots;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.utils.LongListConverter;
 import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
@@ -43,6 +44,10 @@ public class SnapshotProcess extends SnapshotElement {
     @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<SnapshotProcessMetric> metrics = new ArrayList<>();
+
+    @JsonView(Views.Basic.class)
+    @Convert(converter = LongListConverter.class)
+    private List<Long> elementsOrder = new ArrayList<>();
 
     public SnapshotProcess() {
     }
@@ -117,5 +122,13 @@ public class SnapshotProcess extends SnapshotElement {
 
     public void setMetrics(List<SnapshotProcessMetric> metrics) {
         this.metrics = metrics;
+    }
+
+    public List<Long> getElementsOrder() {
+        return elementsOrder;
+    }
+
+    public void setElementsOrder(List<Long> elementsOrder) {
+        this.elementsOrder = elementsOrder;
     }
 }

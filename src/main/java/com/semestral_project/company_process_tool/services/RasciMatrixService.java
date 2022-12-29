@@ -19,11 +19,15 @@ public class RasciMatrixService {
         List<Task> tasksInProcess = new ArrayList<>();
         List<Role> rolesInProcess = new ArrayList<>();
 
-        for(Element e : process.getElements()){
-            if (e instanceof Task){
-                tasksInProcess.add((Task)e);
+        for(Long number : process.getElementsOrder()){
+            for(Element e : process.getElements()){
+                if (e instanceof Task && e.getId() == number){
+                    tasksInProcess.add((Task)e);
+                    break;
+                }
             }
         }
+
         for(Task t : tasksInProcess){
             for(Rasci r : t.getRasciList())
             {
@@ -35,9 +39,7 @@ public class RasciMatrixService {
         }
 
 
-        String[][] returnMatrix = buildMatrix(tasksInProcess, rolesInProcess);
-
-        return returnMatrix;
+        return buildMatrix(tasksInProcess, rolesInProcess);
     }
 
     private String[][] buildMatrix(List<Task> tasks, List<Role> roles){
@@ -84,9 +86,12 @@ public class RasciMatrixService {
         List<Task> tasksInProcess = new ArrayList<>();
         List<Role> rolesInProcess = new ArrayList<>();
 
-        for(Element e : process.getElements()){
-            if (e instanceof Task){
-                tasksInProcess.add((Task)e);
+        for(Long number : process.getElementsOrder()){
+            for(Element e : process.getElements()){
+                if (e instanceof Task && e.getId() == number){
+                    tasksInProcess.add((Task)e);
+                    break;
+                }
             }
         }
         for(Task t : tasksInProcess){
@@ -100,9 +105,7 @@ public class RasciMatrixService {
         }
 
 
-        String[][] returnMatrix = buildMatrixHTML(tasksInProcess, rolesInProcess);
-
-        return returnMatrix;
+        return buildMatrixHTML(tasksInProcess, rolesInProcess);
     }
 
     private String[][] buildMatrixHTML(List<Task> tasks, List<Role> roles){

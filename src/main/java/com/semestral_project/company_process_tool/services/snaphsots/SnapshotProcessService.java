@@ -94,7 +94,7 @@ public class SnapshotProcessService {
             snapshotMetric.setProcess(snapshot);
             snapshotProcessMetricRepository.save(snapshotMetric);
         }
-
+        var order = new ArrayList<>(original.getElementsOrder());
         for(Element element : original.getElements()){
             if(element instanceof Task){
                 SnapshotTask snapshotTask = (SnapshotTask) helper.getExistingSnapshotElement(element.getId());
@@ -107,6 +107,8 @@ public class SnapshotProcessService {
                     snapshotTask.setPartOfProcess(partOf);
                     snapshotTaskRepository.save(snapshotTask);
                 }
+                int i = order.indexOf(snapshotTask.getOriginalId());
+                order.set(i, snapshotTask.getId());
             } else {
                 SnapshotProcess snapshotProcess = (SnapshotProcess) helper.getExistingSnapshotElement(element.getId());
                 if(snapshotProcess == null){
@@ -118,9 +120,11 @@ public class SnapshotProcessService {
                     snapshotProcess.setPartOfProcess(partOf);
                     snapshotProcessRepository.save(snapshotProcess);
                 }
+                int i = order.indexOf(snapshotProcess.getOriginalId());
+                order.set(i, snapshotProcess.getId());
             }
         }
-
+        snapshot.setElementsOrder(order);
         snapshot = snapshotProcessRepository.save(snapshot);
         helper.addElement(original.getId(), snapshot);
         return snapshot;
@@ -162,6 +166,7 @@ public class SnapshotProcessService {
             processMetricRepository.save(metric);
         }
 
+        var order = new ArrayList<>(snapshotProcess.getElementsOrder());
         for(SnapshotElement snapshotElement : snapshotProcess.getElements()){
             if(snapshotElement instanceof SnapshotTask){
                 Task task = (Task) helper.getExistingElement(snapshotElement.getId());
@@ -174,6 +179,8 @@ public class SnapshotProcessService {
                     task.setPartOfProcess(partOf);
                     taskRepository.save(task);
                 }
+                int i = order.indexOf(snapshotElement.getId());
+                order.set(i, task.getId());
             } else {
                 Process subProcess = (Process) helper.getExistingElement(snapshotElement.getId());
                 if(subProcess == null){
@@ -194,6 +201,8 @@ public class SnapshotProcessService {
                         snapshotBPMN.setBpmnContent(content);
                     }
                 }
+                int i = order.indexOf(snapshotElement.getId());
+                order.set(i, subProcess.getId());
             }
         }
         if(snapshotBPMN != null) {
@@ -203,6 +212,7 @@ public class SnapshotProcessService {
             workflow = bpmnFileRepository.save(workflow);
             process.setWorkflow(workflow);
         }
+        process.setElementsOrder(order);
         process = processRepository.save(process);
         helper.addElement(snapshotProcess.getId(), process);
         return process;
@@ -216,7 +226,6 @@ public class SnapshotProcessService {
 
 
     @Transactional
-    //TODO fix unable to safe process - metric not found, check changes of id in workflow
     public Process revertFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, SnapshotBPMN snapshotWorkflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -265,6 +274,7 @@ public class SnapshotProcessService {
 
         SnapshotBPMN snapshotBPMN = snapshotProcess.getWorkflow();
 
+        var order = new ArrayList<>(snapshotProcess.getElementsOrder());
         List<Element> allElements = new ArrayList<>();
         for(SnapshotElement snapshotElement : snapshotProcess.getElements()){
             if(snapshotElement instanceof SnapshotTask){
@@ -283,6 +293,8 @@ public class SnapshotProcessService {
                     task.setPartOfProcess(partOf);
                     taskRepository.save(task);
                 }
+                int i = order.indexOf(snapshotElement.getId());
+                order.set(i, task.getId());
             } else {
                 Process subProcess = (Process) helper.getExistingElement(snapshotElement.getId());
                 if(subProcess == null){
@@ -304,6 +316,8 @@ public class SnapshotProcessService {
                         snapshotBPMN.setBpmnContent(content);
                     }
                 }
+                int i = order.indexOf(snapshotElement.getId());
+                order.set(i, subProcess.getId());
             }
         }
         for(Element e : process.getElements()){
@@ -327,6 +341,7 @@ public class SnapshotProcessService {
             workflow = bpmnFileRepository.save(workflow);
             process.setWorkflow(workflow);
         }
+        process.setElementsOrder(order);
         process = processRepository.save(process);
         helper.addElement(snapshotProcess.getId(), process);
 

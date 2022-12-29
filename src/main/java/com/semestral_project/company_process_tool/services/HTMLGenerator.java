@@ -18,20 +18,7 @@ public class HTMLGenerator {
     @Autowired
     RasciMatrixService rasciMatrixService;
 
-    private static String head =
-            "<!DOCTYPE html>\n" +
-            "<html>\n" +
-            "<head>\n" +
-            "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
-            "<link rel=\"stylesheet\" href=\"styles/main.css\">\n" +
-            "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
-            "<body>";
-    private static String footer =
-            "</body>\n" +
-            "</head>\n" +
-            "</html>";
-
-    private List<Process> processList = new ArrayList<>();
+    private final List<Process> processList = new ArrayList<>();
     private List<Role> rolesToGenerate = new ArrayList<>();
     private List<Task> tasksToGenerate = new ArrayList<>();
     private List<WorkItem> workItemsToGenerate = new ArrayList<>();
@@ -98,25 +85,20 @@ public class HTMLGenerator {
         try {
             to.getParentFile().mkdirs();
             to.createNewFile();
-            this.copy(from,to);
+            copy(from,to);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private static void copy(File src, File dest) throws IOException{
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(src);
-            os = new FileOutputStream(dest); // buffer size 1K
+        try (InputStream is = new FileInputStream(src); OutputStream os = new FileOutputStream(dest)) {
+            // buffer size 1K
             byte[] buf = new byte[1024];
             int bytesRead;
             while ((bytesRead = is.read(buf)) > 0) {
-                os.write(buf, 0, bytesRead); }
-        } finally {
-            is.close();
-            os.close();
+                os.write(buf, 0, bytesRead);
+            }
         }
     }
 
@@ -164,6 +146,9 @@ public class HTMLGenerator {
                 zipOut.closeEntry();
             }
             File[] children = fileToZip.listFiles();
+            if(children == null){
+                return;
+            }
             for (File childFile : children) {
                 zipFile(childFile, fileName + "/" + childFile.getName(), zipOut);
             }
@@ -198,6 +183,13 @@ public class HTMLGenerator {
         workItemsToGenerate = new ArrayList<>();
         StringBuilder htmlBuilder = new StringBuilder();
 
+        String head = "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<head>\n" +
+                "<link rel=\"stylesheet\" href=\"https://unpkg.com/bpmn-js@9.0.2/dist/assets/bpmn-js.css\">\n" +
+                "<link rel=\"stylesheet\" href=\"styles/main.css\">\n" +
+                "<script src=\"https://unpkg.com/bpmn-js@9.0.2/dist/bpmn-navigated-viewer.development.js\"></script>\n" +
+                "<body>";
         htmlBuilder.append(head);
         htmlBuilder.append("<h1 class='processName'>").append(process.getName()).append("</h1>");
         if(process.getWorkflow() != null){
@@ -225,6 +217,9 @@ public class HTMLGenerator {
             htmlBuilder.append(workItemPart(w));
             htmlBuilder.append("</div>");
         }
+        String footer = "</body>\n" +
+                "</head>\n" +
+                "</html>";
         htmlBuilder.append(footer);
         return htmlBuilder.toString();
     }
@@ -237,7 +232,7 @@ public class HTMLGenerator {
         returnString.append("<script>");
         String st = process.getWorkflow().getBpmnContent();
         st = st.replace("\n", "");
-        returnString.append("var xml = ").append("\'").append(st).append("\';");
+        returnString.append("var xml = ").append("'").append(st).append("';");
         returnString.append("var bpmnViewer = new BpmnJS({\n" +
                 "        container: '#canvas'\n" +
                 "      });");
@@ -298,18 +293,23 @@ public class HTMLGenerator {
         returnString.append("<div class='processActivities'>");
         returnString.append("<h3>Activities in process</h3>");
         returnString.append("<dl>");
-        for(Element e : process.getElements()){
-            if(e.getClass() == Task.class)
-            {
-                returnString.append("<dt><a href='#element_").append(e.getId()).append("'>").append(e.getName()).append("</a></dt>");
-                this.tasksToGenerate.add((Task) e);
-            } else {
-                returnString.append("<dt><a href='").append(e.getName()).append("_").append(e.getId()).append(".html'>").append(e.getName()).append("</a></dt>");
-            }
-            if(e.getBriefDescription() == null){
-                returnString.append("<dd>-</dd>");
-            } else {
-                returnString.append("<dd>").append(e.getBriefDescription()).append("</dd>");
+        for(Long number : process.getElementsOrder()){
+            for(Element e : process.getElements()){
+                if(e.getId() != number){
+                    continue;
+                }
+                if(e.getClass() == Task.class)
+                {
+                    returnString.append("<dt><a href='#element_").append(e.getId()).append("'>").append(e.getName()).append("</a></dt>");
+                    this.tasksToGenerate.add((Task) e);
+                } else {
+                    returnString.append("<dt><a href='").append(e.getName()).append("_").append(e.getId()).append(".html'>").append(e.getName()).append("</a></dt>");
+                }
+                if(e.getBriefDescription() == null){
+                    returnString.append("<dd>-</dd>");
+                } else {
+                    returnString.append("<dd>").append(e.getBriefDescription()).append("</dd>");
+                }
             }
         }
         returnString.append("</dl>");
@@ -479,12 +479,10 @@ public class HTMLGenerator {
     }
 
     private String rolePart(Role role){
-        StringBuilder returnString = new StringBuilder();
-        returnString.append("<div id='role_").append(role.getId()).append("' >");
-        returnString.append("<h2 class='roleName'>").append(role.getName()).append("</h2>");
-        returnString.append(roleDetail(role));
-        returnString.append("</div>");
-        return returnString.toString();
+        return "<div id='role_" + role.getId() + "' >" +
+                "<h2 class='roleName'>" + role.getName() + "</h2>" +
+                roleDetail(role) +
+                "</div>";
     }
 
     private String roleDetail(Role role){
@@ -506,14 +504,11 @@ public class HTMLGenerator {
     }
 
     private String workItemPart(WorkItem workItem){
-        StringBuilder returnString = new StringBuilder();
-        returnString.append("<div id='workItem_").append(workItem.getId()).append("' >");
-        returnString.append("<h2 class='workItemName'>").append(workItem.getName()).append("</h2>");
-        returnString.append(workItemDetail(workItem));
-        returnString.append(workItemStates(workItem));
-//        returnString.append(workItemRelations(workItem));
-        returnString.append("</div>");
-        return returnString.toString();
+        return "<div id='workItem_" + workItem.getId() + "' >" +
+                "<h2 class='workItemName'>" + workItem.getName() + "</h2>" +
+                workItemDetail(workItem) +
+                workItemStates(workItem) +
+                "</div>";
     }
 
     private String workItemDetail(WorkItem workItem){
