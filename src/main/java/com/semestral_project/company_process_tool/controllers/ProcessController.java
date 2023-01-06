@@ -38,7 +38,7 @@ public class ProcessController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/processes/templates")
+    @GetMapping("/processes/all")
     public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId) {
         List<Process> processes = processService.getAllUserCanView(userId);
         if(processes != null){
@@ -60,7 +60,7 @@ public class ProcessController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/processes/templatesCanEdit")
+    @GetMapping("/processes/allCanEdit")
     public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId) {
         List<Process> processes = processService.getAllUserCanEdit(userId);
         if(processes != null){

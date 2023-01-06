@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.repositories;
 
 import com.semestral_project.company_process_tool.entities.Element;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.Task;
 import com.semestral_project.company_process_tool.entities.User;
 import org.apache.tomcat.jni.Proc;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,29 @@ public interface ProcessRepository extends CrudRepository<Process, Long> {
     @Query("SELECT p FROM Process p WHERE (?1 MEMBER p.canEdit)")
     List<Process> findAllTemplatesProcessesForUserCanEdit(User user);
 
-    @Query("SELECT p FROM Process p WHERE p.isTemplate = true OR :process MEMBER p.canBeUsedIn")
-    List<Process> usableInProcessForUser(@Param("process") Process process);
+
+
+
+    @Query("SELECT p FROM Process p " +
+            "left JOIN p.canEdit ce  " +
+            "left JOIN p.hasAccess ha " +
+            "WHERE p.isTemplate = :isTemplate AND (:user = p.owner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator)))")
+    List<Process> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
+
+    @Query("SELECT p FROM Process p " +
+            "left JOIN p.canEdit ce  " +
+            "left JOIN p.hasAccess ha " +
+            "WHERE :user = p.owner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))")
+    List<Process> findAllCanUserView(@Param("user") User user);
+
+    @Query("SELECT p FROM Process p " +
+            "left JOIN p.canEdit ce  " +
+            "WHERE :user = p.owner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) ")
+    List<Process> findAllCanUserEdit(@Param("user") User user);
+
 }

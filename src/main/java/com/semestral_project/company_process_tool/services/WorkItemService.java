@@ -38,6 +38,8 @@ public class WorkItemService {
     ElementService elementService;
     @Autowired
     ProcessService processService;
+    @Autowired
+    TaskService taskService;
 
 
 
@@ -286,14 +288,15 @@ public class WorkItemService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<WorkItem> ret = new HashSet<>();
+        return workItemRepository.findAllCanUserView(user);
+        /*HashSet<WorkItem> ret = new HashSet<>();
         List<WorkItem> workItems = (List<WorkItem>) workItemRepository.findAll();
         for(WorkItem w : workItems){
             if(ItemUsersUtil.getAllUsersCanView(w).contains(user)){
                 ret.add(w);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
 
 
 //        if (userRepository.existsById(userId)) {
@@ -307,14 +310,15 @@ public class WorkItemService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<WorkItem> ret = new HashSet<>();
+        return workItemRepository.findAllCanUserEdit(user);
+        /*HashSet<WorkItem> ret = new HashSet<>();
         List<WorkItem> workItems = (List<WorkItem>) workItemRepository.findAll();
         for(WorkItem w : workItems){
             if(ItemUsersUtil.getAllCanEdit(w).contains(user)){
                 ret.add(w);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public List<WorkItem> getAllUserCanViewByTemplate(long userId, boolean isTemplate) {
@@ -322,22 +326,24 @@ public class WorkItemService {
         if (user == null) {
             return new ArrayList<>();
         }
-        HashSet<WorkItem> ret = new HashSet<>();
+        return workItemRepository.findByIsTemplateUserCanView(isTemplate,user);
+        /*HashSet<WorkItem> ret = new HashSet<>();
         List<WorkItem> workItems = workItemRepository.findByIsTemplate(isTemplate);
         for (WorkItem w : workItems) {
             if (ItemUsersUtil.getAllUsersCanView(w).contains(user)) {
                 ret.add(w);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
-    public List<WorkItem> getUsableInProcessForUser(long userId, Process process){
+    public List<WorkItem> getUsableInProcessForUser(long userId, long processId){
         User user = userService.getUserById(userId);
-        if (user == null) {
+        if (user == null || !processService.processExists(processId)) {
             return new ArrayList<>();
         }
-        process = processService.getProcessById(process.getId());
+        return workItemRepository.findUsableInProcessForUserCanEdit(processId, user);
+        /*process = processService.getProcessById(process.getId());
         if(process == null){
             return new ArrayList<>();
         }
@@ -348,11 +354,16 @@ public class WorkItemService {
                 ret.add(w);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
-    public List<WorkItem> getUsableInTaskForUser(long userId, Task task){
+    public List<WorkItem> getUsableInTaskForUser(long userId, long taskId){
         User user = userService.getUserById(userId);
+        if (user == null || !taskService.taskExists(taskId)) {
+            return new ArrayList<>();
+        }
+        return workItemRepository.findUsableInTaskForUserCanEdit(taskId, user);
+        /*User user = userService.getUserById(userId);
         if (user == null) {
             return new ArrayList<>();
         }
@@ -363,7 +374,7 @@ public class WorkItemService {
                 ret.add(w);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public int addAccess(long workItemId, long whoEdits, UserType getAccess) {

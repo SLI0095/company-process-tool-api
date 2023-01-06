@@ -1,9 +1,7 @@
 package com.semestral_project.company_process_tool.repositories;
 
-import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.User;
-import com.semestral_project.company_process_tool.entities.WorkItem;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +22,12 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
             "LEFT JOIN e.canBeUsedIn AS elem " +
             "WHERE e.isTemplate = true OR :id = elem.id")
     List<Element> usableInProcessForUser(@Param("id") Long id);
+
+    @Query("SELECT e FROM Element e " +
+            "left JOIN e.canEdit ce  " +
+            "left join e.canBeUsedIn AS p " +
+            "WHERE (e.isTemplate = true OR :id = p.id) " +
+            "AND (:user = e.owner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
+    List<Element> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user);
 }

@@ -34,7 +34,7 @@ public class RoleController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/roles/templates")
+    @GetMapping("/roles/all")
     public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
         List<Role> roles = roleService.getAllUserCanView(userId);
         if(roles != null){
@@ -56,7 +56,7 @@ public class RoleController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/roles/templatesCanEdit")
+    @GetMapping("/roles/allCanEdit")
     public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
         List<Role> roles = roleService.getAllUserCanEdit(userId);
         if(roles != null){
@@ -68,8 +68,8 @@ public class RoleController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/roles/forTask")
-    public ResponseEntity<List<Role>> getRolesForTask(@RequestParam long userId, @RequestBody Task task) {
-        List<Role> roles = roleService.getUsableInForUser(userId, task);
+    public ResponseEntity<List<Role>> getRolesForTask(@RequestParam long userId, @RequestParam long taskId) {
+        List<Role> roles = roleService.getUsableInForUser(userId, taskId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {

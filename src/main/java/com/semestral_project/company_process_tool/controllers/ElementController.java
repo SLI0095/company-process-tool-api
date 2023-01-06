@@ -30,7 +30,7 @@ public class ElementController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/elements/templates")
+    @GetMapping("/elements/all")
     public ResponseEntity<List<Element>> getElementsTemplates(@RequestParam Long userId) {
         List<Element> elements = elementService.getAllUserCanView(userId);
         if(elements != null){
@@ -41,7 +41,7 @@ public class ElementController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/elements/templatesCanEdit")
+    @GetMapping("/elements/allCanEdit")
     public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId) {
         List<Element> elements = elementService.getAllUserCanEdit(userId);
         if(elements != null){
@@ -53,8 +53,8 @@ public class ElementController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/elements/forProcess")
-    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId, @RequestBody Process process) {
-        List<Element> elements = elementService.getUsableInProcessForUser(userId, process);
+    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId, @RequestParam Long processId) {
+        List<Element> elements = elementService.getUsableInProcessForUser(userId, processId);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {

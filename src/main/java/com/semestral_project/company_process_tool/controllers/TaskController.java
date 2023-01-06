@@ -32,7 +32,7 @@ public class TaskController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/tasks/templates")
+    @GetMapping("/tasks/all")
     public ResponseEntity<List<Task>> getTasksTemplates(@RequestParam long userId) {
         List<Task> tasks = taskService.getAllUserCanView(userId);
         if(tasks != null){
@@ -54,7 +54,7 @@ public class TaskController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/tasks/templatesCanEdit")
+    @GetMapping("/tasks/allCanEdit")
     public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
         List<Task> tasks = taskService.getAllUserCanEdit(userId);
         if(tasks != null){

@@ -64,6 +64,10 @@ public class TaskService {
         }
     }
 
+    public boolean taskExists(long id){
+        return taskRepository.existsById(id);
+    }
+
     public Task getTaskById(long id){
         Optional<Task> taskData = taskRepository.findById(id);
         return taskData.orElse(null);
@@ -1119,20 +1123,15 @@ public class TaskService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Task> ret = new HashSet<>();
+        return taskRepository.findAllCanUserView(user);
+        /*HashSet<Task> ret = new HashSet<>();
         List<Task> roles = (List<Task>) taskRepository.findAll();
         for(Task t : roles){
             if(ItemUsersUtil.getAllUsersCanView(t).contains(user)){
                 ret.add(t);
             }
         }
-        return new ArrayList<>(ret);
-
-
-//        if(userRepository.existsById(userId)) {
-//            User user = userRepository.findById(userId).get();
-//            return taskRepository.findAllTasksTemplatesForUser(user);
-//        }else return null;
+        return new ArrayList<>(ret);*/
     }
 
     public List<Task> getAllUserCanEdit(long userId){
@@ -1140,14 +1139,15 @@ public class TaskService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Task> ret = new HashSet<>();
+        return taskRepository.findAllCanUserEdit(user);
+        /*HashSet<Task> ret = new HashSet<>();
         List<Task> roles = (List<Task>) taskRepository.findAll();
         for(Task t : roles){
             if(ItemUsersUtil.getAllUsersCanEdit(t).contains(user)){
                 ret.add(t);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
 
 //        if(userRepository.existsById(userId)) {
 //            User user = userRepository.findById(userId).get();
@@ -1160,14 +1160,15 @@ public class TaskService {
         if (user == null) {
             return new ArrayList<>();
         }
-        HashSet<Task> ret = new HashSet<>();
+        return taskRepository.findByIsTemplateUserCanView(isTemplate,user);
+        /*HashSet<Task> ret = new HashSet<>();
         List<Task> roles = taskRepository.findByIsTemplate(isTemplate);
         for (Task t : roles) {
             if (ItemUsersUtil.getAllUsersCanView(t).contains(user)) {
                 ret.add(t);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public List<Task> getUsableInForUser(long userId, Process process){

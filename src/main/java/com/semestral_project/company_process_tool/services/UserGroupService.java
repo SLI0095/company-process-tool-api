@@ -50,12 +50,9 @@ public class UserGroupService {
             return 2;
         }
        User creator = userService.getUserById(creatorId);
-
-        //TODO test if comparing works
        if(group.getCreator() != creator){
            return 5;
        }
-
        user = userService.getUserById(user.getId());
        if(user == null){
            return 5;
@@ -78,7 +75,6 @@ public class UserGroupService {
         }
         User creator = userService.getUserById(creatorId);
 
-        //TODO test if comparing works
         if(group.getCreator() != creator){
             return 5;
         }

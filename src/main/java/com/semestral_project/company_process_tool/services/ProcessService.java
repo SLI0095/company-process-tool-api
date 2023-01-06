@@ -72,6 +72,10 @@ public class ProcessService {
         }
     }
 
+    public boolean processExists(long id){
+        return processRepository.existsById(id);
+    }
+
     public Process getProcessById(long id){
         Optional<Process> processData = processRepository.findById(id);
 
@@ -602,8 +606,11 @@ public class ProcessService {
         element.setPartOfProcess(isPartOf);
 
         var orderList = process.getElementsOrder();
-        orderList.add(element.getId());
-        process.setElementsOrder(orderList);
+        if(!orderList.contains(element.getId())) {
+            orderList.add(element.getId());
+            process.setElementsOrder(orderList);
+        }
+
 
         elementRepository.save(process);
         //add access and edit from process to element
@@ -772,14 +779,15 @@ public class ProcessService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Process> ret = new HashSet<>();
+        return processRepository.findAllCanUserView(user);
+        /*HashSet<Process> ret = new HashSet<>();
         List<Process> processes = (List<Process>) processRepository.findAll();
         for(Process p : processes){
             if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
                 ret.add(p);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public List<Process> getAllUserCanEdit(long userId){
@@ -787,14 +795,15 @@ public class ProcessService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Process> ret = new HashSet<>();
+        return processRepository.findAllCanUserEdit(user);
+        /*HashSet<Process> ret = new HashSet<>();
         List<Process> processes = (List<Process>) processRepository.findAll();
         for(Process p : processes){
             if(ItemUsersUtil.getAllUsersCanEdit(p).contains(user)){
                 ret.add(p);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public List<Process> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
@@ -802,30 +811,17 @@ public class ProcessService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Process> ret = new HashSet<>();
+        return processRepository.findByIsTemplateUserCanView(isTemplate, user);
+        /*HashSet<Process> ret = new HashSet<>();
         List<Process> processes = processRepository.findByIsTemplate(isTemplate);
         for(Process p : processes){
             if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
                 ret.add(p);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
-    public List<Process> getUsableInProcessForUser(long userId, Process process){
-        User user = userService.getUserById(userId);
-        if(user == null){
-            return new ArrayList<>();
-        }
-        HashSet<Process> ret = new HashSet<>();
-        List<Process> processes = processRepository.usableInProcessForUser(process);
-        for(Process p : processes){
-            if(ItemUsersUtil.getAllUsersCanView(p).contains(user)){
-                ret.add(p);
-            }
-        }
-        return new ArrayList<>(ret);
-    }
 
     public boolean addProcessFromFile(ProcessAndBpmnHolder holder, long whoEdits){
         Process newProcess = holder.getProcess();

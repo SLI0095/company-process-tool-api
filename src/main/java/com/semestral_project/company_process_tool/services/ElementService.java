@@ -42,6 +42,10 @@ public class ElementService {
         return element.orElse(null);
     }
 
+    public boolean elementExists(long id){
+        return elementRepository.existsById(id);
+    }
+
     public List<Element> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
         if(user == null){
@@ -92,12 +96,13 @@ public class ElementService {
 //        }
     }
 
-    public List<Element> getUsableInProcessForUser(long userId, Process process){
+    public List<Element> getUsableInProcessForUser(long userId, Long processId){
         User user = userService.getUserById(userId);
-        if(user == null){
+        if(user == null || !processService.processExists(processId)){
             return new ArrayList<>();
         }
-        process = processService.getProcessById(process.getId());
+        return elementRepository.findUsableInProcessForUserCanEdit(processId, user);
+       /* process = processService.getProcessById(process.getId());
         if(process == null){
             return new ArrayList<>();
         }
@@ -108,6 +113,6 @@ public class ElementService {
                 ret.add(e);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 }

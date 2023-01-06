@@ -379,21 +379,20 @@ public class RoleService {
 //        }
     }
 
-    //TODO create query that will filter the result OR at least call multiple queries and combine the result OR order list by id
     public List<Role> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Role> ret = new HashSet<>();
+        return roleRepository.findAllCanUserView(user);
+        /*HashSet<Role> ret = new HashSet<>();
         List<Role> roles = (List<Role>) roleRepository.findAll();
         for(Role r : roles){
             if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
                 ret.add(r);
             }
         }
-        return new ArrayList<>(ret);
-       // return roleRepository.findAllCanUserView(user);
+        List result2 = new ArrayList<>(ret);*/
     }
 
     public List<Role> getAllUserCanEdit(long userId){
@@ -401,14 +400,15 @@ public class RoleService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Role> ret = new HashSet<>();
+        /*HashSet<Role> ret = new HashSet<>();
         List<Role> roles = (List<Role>) roleRepository.findAll();
         for(Role r : roles){
             if(ItemUsersUtil.getAllUsersCanEdit(r).contains(user)){
                 ret.add(r);
             }
-        }
-        return new ArrayList<>(ret);
+        }*/
+        return roleRepository.findAllCanUserEdit(user);
+        //return new ArrayList<>(ret);
     }
 
     public List<Role> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
@@ -416,30 +416,33 @@ public class RoleService {
         if(user == null){
             return new ArrayList<>();
         }
-        HashSet<Role> ret = new HashSet<>();
+        return roleRepository.findByIsTemplateUserCanView(isTemplate,user);
+        /*HashSet<Role> ret = new HashSet<>();
         List<Role> roles = roleRepository.findByIsTemplate(isTemplate);
         for(Role r : roles){
             if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
                 ret.add(r);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
         // return roleRepository.findAllCanUserView(user);
     }
 
-    public List<Role> getUsableInForUser(long userId, Task task){
+    public List<Role> getUsableInForUser(long userId, long taskId){
         User user = userService.getUserById(userId);
-        if(user == null){
+        if(user == null || !taskService.taskExists(taskId)){
             return new ArrayList<>();
         }
+
         HashSet<Role> ret = new HashSet<>();
-        List<Role> roles = roleRepository.usableInTaskForUser(task.getId());
+        return roleRepository.findUsableInTaskForUserCanEdit(taskId, user);
+        /*List<Role> roles = roleRepository.usableInTaskForUser(task.getId());
         for(Role r : roles){
-            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
+            if(ItemUsersUtil.getAllUsersCanEdit(r).contains(user)){
                 ret.add(r);
             }
         }
-        return new ArrayList<>(ret);
+        return new ArrayList<>(ret);*/
     }
 
     public int addUsableIn(long taskId, long user,  Task task) {

@@ -33,7 +33,7 @@ public class WorkItemController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/workItems/templates")
+    @GetMapping("/workItems/all")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId) {
         List<WorkItem> workItems = workItemService.getAllUserCanView(userId);
         if(workItems != null){
@@ -55,7 +55,7 @@ public class WorkItemController {
     }
 
     @JsonView(Views.Default.class)
-    @GetMapping("/workItems/templatesCanEdit")
+    @GetMapping("/workItems/allCanEdit")
     public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
         List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId);
         if(workItems != null){
@@ -67,8 +67,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/forProcess")
-    public ResponseEntity<List<WorkItem>> getWorkItemsForProcess(@RequestParam long userId, @RequestBody Process process) {
-        List<WorkItem> workItems = workItemService.getUsableInProcessForUser(userId, process);
+    public ResponseEntity<List<WorkItem>> getWorkItemsForProcess(@RequestParam Long userId, @RequestParam Long processId) {
+        List<WorkItem> workItems = workItemService.getUsableInProcessForUser(userId, processId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -78,8 +78,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/forTask")
-    public ResponseEntity<List<WorkItem>> getWorkItemsForTask(@RequestParam long userId, @RequestBody Task task) {
-        List<WorkItem> workItems = workItemService.getUsableInTaskForUser(userId, task);
+    public ResponseEntity<List<WorkItem>> getWorkItemsForTask(@RequestParam Long userId, @RequestParam Long taskId) {
+        List<WorkItem> workItems = workItemService.getUsableInTaskForUser(userId, taskId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
