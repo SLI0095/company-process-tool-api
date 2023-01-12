@@ -344,7 +344,7 @@ public class SnapshotTaskService {
             SnapshotRole snapshotRole = snapshotRasci.getRole();
             Role role = helper.getExistingRole(snapshotRole.getId());
             if(role == null) {
-                if (snapshotRoleService.existRole(snapshotRole.getId())) {
+                if (snapshotRoleService.existRole(snapshotRole.getOriginalId())) {
                     role = snapshotRoleService.revertRoleFromSnapshot(snapshotRole, helper);
                 } else {
                     role = snapshotRoleService.restoreRoleFromSnapshot(snapshotRole, helper, user);
