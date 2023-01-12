@@ -65,7 +65,6 @@ public class BPMNparser {
     @Transactional
     public void saveBPMN(BPMNfile file, Process process, User editor) {
         inXML = new ArrayList<>();
-
         var bpmn_to_delete = process.getWorkflow();
         //if new BPMN is same as old change nothing
         if(bpmn_to_delete != null){
@@ -76,7 +75,7 @@ public class BPMNparser {
         file.setProcess(process);
         String bpmnContent = file.getBpmnContent();
         bpmnContent = this.newWorkItems(bpmnContent, process, editor);
-        bpmnContent = this.newProcesses(bpmnContent, editor);
+        bpmnContent = this.newProcesses(bpmnContent, process, editor);
         bpmnContent = this.newTasks(bpmnContent, process, editor);
         file.setProcess(process);
         file.setBpmnContent(bpmnContent);
@@ -128,8 +127,9 @@ public class BPMNparser {
                         listOfUsers = w.getHasAccess();
                         listOfUsers.addAll(process.getHasAccess());
                         w.setHasAccess(listOfUsers);
-
-
+                        var listOfProcesses = w.getCanBeUsedInProcesses();
+                        listOfProcesses.add(process);
+                        w.setCanBeUsedInProcesses(listOfProcesses);
 
                         WorkItem savedWorkItem = workItemRepository.save(w);
                         String newId = "WorkItem_" + savedWorkItem.getId() + unchangedId;
@@ -147,7 +147,7 @@ public class BPMNparser {
     }
 
     //@Transactional
-    private String newProcesses(String inputXML, User editor){
+    private String newProcesses(String inputXML, Process process, User editor){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -172,6 +172,9 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
                         p.setOwner(editor);
+                        var listOfProcesses = p.getCanBeUsedIn();
+                        listOfProcesses.add(process);
+                        p.setCanBeUsedIn(listOfProcesses);
                         Process savedProcess = processRepository.save(p);
                         String newId = "Element_" + savedProcess.getId() + unchangedId;
 
@@ -236,6 +239,9 @@ public class BPMNparser {
                     listOfUsers = t.getHasAccess();
                     listOfUsers.addAll(process.getHasAccess());
                     t.setHasAccess(listOfUsers);
+                    var listOfProcesses = t.getCanBeUsedIn();
+                    listOfProcesses.add(process);
+                    t.setCanBeUsedIn(listOfProcesses);
                     Task savedTask = taskRepository.save(t);
                     String newId = "Element_" + savedTask.getId() + unchangedId;
 

@@ -23,7 +23,7 @@ public class SnapshotRoleService {
     @Autowired
     RoleService roleService;
 
-    @Transactional
+    //@Transactional
     public SnapshotRole createSnapshotRole(Role original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -48,7 +48,7 @@ public class SnapshotRoleService {
         return snapshot;
     }
 
-    @Transactional
+   // @Transactional
     public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -63,9 +63,6 @@ public class SnapshotRoleService {
         role.setChangeDescription(snapshot.getChangeDescription());
         role.setVersion(snapshot.getVersion());
 
-        var list = role.getCanEdit();
-        list.add(user);
-        role.setCanEdit(list);
         role.setOwner(user);
 
         role = roleRepository.save(role);
@@ -79,7 +76,7 @@ public class SnapshotRoleService {
     }
 
 
-    @Transactional
+    //@Transactional
     public Role revertRoleFromSnapshot(SnapshotRole snapshotRole, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();

@@ -7,6 +7,7 @@ import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTas
 import com.semestral_project.company_process_tool.repositories.*;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotTaskService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
+import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.ItemUsersUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -131,37 +132,6 @@ public class TaskService {
         task.setHasAccess(list);
         taskRepository.save(task);
         return  1; //OK
-
-
-
-//        Optional<Task> taskData = taskRepository.findById(taskId);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(task_.getCanEdit().contains(whoEdits_)){
-//                User getAccess_ = userRepository.findById(getAccess.getId()).get();
-//                if(task_.getHasAccess().contains(getAccess_)) {
-//                    return 3; //already has access
-//                }
-//                if(task_.getCanEdit().contains(getAccess_)){
-//                    var list = task_.getCanEdit();
-//                    if(list.size() == 1){
-//                        return 6;
-//                    }
-//                    list.remove(getAccess_);
-//                    task_.setCanEdit(list);
-//                }
-//                    var list = task_.getHasAccess();
-//                    list.add(getAccess_);
-//                    task_.setHasAccess(list);
-//                    taskRepository.save(task_);
-//                    return 1; //OK
-//            }else return 5; //cannot edit
-//        }
-//        else
-//        {
-//            return 2; //role not found
-//        }
     }
 
 
@@ -186,34 +156,6 @@ public class TaskService {
         list.add(access);
         task.setHasAccess(list);
         taskRepository.save(task);
-
-
-//        if(!(getAccess instanceof User)){
-//            return 1;
-//        }
-//        Optional<Task> taskData = taskRepository.findById(taskId);
-//        if(taskData.isPresent()) {
-//            Task task_ = taskData.get();
-//
-//            User getAccess_ = userRepository.findById(getAccess.getId()).get();
-//            if (task_.getHasAccess().contains(getAccess_)) {
-//                return 3; //already has access
-//            }
-//            if (task_.getCanEdit().contains(getAccess_)) {
-//                var list = task_.getCanEdit();
-//                list.remove(getAccess_);
-//                task_.setCanEdit(list);
-//            }
-//            var list = task_.getHasAccess();
-//            list.add(getAccess_);
-//            task_.setHasAccess(list);
-//            taskRepository.save(task_);
-//            return 1; //OK
-//        }
-//        else
-//        {
-//            return 2; //role not found
-//        }
     }
 
     public int removeAccess(long taskId, long whoEdits, UserType removeAccess){
@@ -793,6 +735,13 @@ public class TaskService {
         List<Task> tasksList = item.getAsMandatoryInput();
         tasksList.add(task);
         item.setAsMandatoryInput(tasksList);
+
+        var usableList = workItem.getCanBeUsedIn();
+        if(!usableList.contains(task)){
+            usableList.add(task);
+            workItem.setCanBeUsedIn(usableList);
+        }
+
         workItemRepository.save(item);
 
 
@@ -1004,6 +953,13 @@ public class TaskService {
         List<Task> tasksList = item.getAsOutput();
         tasksList.add(task);
         item.setAsOutput(tasksList);
+
+        var usableList = workItem.getCanBeUsedIn();
+        if(!usableList.contains(task)){
+            usableList.add(task);
+            workItem.setCanBeUsedIn(usableList);
+        }
+
         workItemRepository.save(item);
 
 //        Optional<Task> taskData = taskRepository.findById(id);
@@ -1274,7 +1230,7 @@ public class TaskService {
         if(!ItemUsersUtil.getAllUsersCanEdit(task).contains(user)){
             return null;
         }
-        return snapshotTaskService.revertExistingFromSnapshot(snapshot,new SnapshotsHelper(), null, user);
+        return snapshotTaskService.revertExistingFromSnapshot(snapshot,new SnapshotsHelper(), new BPMNSnapshotUtil(null), user);
     }
 
     public void deleteAllSteps(long id){

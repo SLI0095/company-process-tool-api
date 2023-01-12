@@ -35,7 +35,7 @@ public class SnapshotWorkItemService {
     @Autowired
     BPMNparser bpmNparser;
 
-    @Transactional
+    //@Transactional
     public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -77,7 +77,7 @@ public class SnapshotWorkItemService {
         return snapshotWorkItemRepository.save(snapshot);
     }
 
-    @Transactional
+    //@Transactional
     public WorkItem restoreFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -99,9 +99,6 @@ public class SnapshotWorkItemService {
         workItem.setUrlAddress(snapshotWorkItem.getUrlAddress());
         workItem.setTemplateText(snapshotWorkItem.getTemplateText());
 
-        var list = workItem.getCanEdit();
-        list.add(user);
-        workItem.setCanEdit(list);
         workItem.setOwner(user);
 
         workItem = workItemRepository.save(workItem);
@@ -118,7 +115,7 @@ public class SnapshotWorkItemService {
         return workItem;
     }
 
-    @Transactional
+    //@Transactional
     public WorkItem revertFromSnapshot(SnapshotWorkItem snapshotWorkItem, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();

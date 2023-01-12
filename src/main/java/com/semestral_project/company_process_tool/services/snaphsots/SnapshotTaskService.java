@@ -12,6 +12,7 @@ import com.semestral_project.company_process_tool.repositories.snapshots.Snapsho
 import com.semestral_project.company_process_tool.repositories.snapshots.SnapshotWorkItemRepository;
 import com.semestral_project.company_process_tool.services.BPMNparser;
 import com.semestral_project.company_process_tool.services.TaskService;
+import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class SnapshotTaskService {
     @Autowired
     TaskService taskService;
 
-    @Transactional
+    //@Transactional
     public SnapshotTask createSnapshot(Task original, String snapshotDescription, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -123,8 +124,8 @@ public class SnapshotTaskService {
         return snapshot;
     }
 
-    @Transactional
-    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
+    //@Transactional
+    public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -140,9 +141,6 @@ public class SnapshotTaskService {
         task.setKeyConsiderations(snapshotTask.getKeyConsiderations());
         task.setTaskType(snapshotTask.getTaskType());
 
-        var list = task.getCanEdit();
-        list.add(user);
-        task.setCanEdit(list);
         task.setOwner(user);
 
         task = taskRepository.save(task);
@@ -160,11 +158,11 @@ public class SnapshotTaskService {
             workItemRepository.save(workItem);
             if(updateWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
 
@@ -180,11 +178,11 @@ public class SnapshotTaskService {
             workItemRepository.save(workItem);
             if(updateWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
 
@@ -210,11 +208,11 @@ public class SnapshotTaskService {
         }
         if(updateWorkflow){
             //Change old id in workflow
-            String content = workflow.getBpmnContent();
+            String content = workflow.toString();
             String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotTask.getOriginalId().toString() + "_";
             String newId = CompanyProcessToolConst.ELEMENT_ + task.getId() + "_";
             content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-            workflow.setBpmnContent(content);
+            workflow.changeTo(content);
         }
         helper.addElement(snapshotTask.getId(), task);
         return task;
@@ -225,12 +223,12 @@ public class SnapshotTaskService {
         return taskData.orElse(null);
     }
 
-    @Transactional
-    public Task revertExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
+    //@Transactional
+    public Task revertExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
-        boolean updateWorkflow = workflow != null;
+        boolean updateWorkflow = workflow.toString() != null;
         Task task = taskService.getTaskById(snapshotTask.getOriginalId());
         String oldTaskType = task.getTaskType();
 
@@ -276,11 +274,11 @@ public class SnapshotTaskService {
             }
             if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
         task = taskService.getTaskById(task.getId());
@@ -313,11 +311,11 @@ public class SnapshotTaskService {
             }
             if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
         task = taskService.getTaskById(task.getId());
@@ -366,12 +364,12 @@ public class SnapshotTaskService {
         return task;
     }
 
-    @Transactional
-    public Task revertNonExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, SnapshotBPMN workflow, User user){
+   // @Transactional
+    public Task revertNonExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
-        boolean updateWorkflow = workflow != null;
+        boolean updateWorkflow = workflow.toString() != null;
         Task task = new Task();
         task.setName(snapshotTask.getName());
         task.setBriefDescription(snapshotTask.getBriefDescription());
@@ -418,11 +416,11 @@ public class SnapshotTaskService {
 
             if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
 
@@ -445,11 +443,11 @@ public class SnapshotTaskService {
 
             if(updateWorkflow && changeIdInWorkflow){
                 //Change old id in workflow
-                String content = workflow.getBpmnContent();
+                String content = workflow.toString();
                 String originalId = CompanyProcessToolConst.WORKITEM_ + snapshotWorkItem.getOriginalId().toString() + "_";
                 String newId = CompanyProcessToolConst.WORKITEM_ + workItem.getId() + "_";
                 content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-                workflow.setBpmnContent(content);
+                workflow.changeTo(content);
             }
         }
 
@@ -483,11 +481,11 @@ public class SnapshotTaskService {
         }
         if(updateWorkflow){
             //Change old id in workflow
-            String content = workflow.getBpmnContent();
+            String content = workflow.toString();
             String originalId = CompanyProcessToolConst.ELEMENT_ + snapshotTask.getOriginalId().toString() + "_";
             String newId = CompanyProcessToolConst.ELEMENT_ + task.getId()  + "_";
             content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
-            workflow.setBpmnContent(content);
+            workflow.changeTo(content);
         }
         helper.addElement(snapshotTask.getId(), task);
         return task;
