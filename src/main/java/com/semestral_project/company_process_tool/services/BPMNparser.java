@@ -72,7 +72,6 @@ public class BPMNparser {
                 return;
             }
         }
-        file.setProcess(process);
         String bpmnContent = file.getBpmnContent();
         bpmnContent = this.newWorkItems(bpmnContent, process, editor);
         bpmnContent = this.newProcesses(bpmnContent, process, editor);
@@ -116,7 +115,7 @@ public class BPMNparser {
                     String oldId = element.getAttribute("id");
                     String name = element.getAttribute("name");
 
-                    if (oldId.contains("WorkItem_new_")) { //Create new WorkItem
+                    if (oldId.startsWith("WorkItem_new_")) { //Create new WorkItem
                         WorkItem w = new WorkItem();
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
@@ -167,7 +166,7 @@ public class BPMNparser {
                     String oldId = element.getAttribute("id");
                     String name = element.getAttribute("name");
 
-                    if (oldId.contains("Element_new_")) { //Create new Process
+                    if (oldId.startsWith("Element_new_")) { //Create new Process
                         Process p = new Process();
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
@@ -227,7 +226,7 @@ public class BPMNparser {
                 String oldId = element.getAttribute("id");
                 String name = element.getAttribute("name");
 
-                if (oldId.contains("Element_new_")) { //Create new Process
+                if (oldId.startsWith("Element_new_")) { //Create new Task
                     Task t = new Task();
                     String unchangedId = oldId.substring(11); //_Activity_....
                     t.setName(name);
@@ -425,16 +424,6 @@ public class BPMNparser {
 
                         processService.addElementToProcess(process.getId(), task1);
 
-//                        var isPartOf = task1.getPartOfProcess();
-//                        if(isPartOf == null){
-//                            isPartOf = new ArrayList<>();
-//                        }
-//                        if(!isPartOf.contains(process)){ //Check if task already part of Process
-//                            isPartOf.add(process);
-//                            task1.setPartOfProcess(isPartOf);
-//                            needToSave = true;
-//                        }
-
                         //Check added Inputs
                         NodeList listOfInputs = element.getElementsByTagNameNS("*","dataInputAssociation");
                         for (int temp2 = 0; temp2 < listOfInputs.getLength(); temp2++) {
@@ -456,19 +445,6 @@ public class BPMNparser {
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
                                         taskService.addMandatoryInputWithoutUser(task1.getId(), workItem);
-//                                        List<WorkItem> inputList = task1.getMandatoryInputs();
-//                                        if(inputList == null){
-//                                            inputList = new ArrayList<>();
-//                                        }
-//                                        if (!inputList.contains(workItem)) {
-//                                            List<Task> tasksList = workItem.getAsMandatoryInput();
-//                                            if(tasksList == null){
-//                                                tasksList = new ArrayList<>();
-//                                            }
-//                                            tasksList.add(task1);
-//                                            workItem.setAsMandatoryInput(tasksList);
-//                                            workItemRepository.save(workItem);
-//                                        }
                                     }
                                 }
                             }
@@ -496,20 +472,6 @@ public class BPMNparser {
                                         WorkItem workItem = workItemRepository.findById(workItemId).get();
 
                                         taskService.addOutputWithoutUser(task1.getId(), workItem);
-
-//                                        List<WorkItem> outputList = task1.getOutputs();
-//                                        if(outputList == null){
-//                                            outputList = new ArrayList<>();
-//                                        }
-//                                        if (!outputList.contains(workItem)) {
-//                                            List<Task> tasksList = workItem.getAsOutput();
-//                                            if(tasksList == null){
-//                                                tasksList = new ArrayList<>();
-//                                            }
-//                                            tasksList.add(task1);
-//                                            workItem.setAsOutput(tasksList);
-//                                            workItemRepository.save(workItem);
-//                                        }
                                     }
                                 }
                             }
@@ -541,7 +503,6 @@ public class BPMNparser {
             makeTaskUpdate(doc,process,"serviceTask");
             makeTaskUpdate(doc,process,"scriptTask");
             makeTaskUpdate(doc,process,"businessRuleTask");
-            //makeTaskUpdate(doc,process,"subProcess");
 
             List<Element> allElementsOfProcess = process.getElements();
             for(Element e : allElementsOfProcess) {

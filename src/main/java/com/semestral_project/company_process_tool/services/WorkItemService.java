@@ -584,6 +584,7 @@ public class WorkItemService {
     }
 
     public int addUsableIn(long workItemId, long user,  Element element) {
+        //TODO NOT WORKING
         WorkItem workItem = getWorkItemById(workItemId);
         if(workItem == null){
             return 2; //workItem not found
