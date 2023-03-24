@@ -20,6 +20,10 @@ public class User extends UserType {
     @OneToMany(mappedBy = "owner")
     private List<Item> isOwner = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "projectOwner")
+    private List<Project> isProjectOwner = new ArrayList<>();
+
 
     @JsonView(Views.UsersGroups.class)
     @OneToMany(mappedBy = "creator")
@@ -72,5 +76,13 @@ public class User extends UserType {
 
     public void setGroups(List<UserGroup> groups) {
         this.groups = groups;
+    }
+
+    public List<Project> getIsProjectOwner() {
+        return isProjectOwner;
+    }
+
+    public void setIsProjectOwner(List<Project> isProjectOwner) {
+        this.isProjectOwner = isProjectOwner;
     }
 }

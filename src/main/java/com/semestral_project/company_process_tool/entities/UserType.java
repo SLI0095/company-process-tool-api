@@ -27,6 +27,14 @@ public class UserType {
     @ManyToMany(mappedBy = "hasAccess")
     private List<Item> hasAccessItems = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "canEdit")
+    private List<Project> canEditProjects = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "hasAccess")
+    private List<Project> hasAccessProjects = new ArrayList<>();
+
     public long getId() {
         return id;
     }
@@ -49,5 +57,21 @@ public class UserType {
 
     public void setHasAccessItems(List<Item> hasAccessItems) {
         this.hasAccessItems = hasAccessItems;
+    }
+
+    public List<Project> getCanEditProjects() {
+        return canEditProjects;
+    }
+
+    public void setCanEditProjects(List<Project> canEditProjects) {
+        this.canEditProjects = canEditProjects;
+    }
+
+    public List<Project> getHasAccessProjects() {
+        return hasAccessProjects;
+    }
+
+    public void setHasAccessProjects(List<Project> hasAccessProjects) {
+        this.hasAccessProjects = hasAccessProjects;
     }
 }

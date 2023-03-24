@@ -38,6 +38,10 @@ public class Item {
     private String changeDescription;
 
     @JsonView(Views.Basic.class)
+    @ManyToOne
+    private Project project = null;
+
+    @JsonView(Views.Basic.class)
     @ManyToMany
     @JoinTable(name = "item_user_access",
             joinColumns = {@JoinColumn(name = "element_id")},
@@ -149,4 +153,11 @@ public class Item {
         isTemplate = template;
     }
 
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
 }
