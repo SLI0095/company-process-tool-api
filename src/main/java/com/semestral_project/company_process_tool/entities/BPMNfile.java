@@ -9,10 +9,12 @@ import javax.persistence.*;
 @Entity
 public class BPMNfile {
 
+    @JsonView(Views.Basic.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(Views.Basic.class)
     @Lob
     private String bpmnContent;
 

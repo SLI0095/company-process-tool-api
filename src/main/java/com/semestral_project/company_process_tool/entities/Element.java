@@ -1,8 +1,12 @@
 package com.semestral_project.company_process_tool.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
+import com.semestral_project.company_process_tool.utils.Views;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -11,50 +15,77 @@ import java.util.List;
         discriminatorType = DiscriminatorType.STRING)
 public class Element extends Item{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany
     @JoinTable(name = "element_process",
             joinColumns = {@JoinColumn(name = "element_id")},
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
-    private List<Process> partOfProcess;
+    private List<Process> partOfProcess = new ArrayList<>();
+
+//    @ManyToMany
+//    @JoinTable(name = "element_user_access",
+//            joinColumns = {@JoinColumn(name = "element_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> hasAccess = new ArrayList<>();
+//
+//    @ManyToMany
+//    @JoinTable(name = "element_user_edit",
+//            joinColumns = {@JoinColumn(name = "element_id")},
+//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+//    private List<User> canEdit = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
-    @JoinTable(name = "element_activity",
+    @JoinTable(name = "element_process_usage",
             joinColumns = {@JoinColumn(name = "element_id")},
-            inverseJoinColumns = {@JoinColumn(name = "activity_id")})
-    private List<Activity> partOfActivity;
+            inverseJoinColumns = {@JoinColumn(name = "process_id")})
+    private List<Process> canBeUsedIn = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
+    @OneToMany(mappedBy ="originalElement", cascade = CascadeType.DETACH)
+    private List<SnapshotElement> snapshots = new ArrayList<>();
 
     public Element() {
-    }
-
-    public long getId() {
-        return id;
     }
 
     public List<Process> getPartOfProcess() {
         return partOfProcess;
     }
 
-    public List<Activity> getPartOfActivity() {
-        return partOfActivity;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setPartOfProcess(List<Process> partOfProcess) {
         this.partOfProcess = partOfProcess;
     }
 
-    public void setPartOfActivity(List<Activity> partOfActivity) {
-        this.partOfActivity = partOfActivity;
+//    public List<User> getHasAccess() {
+//        return hasAccess;
+//    }
+//
+//    public void setHasAccess(List<User> hasAccess) {
+//        this.hasAccess = hasAccess;
+//    }
+//
+//    public List<User> getCanEdit() {
+//        return canEdit;
+//    }
+//
+//    public void setCanEdit(List<User> canEdit) {
+//        this.canEdit = canEdit;
+//    }
+
+
+    public List<Process> getCanBeUsedIn() {
+        return canBeUsedIn;
     }
 
+    public void setCanBeUsedIn(List<Process> canBeUsedIn) {
+        this.canBeUsedIn = canBeUsedIn;
+    }
+
+    public List<SnapshotElement> getSnapshots() {
+        return snapshots;
+    }
+
+    public void setSnapshots(List<SnapshotElement> snapshots) {
+        this.snapshots = snapshots;
+    }
 }

@@ -1,0 +1,135 @@
+/* Process classes */
+
+#canvas {
+
+}
+
+.processName {
+
+}
+
+.processDetails {
+
+}
+
+.processMetrics {
+
+}
+
+.processActivities {
+
+}
+
+.processMatrix {
+
+}
+
+/* Rasci matrix */
+
+.tableR {
+
+}
+
+.tableA {
+
+}
+
+.tableS {
+
+}
+
+.tableC {
+
+}
+
+.tableI {
+
+}
+
+.table- {
+
+}
+
+/* Tasks classes */
+
+.tasksHeading {
+
+}
+
+.task {
+
+}
+
+.taskName {
+
+}
+
+.taskDetail {
+
+}
+
+.taskSteps {
+
+}
+
+.taskInputs {
+
+}
+
+.taskOutputs {
+
+}
+
+.taskGuidance {
+
+}
+
+/* Roles classes */
+
+.rolesHeading {
+
+}
+
+.role {
+
+}
+
+.roleName {
+
+}
+
+.roleDetail {
+
+}
+
+/* Work items classes */
+
+.workItemsHeading {
+
+}
+
+.workItem {
+
+}
+
+.workItemName {
+
+}
+
+.workItemDetail {
+
+}
+
+.workItemStates {
+
+}
+
+.workItemRelations {
+
+}
+
+/* Special class when nothing in detail */
+
+.null {
+
+}

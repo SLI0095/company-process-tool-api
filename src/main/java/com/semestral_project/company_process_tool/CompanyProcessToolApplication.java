@@ -1,11 +1,14 @@
 package com.semestral_project.company_process_tool;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.stream.Stream;
 
@@ -20,16 +23,4 @@ public class CompanyProcessToolApplication {
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    CommandLineRunner init(UserRepository userRepository) {
-//        return args -> {
-//            Stream.of("John", "Julie", "Jennifer", "Helen", "Rachel").forEach(name -> {
-//                User user = new User(name);
-//                userRepository.save(user);
-//            });
-//            userRepository.findAll().forEach(System.out::println);
-//        };
-//    }
-
 }

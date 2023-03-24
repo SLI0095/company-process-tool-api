@@ -1,32 +1,63 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.LongListConverter;
+import com.semestral_project.company_process_tool.utils.Views;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @DiscriminatorValue("process")
 public class Process extends Element{
 
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String scope;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String usageNotes;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String alternatives;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String howToStaff;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
-    @ManyToMany(mappedBy = "partOfProcess")
-    private List<Element> elements;
+    @JsonView(Views.Basic.class)
+    @ManyToMany(mappedBy = "partOfProcess", cascade = CascadeType.DETACH)
+    private List<Element> elements = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "bpmnId")
+    @JoinColumn(name = "bpmn_id")
     private BPMNfile workflow;
 
+    @JsonView(Views.Basic.class)
+    @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
+    private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
+
+    @JsonView(Views.Basic.class)
+    @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
+    private List<ProcessMetric> metrics = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<Element> usableElements = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "canBeUsedInProcesses", cascade = CascadeType.DETACH)
+    private List<WorkItem> usableWorkItems = new ArrayList<>();
+
+    @JsonView(Views.Basic.class)
+    @Convert(converter = LongListConverter.class)
+    private List<Long> elementsOrder = new ArrayList<>();
 
     public Process() {
     }
@@ -93,5 +124,45 @@ public class Process extends Element{
 
     public void setElements(List<Element> elements) {
         this.elements = elements;
+    }
+
+    public List<HistoryBPMN> getHistoryWorkflow() {
+        return historyWorkflow;
+    }
+
+    public void setHistoryWorkflow(List<HistoryBPMN> historyWorkflow) {
+        this.historyWorkflow = historyWorkflow;
+    }
+
+    public List<ProcessMetric> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<ProcessMetric> metrics) {
+        this.metrics = metrics;
+    }
+
+    public List<Element> getUsableElements() {
+        return usableElements;
+    }
+
+    public void setUsableElements(List<Element> usableElements) {
+        this.usableElements = usableElements;
+    }
+
+    public List<WorkItem> getUsableWorkItems() {
+        return usableWorkItems;
+    }
+
+    public void setUsableWorkItems(List<WorkItem> usableWorkItems) {
+        this.usableWorkItems = usableWorkItems;
+    }
+
+    public List<Long> getElementsOrder() {
+        return elementsOrder;
+    }
+
+    public void setElementsOrder(List<Long> elementsOrder) {
+        this.elementsOrder = elementsOrder;
     }
 }

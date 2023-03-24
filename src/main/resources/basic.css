@@ -1,0 +1,222 @@
+body {
+    font-family: Tahoma, sans-serif;
+    padding-right: 2rem;
+    padding-left: 2rem;
+}
+
+#canvas {
+    height: 50vh;
+}
+
+h1 {
+    font-size: 4rem;
+    text-align: center;
+}
+
+h1.tasksHeading {
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
+}
+
+h1.rolesHeading {
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
+}
+
+h1.workItemsHeading {
+    margin-top: 10rem;
+    border-top: double 5px black;
+    border-bottom: double 5px black;
+}
+
+h2 {
+    font-size: 3rem;
+}
+
+h3 {
+    font-size: 2rem;
+}
+
+label {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding-top: 2rem;
+}
+
+dt {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding-top: 2rem;
+}
+
+dd {
+    margin-left: 1.5rem;
+}
+
+p {
+    font-size: 1rem;
+}
+
+table, td, th {
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table {
+    border-collapse: collapse;
+    /* width: 50%; */
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+.processDetail {
+    margin-bottom: 2rem;
+}
+
+.processMetrics h3{
+    border-bottom: dashed black;
+    margin-bottom: 2rem;
+ }
+
+.processActivities h3{
+   border-bottom: dashed black;
+   margin-bottom: 2rem;
+}
+
+.processMatrix h3{
+   border-bottom: dashed black;
+   margin-bottom: 2rem;
+}
+
+.task {
+   border-style: solid;
+   padding: 1rem;
+   margin-bottom: 1rem;
+}
+
+.taskName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
+}
+
+.taskDetail {
+    margin-bottom: 2rem;
+}
+
+.taskSteps h3{
+   border-bottom: dashed black;
+   margin-bottom: 0rem;
+}
+
+.taskInputs h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+}
+
+.taskOutputs h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+ }
+
+.taskGuidance h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+ }
+
+.role {
+   border-style: solid;
+   padding: 1rem;
+   margin-bottom: 1rem;
+}
+
+.roleName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
+}
+
+.workItem {
+   border-style: solid;
+   padding: 1rem;
+   margin-bottom: 1rem;
+}
+
+.workItemName {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: solid;
+}
+
+.workItemDetail {
+    margin-bottom: 2rem;
+}
+
+.workItemStates h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+}
+
+.workItemRelations h3{
+    border-bottom: dashed black;
+    margin-bottom: 0rem;
+}
+
+.tableR {
+    text-align: center;
+    background: green;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableA {
+    text-align: center;
+    background: crimson;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableS {
+    text-align: center;
+    background: darkorchid;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableC {
+    text-align: center;
+    background: royalblue;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.tableI {
+    text-align: center;
+    background: goldenrod;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.table- {
+    text-align: center;
+    background: gray;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+}
+
+.null {
+    font-size: 2rem;
+    margin-left: 1.5rem;
+}

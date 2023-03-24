@@ -1,40 +1,57 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.semestral_project.company_process_tool.utils.Views;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @DiscriminatorValue("task")
 public class Task extends Element{
 
+    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
-    private List<TaskStep> steps;
+    private List<TaskStep> steps = new ArrayList<>();
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String purpose;
+    @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String keyConsiderations;
 
+    @JsonView(Views.Basic.class)
     private String taskType = "task";
 
-//    @ManyToMany(mappedBy = "asPrimaryPerformer")
-//    private List<Role> primaryPerformers;
-//    @ManyToMany(mappedBy = "asAdditionalPerformer")
-//    private List<Role> additionalPerformers;
-
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asMandatoryInput")
-    private List<WorkItem> mandatoryInputs;
+    private List<WorkItem> mandatoryInputs = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "asOptionalInput")
-    private List<WorkItem> optionalInputs;
+//    @ManyToMany(mappedBy = "asOptionalInput")
+//    private List<WorkItem> optionalInputs = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asOutput")
-    private List<WorkItem> outputs;
+    private List<WorkItem> outputs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "element", cascade = CascadeType.REMOVE)
-    private List<Rasci> rasciList;
+    @JsonView(Views.Basic.class)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.REMOVE)
+    private List<Rasci> rasciList = new ArrayList<>();
 
+    @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asGuidanceWorkItem")
-    private List<WorkItem> guidanceWorkItems;
+    private List<WorkItem> guidanceWorkItems = new ArrayList<>();
+
+
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<Role> usableRoles = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "canBeUsedIn", cascade = CascadeType.DETACH)
+    private List<WorkItem> usableWorkItems = new ArrayList<>();
+
+
 
     public Task() {
     }
@@ -79,21 +96,6 @@ public class Task extends Element{
         this.guidanceWorkItems = guidanceWorkItems;
     }
 
-    //    public List<Role> getPrimaryPerformers() {
-//        return primaryPerformers;
-//    }
-//
-//    public void setPrimaryPerformers(List<Role> primaryPerformers) {
-//        this.primaryPerformers = primaryPerformers;
-//    }
-//
-//    public List<Role> getAdditionalPerformers() {
-//        return additionalPerformers;
-//    }
-//
-//    public void setAdditionalPerformers(List<Role> additionalPerformers) {
-//        this.additionalPerformers = additionalPerformers;
-//    }
 
     public List<WorkItem> getMandatoryInputs() {
         return mandatoryInputs;
@@ -103,13 +105,13 @@ public class Task extends Element{
         this.mandatoryInputs = mandatoryInputs;
     }
 
-    public List<WorkItem> getOptionalInputs() {
-        return optionalInputs;
-    }
-
-    public void setOptionalInputs(List<WorkItem> optionalInputs) {
-        this.optionalInputs = optionalInputs;
-    }
+//    public List<WorkItem> getOptionalInputs() {
+//        return optionalInputs;
+//    }
+//
+//    public void setOptionalInputs(List<WorkItem> optionalInputs) {
+//        this.optionalInputs = optionalInputs;
+//    }
 
     public List<WorkItem> getOutputs() {
         return outputs;
