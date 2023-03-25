@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 public final class ItemUsersUtil {
 
     public static HashSet<User> getAllUsersCanEdit(Item item){
+        if(item.getProject() != null){
+            return getAllUsersCanEdit(item.getProject());
+        }
         var allUsers = new HashSet<User>();
         //add solo users
         allUsers.addAll(item.getCanEdit().stream()
@@ -24,6 +27,9 @@ public final class ItemUsersUtil {
         return allUsers;
     }
     public static HashSet<User> getAllUsersCanView(Item item){
+        if(item.getProject() != null){
+            return getAllUsersCanView(item.getProject());
+        }
         var allUsers = new HashSet<User>();
         //add solo users, access
         allUsers.addAll(item.getHasAccess().stream()

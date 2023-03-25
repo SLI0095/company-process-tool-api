@@ -1,10 +1,7 @@
 package com.semestral_project.company_process_tool.services;
 
-import com.semestral_project.company_process_tool.entities.Element;
+import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.Role;
-import com.semestral_project.company_process_tool.entities.User;
-import com.semestral_project.company_process_tool.entities.WorkItem;
 import com.semestral_project.company_process_tool.repositories.ElementRepository;
 import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.utils.ItemUsersUtil;
@@ -25,7 +22,8 @@ public class ElementService {
     UserService userService;
     @Autowired
     ProcessService processService;
-
+    @Autowired
+    ProjectService projectService;
 
 
     public List<Element> getAllElements(){
@@ -59,16 +57,6 @@ public class ElementService {
             }
         }
         return new ArrayList<>(ret);
-
-//        try {
-//            if(userRepository.existsById(userId)) {
-//                User user = userRepository.findById(userId).get();
-//                return elementRepository.findAllElementsTemplateForUser(user);
-//            } else return null;
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return null;
-//        }
     }
 
     public List<Element> getAllUserCanEdit(long userId){
@@ -84,35 +72,20 @@ public class ElementService {
             }
         }
         return new ArrayList<>(ret);
-
-//        try {
-//            if(userRepository.existsById(userId)) {
-//                User user = userRepository.findById(userId).get();
-//                return elementRepository.findAllElementsTemplateForUserCanEdit(user);
-//            } else return null;
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return null;
-//        }
     }
 
-    public List<Element> getUsableInProcessForUser(long userId, Long processId){
+    public List<Element> getUsableInProcessForUser(long userId, Long processId, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null || !processService.processExists(processId)){
             return new ArrayList<>();
         }
-        return elementRepository.findUsableInProcessForUserCanEdit(processId, user);
-       /* process = processService.getProcessById(process.getId());
-        if(process == null){
+        if(projectId == -1){
+            return elementRepository.findUsableInProcessForUserCanEdit(processId, user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
             return new ArrayList<>();
         }
-        HashSet<Element> ret = new HashSet<>();
-        List<Element> elements = elementRepository.usableInProcessForUser(process.getId());
-        for(Element e : elements){
-            if(ItemUsersUtil.getAllCanEdit(e).contains(user)){
-                ret.add(e);
-            }
-        }
-        return new ArrayList<>(ret);*/
+        return elementRepository.findUsableInProcessForUserCanEdit(processId, user, project);
     }
 }

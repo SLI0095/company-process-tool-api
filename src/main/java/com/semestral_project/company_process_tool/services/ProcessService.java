@@ -101,7 +101,18 @@ public class ProcessService {
         if (owner == null) {
             return -1;
         }
-        process.setOwner(owner);
+        if(process.getProject() != null){
+            Project project = projectService.getProjectById(process.getProject().getId());
+            if(project == null) {
+                return -1;
+            }
+            if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
+                return -2;
+            }
+            process.setOwner(project.getProjectOwner());
+        } else {
+            process.setOwner(owner);
+        }
         process = processRepository.save(process);
         return process.getId();
     }
@@ -435,28 +446,49 @@ public class ProcessService {
         }else return -1;
     }
 
-    public List<Process> getAllUserCanView(long userId){
+    public List<Process> getAllUserCanView(long userId, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        return processRepository.findAllCanUserView(user);
+        if(projectId == -1){
+            return processRepository.findAllCanUserView(user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return processRepository.findAllCanUserView(user, project);
     }
 
-    public List<Process> getAllUserCanEdit(long userId){
+    public List<Process> getAllUserCanEdit(long userId, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        return processRepository.findAllCanUserEdit(user);
+        if(projectId == -1){
+            return processRepository.findAllCanUserEdit(user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return processRepository.findAllCanUserEdit(user, project);
     }
 
-    public List<Process> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
+    public List<Process> getAllUserCanViewByTemplate(long userId, boolean isTemplate, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        return processRepository.findByIsTemplateUserCanView(isTemplate, user);
+        if(projectId == -1){
+            return processRepository.findByIsTemplateUserCanView(isTemplate,user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return processRepository.findByIsTemplateUserCanView(isTemplate, user, project);
     }
 
 
@@ -485,24 +517,6 @@ public class ProcessService {
         processMetricRepository.save(metric);
 
         return 1;
-
-//        Optional<Process> processData = processRepository.findById(id);
-//        if(processData.isPresent()) {
-//            Process process_ = processData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(process_.getCanEdit().contains(whoEdits_)) {
-//
-//                metric.setProcess(process_);
-//                processMetricRepository.save(metric);
-//
-//                return 1;
-//            }
-//            return 3;
-//        }
-//        else
-//        {
-//            return 2;
-//        }
     }
 
     public int removeMetric(Long id, ProcessMetric metric, long whoEdits) {
@@ -524,26 +538,6 @@ public class ProcessService {
         processMetricRepository.delete(metric);
         return 1;
 
-//        Optional<Process> processData = processRepository.findById(id);
-//        if(processData.isPresent()) {
-//            Process process_ = processData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(process_.getCanEdit().contains(whoEdits_)) {
-//                ProcessMetric metric_ = processMetricRepository.findById(metric.getId()).get();
-//                if (metric_.getProcess().getId() == process_.getId()) {
-//                    processMetricRepository.delete(metric_);
-//                    return 1;
-//                } else {
-//                    return 4;
-//                }
-//            }
-//            return 3;
-//
-//        }
-//        else
-//        {
-//            return 2;
-//        }
     }
 
     public ZipOutputStream generateHTML(long id, OutputStream stream){
@@ -682,7 +676,7 @@ public class ProcessService {
         }
         Project project = projectService.getProjectById(projectId);
         //TODO check if user can edit project and project exists
-        if(true){
+        if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){
             return configurationProcessService.createNewConfiguration(process, new ConfigurationHelper(), null, user, project);
         }
         return null;

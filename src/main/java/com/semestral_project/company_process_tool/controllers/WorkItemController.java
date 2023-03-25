@@ -34,8 +34,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/all")
-    public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId) {
-        List<WorkItem> workItems = workItemService.getAllUserCanView(userId);
+    public ResponseEntity<List<WorkItem>> getWorkItemsTemplates(@RequestParam long userId, @RequestParam long projectId) {
+        List<WorkItem> workItems = workItemService.getAllUserCanView(userId, projectId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -45,8 +45,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/isTemplate")
-    public ResponseEntity<List<WorkItem>> getWorkItemsIsTemplate(@RequestParam long userId, @RequestParam boolean isTemplate) {
-        List<WorkItem> workItems = workItemService.getAllUserCanViewByTemplate(userId, isTemplate);
+    public ResponseEntity<List<WorkItem>> getWorkItemsIsTemplate(@RequestParam long userId, @RequestParam boolean isTemplate, @RequestParam long projectId) {
+        List<WorkItem> workItems = workItemService.getAllUserCanViewByTemplate(userId, isTemplate, projectId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -56,8 +56,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/allCanEdit")
-    public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId) {
-        List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId);
+    public ResponseEntity<List<WorkItem>> getWorkItemsTemplatesCanEdit(@RequestParam long userId, @RequestParam long projectId) {
+        List<WorkItem> workItems = workItemService.getAllUserCanEdit(userId, projectId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -67,8 +67,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/forProcess")
-    public ResponseEntity<List<WorkItem>> getWorkItemsForProcess(@RequestParam Long userId, @RequestParam Long processId) {
-        List<WorkItem> workItems = workItemService.getUsableInProcessForUser(userId, processId);
+    public ResponseEntity<List<WorkItem>> getWorkItemsForProcess(@RequestParam Long userId, @RequestParam Long processId, @RequestParam long projectId) {
+        List<WorkItem> workItems = workItemService.getUsableInProcessForUser(userId, processId, projectId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {
@@ -78,8 +78,8 @@ public class WorkItemController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/workItems/forTask")
-    public ResponseEntity<List<WorkItem>> getWorkItemsForTask(@RequestParam Long userId, @RequestParam Long taskId) {
-        List<WorkItem> workItems = workItemService.getUsableInTaskForUser(userId, taskId);
+    public ResponseEntity<List<WorkItem>> getWorkItemsForTask(@RequestParam Long userId, @RequestParam Long taskId, @RequestParam long projectId) {
+        List<WorkItem> workItems = workItemService.getUsableInTaskForUser(userId, taskId, projectId);
         if(workItems != null){
             return ResponseEntity.ok(workItems);
         } else {

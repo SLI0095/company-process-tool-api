@@ -11,7 +11,9 @@ import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHe
 import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ConfigurationTaskService {
     @Autowired
     TaskRepository taskRepository;
@@ -45,7 +47,7 @@ public class ConfigurationTaskService {
         task.setTemplate(true);
 
         task.setProject(project);
-        task.setOwner(user);
+        task.setOwner(project.getProjectOwner());
 
         task = taskRepository.save(task);
 

@@ -15,14 +15,14 @@ public interface ProjectRepository extends CrudRepository<Project, Long> {
     @Query("SELECT p FROM Project p " +
             "left JOIN p.canEdit ce  " +
             "left JOIN p.hasAccess ha " +
-            "WHERE :user = p.owner OR (type(ce) = User AND ce = :user) " +
+            "WHERE :user = p.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
             "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))")
     List<Project> findAllCanUserView(@Param("user") User user);
 
     @Query("SELECT p FROM Project p " +
             "left JOIN p.canEdit ce  " +
-            "WHERE :user = p.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) ")
+            "WHERE :user = p.projectOwner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))")
     List<Project> findAllCanUserEdit(@Param("user") User user);
 }

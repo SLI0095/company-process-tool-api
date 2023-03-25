@@ -4,6 +4,8 @@ import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
+import com.semestral_project.company_process_tool.services.configurations.ConfigurationHelper;
+import com.semestral_project.company_process_tool.services.configurations.ConfigurationRoleService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotRoleService;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import com.semestral_project.company_process_tool.utils.ItemUsersUtil;
@@ -30,6 +32,11 @@ public class RoleService {
     @Autowired
     TaskService taskService;
 
+    @Autowired
+    ProjectService projectService;
+
+    @Autowired
+    ConfigurationRoleService configurationRoleService;
 
     public Role fillRole(Role oldRole, Role updateRole){
         oldRole.setName(updateRole.getName());
@@ -62,22 +69,22 @@ public class RoleService {
         if(owner == null){
             return -1;
         }
+        //TODO check for project
+        if(role.getProject() != null){
+            Project project = projectService.getProjectById(role.getProject().getId());
+            if(project == null) {
+                return -1;
+            }
+            if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
+                return -2;
+            }
+            role.setOwner(project.getProjectOwner());
+        } else {
+            role.setOwner(owner);
+        }
         role.setOwner(owner);
         role = roleRepository.save(role);
         return role.getId();
-//        try {
-//            if(userRepository.existsById(userId)) {
-//                User user = userRepository.findById(userId).get();
-//                var list = role.getCanEdit();
-//                list.add(user);
-//                role = roleRepository.save(role);
-//                return role.getId();
-//            }
-//            else return -1;
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return -1;
-//        }
     }
 
     public List<Task> getUsableIn(long id){
@@ -202,23 +209,6 @@ public class RoleService {
         mainRole = fillRole(mainRole, role);
         roleRepository.save(mainRole);
         return 1;
-
-//        Optional<Role> roleData = roleRepository.findById(id);
-//        if(roleData.isPresent()) {
-//            Role role_ = roleData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(role_.getCanEdit().contains(whoEdits_)){
-//                role_ = fillRole(role_, role);
-//                roleRepository.save(role_);
-//                return 1;
-//            } else {
-//                return 3; //cannot edit
-//            }
-//        }
-//        else
-//        {
-//            return 2;
-//        }
     }
 
     public int updateIsTemplate(long id, boolean isTemplate, long whoEdits) {
@@ -247,92 +237,98 @@ public class RoleService {
         roleRepository.delete(role);
         return 1;
 
-//
-//
-//        Optional<Role> roleData = roleRepository.findById(id);
-//        if(roleData.isPresent()) {
-//            Role role_ = roleData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(role_.getCanEdit().contains(whoEdits_)){
-//                for(SnapshotRole snapshot : role_.getSnapshots()){
-//                    snapshot.setBriefDescription(null);
-//                }
-//                roleRepository.delete(role_);
-//                return 1;
-//            } else {
-//                return 3; //cannot edit
-//            }
+    }
+
+//    public List<Role> getAllUserCanView(long userId){
+//        User user = userService.getUserById(userId);
+//        if(user == null){
+//            return new ArrayList<>();
 //        }
-//        else
-//        {
-//            return 2; //role not found
+//        return roleRepository.findAllCanUserView(user);
+//    }
+
+    public List<Role> getAllUserCanView(long userId, Long projectId){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        if(projectId == -1){
+            return roleRepository.findAllCanUserView(user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return roleRepository.findAllCanUserView(user, project);
+    }
+
+//    public List<Role> getAllUserCanEdit(long userId){
+//        User user = userService.getUserById(userId);
+//        if(user == null){
+//            return new ArrayList<>();
 //        }
-    }
+//        return roleRepository.findAllCanUserEdit(user);
+//    }
 
-    public List<Role> getAllUserCanView(long userId){
+    public List<Role> getAllUserCanEdit(long userId, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        return roleRepository.findAllCanUserView(user);
-        /*HashSet<Role> ret = new HashSet<>();
-        List<Role> roles = (List<Role>) roleRepository.findAll();
-        for(Role r : roles){
-            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
-                ret.add(r);
-            }
+        if(projectId == -1){
+            return roleRepository.findAllCanUserEdit(user, null);
         }
-        List result2 = new ArrayList<>(ret);*/
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return roleRepository.findAllCanUserEdit(user, project);
     }
 
-    public List<Role> getAllUserCanEdit(long userId){
+//    public List<Role> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
+//        User user = userService.getUserById(userId);
+//        if(user == null){
+//            return new ArrayList<>();
+//        }
+//        return roleRepository.findByIsTemplateUserCanView(isTemplate,user);
+//    }
+
+    public List<Role> getAllUserCanViewByTemplate(long userId, boolean isTemplate, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null){
             return new ArrayList<>();
         }
-        /*HashSet<Role> ret = new HashSet<>();
-        List<Role> roles = (List<Role>) roleRepository.findAll();
-        for(Role r : roles){
-            if(ItemUsersUtil.getAllUsersCanEdit(r).contains(user)){
-                ret.add(r);
-            }
-        }*/
-        return roleRepository.findAllCanUserEdit(user);
-        //return new ArrayList<>(ret);
-    }
-
-    public List<Role> getAllUserCanViewByTemplate(long userId, boolean isTemplate){
-        User user = userService.getUserById(userId);
-        if(user == null){
+        if(projectId == -1){
+            return roleRepository.findByIsTemplateUserCanView(isTemplate, user, null);
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
             return new ArrayList<>();
         }
-        return roleRepository.findByIsTemplateUserCanView(isTemplate,user);
-        /*HashSet<Role> ret = new HashSet<>();
-        List<Role> roles = roleRepository.findByIsTemplate(isTemplate);
-        for(Role r : roles){
-            if(ItemUsersUtil.getAllUsersCanView(r).contains(user)){
-                ret.add(r);
-            }
-        }
-        return new ArrayList<>(ret);*/
-        // return roleRepository.findAllCanUserView(user);
+        return roleRepository.findByIsTemplateUserCanView(isTemplate,user, project);
     }
 
-    public List<Role> getUsableInForUser(long userId, long taskId){
+//    public List<Role> getUsableInForUser(long userId, long taskId){
+//        User user = userService.getUserById(userId);
+//        if(user == null || !taskService.taskExists(taskId)){
+//            return new ArrayList<>();
+//        }
+//        return roleRepository.findUsableInTaskForUserCanEdit(taskId, user);
+//    }
+
+    public List<Role> getUsableInForUser(long userId, long taskId, Long projectId){
         User user = userService.getUserById(userId);
         if(user == null || !taskService.taskExists(taskId)){
             return new ArrayList<>();
         }
-
-        HashSet<Role> ret = new HashSet<>();
-        return roleRepository.findUsableInTaskForUserCanEdit(taskId, user);
-        /*List<Role> roles = roleRepository.usableInTaskForUser(task.getId());
-        for(Role r : roles){
-            if(ItemUsersUtil.getAllUsersCanEdit(r).contains(user)){
-                ret.add(r);
-            }
+        if(projectId == -1){
+            return roleRepository.findUsableInTaskForUserCanEdit(taskId, user, null);
         }
-        return new ArrayList<>(ret);*/
+        Project project = projectService.getProjectById(projectId);
+        if(project == null){
+            return new ArrayList<>();
+        }
+        return roleRepository.findUsableInTaskForUserCanEdit(taskId, user, project);
     }
 
     public int addUsableIn(long taskId, long user,  Task task) {
@@ -423,5 +419,21 @@ public class RoleService {
             return null;
         }
         return snapshotRoleService.revertRoleFromSnapshot(snapshot,new SnapshotsHelper());
+    }
+
+    public Role createNewConfiguration(long userId, Role role, long projectId) {
+        role = getRoleById(role.getId());
+        if(role == null){
+            return null;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return null;
+        }
+        Project project = projectService.getProjectById(projectId);
+        if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){
+            return configurationRoleService.createNewConfiguration(role, new ConfigurationHelper(),  user, project);
+        }
+        return null;
     }
 }

@@ -5,7 +5,9 @@ import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ConfigurationRoleService {
     @Autowired
     RoleRepository roleRepository;
@@ -26,7 +28,7 @@ public class ConfigurationRoleService {
         role.setTemplate(true);
 
         role.setProject(project);
-        role.setOwner(user);
+        role.setOwner(project.getProjectOwner());
 
         role = roleRepository.save(role);
         helper.addRole(defaultRole.getId(), role);

@@ -58,24 +58,6 @@ public class StateService {
         mainState.setStateDescription(state.getStateDescription());
         stateRepository.save(mainState);
         return 1;
-//        Optional<State> stateData = stateRepository.findById(id);
-//
-//        if(stateData.isPresent()){
-//            State state_ = stateData.get();
-//            User whoEdits_ = userRepository.findById(whoEdits).get();
-//            if(state_.getWorkItem().getCanEdit().contains(whoEdits_)) {
-//                state_.setStateName(state.getStateName());
-//                state_.setStateDescription(state.getStateDescription());
-//
-//                stateRepository.save(state_);
-//                return 1;
-//            }
-//            return 3;
-//        }
-//        else
-//        {
-//            return 2;
-//        }
     }
 
 }

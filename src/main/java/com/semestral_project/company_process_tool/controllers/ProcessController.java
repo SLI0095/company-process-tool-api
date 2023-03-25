@@ -39,8 +39,8 @@ public class ProcessController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/processes/all")
-    public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId) {
-        List<Process> processes = processService.getAllUserCanView(userId);
+    public ResponseEntity<List<Process>> getProcessesTemplates(@RequestParam long userId, @RequestParam long projectId) {
+        List<Process> processes = processService.getAllUserCanView(userId, projectId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {
@@ -50,8 +50,8 @@ public class ProcessController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/processes/isTemplate")
-    public ResponseEntity<List<Process>> getProcessesByTemplate(@RequestParam long userId, @RequestParam boolean isTemplate) {
-        List<Process> processes = processService.getAllUserCanViewByTemplate(userId, isTemplate);
+    public ResponseEntity<List<Process>> getProcessesByTemplate(@RequestParam long userId, @RequestParam boolean isTemplate, @RequestParam long projectId) {
+        List<Process> processes = processService.getAllUserCanViewByTemplate(userId, isTemplate, projectId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {
@@ -61,8 +61,8 @@ public class ProcessController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/processes/allCanEdit")
-    public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId) {
-        List<Process> processes = processService.getAllUserCanEdit(userId);
+    public ResponseEntity<List<Process>> getProcessesTemplatesCanEdit(@RequestParam long userId, @RequestParam long projectId) {
+        List<Process> processes = processService.getAllUserCanEdit(userId, projectId);
         if(processes != null){
             return ResponseEntity.ok(processes);
         } else {

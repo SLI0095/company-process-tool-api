@@ -10,7 +10,9 @@ import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ConfigurationWorkItemService {
 
     @Autowired
@@ -41,7 +43,7 @@ public class ConfigurationWorkItemService {
         workItem.setTemplateText(defaultWorkItem.getTemplateText());
         workItem.setTemplate(true);
 
-        workItem.setProject(project);
+        workItem.setOwner(project.getProjectOwner());
         workItem.setOwner(user);
 
         workItem = workItemRepository.save(workItem);

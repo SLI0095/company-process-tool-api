@@ -15,9 +15,11 @@ import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHe
 import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+@Service
 public class ConfigurationProcessService {
 
     @Autowired
@@ -53,7 +55,7 @@ public class ConfigurationProcessService {
         process.setTemplate(true);
 
         process.setProject(project);
-        process.setOwner(user);
+        process.setOwner(project.getProjectOwner());
 
         process = processRepository.save(process);
 

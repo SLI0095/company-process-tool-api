@@ -23,7 +23,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t " +
             "LEFT JOIN t.canBeUsedIn AS p " +
-            "WHERE t.isTemplate = true OR :id = p.id")
+            "WHERE (t.isTemplate = true OR :id = p.id) AND t.project = :project")
     List<Task> usableInProcessForUser(@Param("id") Long id);
 
 
@@ -35,22 +35,24 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "left JOIN t.hasAccess ha " +
             "WHERE t.isTemplate = :isTemplate AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
-            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator)))")
-    List<Task> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))) AND t.project = :project")
+    List<Task> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user, @Param("project") Project project);
 
     @Query("SELECT t FROM Task t " +
             "left JOIN t.canEdit ce  " +
             "left JOIN t.hasAccess ha " +
             "WHERE :user = t.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
-            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))")
-    List<Task> findAllCanUserView(@Param("user") User user);
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator)) " +
+            "AND t.project = :project")
+    List<Task> findAllCanUserView(@Param("user") User user, @Param("project") Project project);
 
     @Query("SELECT t FROM Task t " +
             "left JOIN t.canEdit ce  " +
             "WHERE :user = t.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) ")
-    List<Task> findAllCanUserEdit(@Param("user") User user);
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
+            "AND t.project = :project")
+    List<Task> findAllCanUserEdit(@Param("user") User user, @Param("project") Project project);
 
 
     @Query("SELECT t FROM Task t " +
@@ -58,6 +60,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "left join t.canBeUsedIn AS p " +
             "WHERE (t.isTemplate = true OR :id = p.id) " +
             "AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
-    List<Task> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user);
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
+            "AND t.project = :project")
+    List<Task> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user, @Param("project") Project project);
 }

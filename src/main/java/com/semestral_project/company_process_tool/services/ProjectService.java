@@ -169,4 +169,14 @@ public class ProjectService {
         projectRepository.save(project);
         return  1; //OK
     }
+
+    public int updateProject(Long id, Project project, long userId) {
+        //TODO add body
+        return 1;
+    }
+
+    public int removeProject(Long id, long userId) {
+        //TODO add body, remove project only owner and also remove all items with this project
+        return 1;
+    }
 }

@@ -53,8 +53,8 @@ public class ElementController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/elements/forProcess")
-    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId, @RequestParam Long processId) {
-        List<Element> elements = elementService.getUsableInProcessForUser(userId, processId);
+    public ResponseEntity<List<Element>> getElementsTemplatesCanEdit(@RequestParam Long userId, @RequestParam Long processId, @RequestParam long projectId) {
+        List<Element> elements = elementService.getUsableInProcessForUser(userId, processId, projectId);
         if(elements != null){
             return ResponseEntity.ok(elements);
         } else {

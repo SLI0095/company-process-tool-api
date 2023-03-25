@@ -35,8 +35,8 @@ public class RoleController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/roles/all")
-    public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId) {
-        List<Role> roles = roleService.getAllUserCanView(userId);
+    public ResponseEntity<List<Role>> getRolesTemplates(@RequestParam long userId, @RequestParam long projectId) {
+        List<Role> roles = roleService.getAllUserCanView(userId, projectId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -46,8 +46,8 @@ public class RoleController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/roles/isTemplate")
-    public ResponseEntity<List<Role>> getRolesByTemplates(@RequestParam long userId, @RequestParam boolean isTemplate) {
-        List<Role> roles = roleService.getAllUserCanViewByTemplate(userId, isTemplate);
+    public ResponseEntity<List<Role>> getRolesByTemplates(@RequestParam long userId, @RequestParam boolean isTemplate, @RequestParam long projectId) {
+        List<Role> roles = roleService.getAllUserCanViewByTemplate(userId, isTemplate, projectId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -57,8 +57,8 @@ public class RoleController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/roles/allCanEdit")
-    public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId) {
-        List<Role> roles = roleService.getAllUserCanEdit(userId);
+    public ResponseEntity<List<Role>> getRolesTemplatesCanEdit(@RequestParam long userId, @RequestParam long projectId) {
+        List<Role> roles = roleService.getAllUserCanEdit(userId, projectId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {
@@ -68,8 +68,8 @@ public class RoleController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/roles/forTask")
-    public ResponseEntity<List<Role>> getRolesForTask(@RequestParam long userId, @RequestParam long taskId) {
-        List<Role> roles = roleService.getUsableInForUser(userId, taskId);
+    public ResponseEntity<List<Role>> getRolesForTask(@RequestParam long userId, @RequestParam long taskId, @RequestParam long projectId) {
+        List<Role> roles = roleService.getUsableInForUser(userId, taskId, projectId);
         if(roles != null){
             return ResponseEntity.ok(roles);
         } else {

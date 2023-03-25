@@ -33,8 +33,8 @@ public class TaskController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/tasks/all")
-    public ResponseEntity<List<Task>> getTasksTemplates(@RequestParam long userId) {
-        List<Task> tasks = taskService.getAllUserCanView(userId);
+    public ResponseEntity<List<Task>> getTasksTemplates(@RequestParam long userId, @RequestParam long projectId) {
+        List<Task> tasks = taskService.getAllUserCanView(userId, projectId);
         if(tasks != null){
             return ResponseEntity.ok(tasks);
         } else {
@@ -44,8 +44,8 @@ public class TaskController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/tasks/isTemplate")
-    public ResponseEntity<List<Task>> getTasksByTemplate(@RequestParam long userId, @RequestParam boolean isTemplate) {
-        List<Task> tasks = taskService.getAllUserCanViewFiltered(userId, isTemplate);
+    public ResponseEntity<List<Task>> getTasksByTemplate(@RequestParam long userId, @RequestParam boolean isTemplate, @RequestParam long projectId) {
+        List<Task> tasks = taskService.getAllUserCanViewFiltered(userId, isTemplate, projectId);
         if(tasks != null){
             return ResponseEntity.ok(tasks);
         } else {
@@ -55,8 +55,8 @@ public class TaskController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/tasks/allCanEdit")
-    public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId) {
-        List<Task> tasks = taskService.getAllUserCanEdit(userId);
+    public ResponseEntity<List<Task>> getTasksTemplatesCanEdit(@RequestParam long userId, @RequestParam long projectId) {
+        List<Task> tasks = taskService.getAllUserCanEdit(userId, projectId);
         if(tasks != null){
             return ResponseEntity.ok(tasks);
         } else {

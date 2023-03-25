@@ -28,6 +28,6 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
             "left join e.canBeUsedIn AS p " +
             "WHERE (e.isTemplate = true OR :id = p.id) " +
             "AND (:user = e.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
-    List<Element> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user);
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) AND e.project = :project")
+    List<Element> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user,  @Param("project") Project project);
 }
