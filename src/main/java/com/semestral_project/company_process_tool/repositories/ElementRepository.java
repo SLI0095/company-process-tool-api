@@ -24,10 +24,11 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
     List<Element> usableInProcessForUser(@Param("id") Long id);
 
     @Query("SELECT e FROM Element e " +
+            "left JOIN e.project proj ON proj = :project " +
             "left JOIN e.canEdit ce  " +
             "left join e.canBeUsedIn AS p " +
             "WHERE (e.isTemplate = true OR :id = p.id) " +
             "AND (:user = e.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) AND e.project = :project")
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
     List<Element> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user,  @Param("project") Project project);
 }
