@@ -180,7 +180,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return workItemRepository.findAllCanUserView(user, null);
+            return workItemRepository.findAllCanUserViewInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -195,7 +195,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return workItemRepository.findAllCanUserEdit(user, null);
+            return workItemRepository.findAllCanUserEditInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -210,7 +210,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return workItemRepository.findByIsTemplateUserCanView(isTemplate, user, null);
+            return workItemRepository.findByIsTemplateUserCanViewInDefault(isTemplate, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -225,7 +225,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return workItemRepository.findUsableInProcessForUserCanEdit(processId, user, null);
+            return workItemRepository.findUsableInProcessForUserCanEditInDefault(processId, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -240,7 +240,7 @@ public class WorkItemService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return workItemRepository.findUsableInTaskForUserCanEdit(taskId, user, null);
+            return workItemRepository.findUsableInTaskForUserCanEditInDefault(taskId, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -352,7 +352,6 @@ public class WorkItemService {
     }
 
     public int addUsableIn(long workItemId, long user,  Element element) {
-        //TODO NOT WORKING
         WorkItem workItem = getWorkItemById(workItemId);
         if(workItem == null){
             return 2; //workItem not found

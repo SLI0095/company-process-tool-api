@@ -10,4 +10,6 @@ public final class Views {
     public static class Default extends Basic {
     }
 
+    public static class Projects extends Basic {
+    }
 }

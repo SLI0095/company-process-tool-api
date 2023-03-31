@@ -452,7 +452,7 @@ public class ProcessService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return processRepository.findAllCanUserView(user, null);
+            return processRepository.findAllCanUserViewInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -467,7 +467,7 @@ public class ProcessService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return processRepository.findAllCanUserEdit(user, null);
+            return processRepository.findAllCanUserEditInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -482,7 +482,7 @@ public class ProcessService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return processRepository.findByIsTemplateUserCanView(isTemplate,user, null);
+            return processRepository.findByIsTemplateUserCanViewInDefault(isTemplate,user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){

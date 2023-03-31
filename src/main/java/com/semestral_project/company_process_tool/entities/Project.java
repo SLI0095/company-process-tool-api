@@ -22,14 +22,14 @@ public class Project {
     @Column(columnDefinition="LONGTEXT")
     private String briefDescription;
 
-    @JsonView(Views.Basic.class)
+    @JsonView(Views.Default.class)
     @ManyToMany
     @JoinTable(name = "project_user_access",
             joinColumns = {@JoinColumn(name = "project_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<UserType> hasAccess = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
+    @JsonView(Views.Default.class)
     @ManyToMany
     @JoinTable(name = "project_user_edit",
             joinColumns = {@JoinColumn(name = "project_id")},
@@ -40,7 +40,7 @@ public class Project {
     @OneToMany(mappedBy = "project")
     private List<Item> projectItems = new ArrayList<>();
 
-    @JsonView(Views.Basic.class)
+    @JsonView(Views.Default.class)
     @ManyToOne
     private User projectOwner;
 

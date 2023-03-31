@@ -80,7 +80,7 @@ public class ElementService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return elementRepository.findUsableInProcessForUserCanEdit(processId, user, null);
+            return elementRepository.findUsableInProcessForUserCanEditInDefault(processId, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){

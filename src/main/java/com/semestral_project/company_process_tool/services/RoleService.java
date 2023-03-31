@@ -253,7 +253,7 @@ public class RoleService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return roleRepository.findAllCanUserView(user, null);
+            return roleRepository.findAllCanUserViewInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -276,7 +276,7 @@ public class RoleService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return roleRepository.findAllCanUserEdit(user, null);
+            return roleRepository.findAllCanUserEditInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -299,7 +299,7 @@ public class RoleService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return roleRepository.findByIsTemplateUserCanView(isTemplate, user, null);
+            return roleRepository.findByIsTemplateUserCanViewInDefault(isTemplate, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -322,7 +322,7 @@ public class RoleService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return roleRepository.findUsableInTaskForUserCanEdit(taskId, user, null);
+            return roleRepository.findUsableInTaskForUserCanEditInDefault(taskId, user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){

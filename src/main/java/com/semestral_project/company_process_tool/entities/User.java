@@ -20,7 +20,7 @@ public class User extends UserType {
     @OneToMany(mappedBy = "owner")
     private List<Item> isOwner = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonView(Views.Projects.class)
     @OneToMany(mappedBy = "projectOwner")
     private List<Project> isProjectOwner = new ArrayList<>();
 

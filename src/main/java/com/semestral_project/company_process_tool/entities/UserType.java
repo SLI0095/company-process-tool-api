@@ -27,11 +27,11 @@ public class UserType {
     @ManyToMany(mappedBy = "hasAccess")
     private List<Item> hasAccessItems = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonView(Views.Projects.class)
     @ManyToMany(mappedBy = "canEdit")
     private List<Project> canEditProjects = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonView(Views.Projects.class)
     @ManyToMany(mappedBy = "hasAccess")
     private List<Project> hasAccessProjects = new ArrayList<>();
 

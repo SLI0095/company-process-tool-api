@@ -57,6 +57,17 @@ public class UserController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+    @JsonView(Views.Projects.class)
+    @GetMapping("/users/{id}/projects")
+    public ResponseEntity<User> getUserWithProjects(@PathVariable long id) {
+        User user = userService.getUserById(id);
+        if(user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
     @JsonView(Views.Default.class)
     @GetMapping("/userGroups")

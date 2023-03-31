@@ -20,7 +20,7 @@ public class ProjectController {
     @Autowired
     ProjectService projectService;
 
-    @JsonView(Views.Default.class)
+    @JsonView(Views.Basic.class)
     @GetMapping("/projects")
     public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
@@ -31,7 +31,7 @@ public class ProjectController {
         }
     }
 
-    @JsonView(Views.Default.class)
+    @JsonView(Views.Basic.class)
     @GetMapping("/projects/all")
     public ResponseEntity<List<Project>> getProjects(@RequestParam long userId) {
         List<Project> projects = projectService.getAllUserCanView(userId );
@@ -49,6 +49,17 @@ public class ProjectController {
             return ResponseEntity.ok(new ResponseMessage("Project added"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Project could not be added"));
+        }
+    }
+
+    @JsonView(Views.Default.class)
+    @GetMapping("/projects/{id}")
+    public ResponseEntity<Project> getProject(@RequestParam long projectId) {
+        Project project = projectService.getProjectById(projectId);
+        if(project != null){
+            return ResponseEntity.ok(project);
+        } else {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 

@@ -569,7 +569,7 @@ public class TaskService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return taskRepository.findAllCanUserView(user, null);
+            return taskRepository.findAllCanUserViewInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -585,7 +585,7 @@ public class TaskService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return taskRepository.findAllCanUserEdit(user, null);
+            return taskRepository.findAllCanUserEditInDefault(user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){
@@ -600,7 +600,7 @@ public class TaskService {
             return new ArrayList<>();
         }
         if(projectId == -1){
-            return taskRepository.findByIsTemplateUserCanView(isTemplate,user, null);
+            return taskRepository.findByIsTemplateUserCanViewInDefault(isTemplate,user);
         }
         Project project = projectService.getProjectById(projectId);
         if(project == null){

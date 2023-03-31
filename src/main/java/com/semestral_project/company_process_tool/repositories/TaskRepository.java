@@ -11,57 +11,54 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
-
-    @Query("SELECT t FROM Task t WHERE (?1 MEMBER t.canEdit OR ?1 MEMBER t.hasAccess)")
-    List<Task> findAllTasksTemplatesForUser(User user);
-
-    @Query("SELECT t FROM Task t WHERE t.isTemplate = :isTemplate")
-    List<Task> findByIsTemplate(@Param("isTemplate") boolean isTemplate);
-
-    @Query("SELECT t FROM Task t WHERE (?1 MEMBER t.canEdit)")
-    List<Task> findAllTasksTemplatesForUserCanEdit(User user);
-
-    @Query("SELECT t FROM Task t " +
-            "LEFT JOIN t.canBeUsedIn AS p " +
-            "WHERE (t.isTemplate = true OR :id = p.id) AND t.project = :project")
-    List<Task> usableInProcessForUser(@Param("id") Long id);
-
-
-
-
+        @Query("SELECT t FROM Task t " +
+                "left JOIN t.canEdit ce  " +
+                "left JOIN t.hasAccess ha " +
+                "WHERE t.isTemplate = :isTemplate AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
+                "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
+                "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))) " +
+                "AND t.project = null")
+    List<Task> findByIsTemplateUserCanViewInDefault(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
 
     @Query("SELECT t FROM Task t " +
-            "left JOIN t.project proj ON proj = :project " +
             "left JOIN t.canEdit ce  " +
             "left JOIN t.hasAccess ha " +
-            "WHERE t.isTemplate = :isTemplate AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
+            "WHERE (:user = t.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
-            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator)))")
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))) " +
+            "AND t.project = null")
+    List<Task> findAllCanUserViewInDefault(@Param("user") User user);
+
+    @Query("SELECT t FROM Task t " +
+            "left JOIN t.canEdit ce  " +
+            "WHERE (:user = t.owner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
+            "AND t.project = null")
+    List<Task> findAllCanUserEditInDefault(@Param("user") User user);
+
+    @Query("SELECT t FROM Task t " +
+            "left JOIN t.project.canEdit ce  " +
+            "left JOIN t.project.hasAccess ha " +
+            "WHERE t.isTemplate = :isTemplate AND (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))) " +
+            "AND t.project = :project")
     List<Task> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user, @Param("project") Project project);
 
     @Query("SELECT t FROM Task t " +
-            "left JOIN t.project proj ON proj = :project " +
-            "left JOIN t.canEdit ce  " +
-            "left JOIN t.hasAccess ha " +
-            "WHERE :user = t.owner OR (type(ce) = User AND ce = :user) " +
+            "left JOIN t.project.canEdit ce  " +
+            "left JOIN t.project. hasAccess ha " +
+            "WHERE (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ha) = User AND ha = :user) OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) " +
-            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator)) ")
+            "OR (type(ha) = UserGroup AND (:user MEMBER ha.users OR :user = ha.creator))) " +
+            "AND t.project = :project")
     List<Task> findAllCanUserView(@Param("user") User user, @Param("project") Project project);
 
     @Query("SELECT t FROM Task t " +
-            "left JOIN t.project proj ON proj = :project " +
-            "left JOIN t.canEdit ce  " +
-            "WHERE :user = t.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator)) ")
+            "left JOIN t.project.canEdit ce  " +
+            "WHERE (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
+            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
+            "AND t.project = :project")
     List<Task> findAllCanUserEdit(@Param("user") User user, @Param("project") Project project);
 
-
-    @Query("SELECT t FROM Task t " +
-            "left JOIN t.project proj ON proj = :project " +
-            "left JOIN t.canEdit ce  " +
-            "left join t.canBeUsedIn AS p " +
-            "WHERE (t.isTemplate = true OR :id = p.id) " +
-            "AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
-            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
-    List<Task> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user, @Param("project") Project project);
 }

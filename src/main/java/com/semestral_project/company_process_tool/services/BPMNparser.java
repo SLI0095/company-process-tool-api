@@ -120,12 +120,18 @@ public class BPMNparser {
                         String unchangedId = oldId.substring(12); //_DataObjectReference_....
                         w.setName(name);
                         w.setOwner(editor);
-                        var listOfUsers = w.getCanEdit();
-                        listOfUsers.addAll(process.getCanEdit());
-                        w.setCanEdit(listOfUsers);
-                        listOfUsers = w.getHasAccess();
-                        listOfUsers.addAll(process.getHasAccess());
-                        w.setHasAccess(listOfUsers);
+                        if(process.getProject() == null){
+                            var listOfUsers = w.getCanEdit();
+                            listOfUsers.addAll(process.getCanEdit());
+                            w.setCanEdit(listOfUsers);
+                            listOfUsers = w.getHasAccess();
+                            listOfUsers.addAll(process.getHasAccess());
+                            w.setHasAccess(listOfUsers);
+                            w.setProject(null);
+                        } else {
+                            w.setOwner(process.getProject().getProjectOwner());
+                            w.setProject(process.getProject());
+                        }
                         var listOfProcesses = w.getCanBeUsedInProcesses();
                         listOfProcesses.add(process);
                         w.setCanBeUsedInProcesses(listOfProcesses);
@@ -170,7 +176,19 @@ public class BPMNparser {
                         Process p = new Process();
                         String unchangedId = oldId.substring(11); //_Activity_....
                         p.setName(name);
-                        p.setOwner(editor);
+                        if(process.getProject() == null){
+                            p.setOwner(editor);
+                            var listOfUsers = p.getCanEdit();
+                            listOfUsers.addAll(process.getCanEdit());
+                            p.setCanEdit(listOfUsers);
+                            listOfUsers = p.getHasAccess();
+                            listOfUsers.addAll(process.getHasAccess());
+                            p.setHasAccess(listOfUsers);
+                            p.setProject(null);
+                        } else {
+                            p.setOwner(process.getProject().getProjectOwner());
+                            p.setProject(process.getProject());
+                        }
                         var listOfProcesses = p.getCanBeUsedIn();
                         listOfProcesses.add(process);
                         p.setCanBeUsedIn(listOfProcesses);
@@ -231,13 +249,19 @@ public class BPMNparser {
                     String unchangedId = oldId.substring(11); //_Activity_....
                     t.setName(name);
                     t.setTaskType(type);
-                    t.setOwner(editor);
-                    var listOfUsers = t.getCanEdit();
-                    listOfUsers.addAll(process.getCanEdit());
-                    t.setCanEdit(listOfUsers);
-                    listOfUsers = t.getHasAccess();
-                    listOfUsers.addAll(process.getHasAccess());
-                    t.setHasAccess(listOfUsers);
+                    if(process.getProject() == null) {
+                        t.setOwner(editor);
+                        var listOfUsers = t.getCanEdit();
+                        listOfUsers.addAll(process.getCanEdit());
+                        t.setCanEdit(listOfUsers);
+                        listOfUsers = t.getHasAccess();
+                        listOfUsers.addAll(process.getHasAccess());
+                        t.setHasAccess(listOfUsers);
+                        t.setProject(null);
+                    } else {
+                        t.setOwner(process.getProject().getProjectOwner());
+                        t.setProject(process.getProject());
+                    }
                     var listOfProcesses = t.getCanBeUsedIn();
                     listOfProcesses.add(process);
                     t.setCanBeUsedIn(listOfProcesses);
