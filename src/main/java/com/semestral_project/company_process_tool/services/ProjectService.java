@@ -171,7 +171,17 @@ public class ProjectService {
     }
 
     public int updateProject(Long id, Project project, long userId) {
-        //TODO add body
+        Project mainProject = getProjectById(id);
+        if (mainProject == null){
+            return  2;
+        }
+        User editor = userService.getUserById(userId);
+        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(mainProject).contains(editor)){
+            return 3;
+        }
+        mainProject.setName(project.getName());
+        mainProject.setBriefDescription(project.getBriefDescription());
+        projectRepository.save(mainProject);
         return 1;
     }
 

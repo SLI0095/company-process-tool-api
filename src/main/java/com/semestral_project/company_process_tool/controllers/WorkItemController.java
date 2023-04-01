@@ -7,6 +7,7 @@ import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWor
 import com.semestral_project.company_process_tool.services.WorkItemService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
 import com.semestral_project.company_process_tool.utils.Views;
+import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -217,36 +218,6 @@ public class WorkItemController {
         }
     }
 
-//    @PutMapping("/workItems/{id}/addRelation")
-//    public ResponseEntity<ResponseMessage> addRelation(@PathVariable Long id, @RequestBody WorkItem workItem, @RequestParam String relationType, @RequestParam long userId) {
-//
-//        int status = workItemService.addRelationToWorkItem(id, workItem, relationType, userId);
-//        if(status == 1){
-//            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-//        } else if(status == 2){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
-//        } else if(status == 3){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
-//        }else if(status == 4){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " already has relation to work item " + workItem.getId()));
-//        } else {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Can not add relation to itself"));
-//        }
-//    }
-
-//    @PutMapping("/workItems/{id}/removeRelation")
-//    public ResponseEntity<ResponseMessage> removeRelation(@PathVariable Long id, @RequestBody WorkItemRelation workItemRelation, @RequestParam long userId) {
-//
-//        int status = workItemService.removeRelationFromWorkItem(id, workItemRelation, userId);
-//        if(status == 1){
-//            return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " is updated"));
-//        } else if(status == 3){
-//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this work item."));
-//        }else {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
-//        }
-//    }
-
     @PutMapping("/workItems/{id}/addAccess")
     public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 
@@ -340,6 +311,16 @@ public class WorkItemController {
             return ResponseEntity.ok(new ResponseMessage("Work item reverted"));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Work item not reverted"));
+        }
+    }
+
+    @PutMapping("/workItems/{id}/newConfiguration")
+    public ResponseEntity<ResponseMessage> newConfig(@PathVariable Long id, @RequestParam long projectId, @RequestParam long userId){
+        WorkItem ret = workItemService.createNewConfiguration(userId, id, projectId);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Configuration created, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
         }
     }
 }

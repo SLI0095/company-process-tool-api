@@ -28,8 +28,11 @@ public class ConfigurationRoleService {
         role.setTemplate(true);
 
         role.setProject(project);
-        role.setOwner(project.getProjectOwner());
-
+        if (project == null){
+            role.setOwner(user);
+        } else {
+            role.setOwner(project.getProjectOwner());
+        }
         role = roleRepository.save(role);
         helper.addRole(defaultRole.getId(), role);
         return role;

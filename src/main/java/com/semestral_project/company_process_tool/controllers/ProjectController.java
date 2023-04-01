@@ -2,7 +2,6 @@ package com.semestral_project.company_process_tool.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.Project;
-import com.semestral_project.company_process_tool.entities.Role;
 import com.semestral_project.company_process_tool.entities.UserType;
 import com.semestral_project.company_process_tool.services.ProjectService;
 import com.semestral_project.company_process_tool.utils.ResponseMessage;
@@ -42,6 +41,17 @@ public class ProjectController {
         }
     }
 
+    @JsonView(Views.Basic.class)
+    @GetMapping("/projects/canEdit")
+    public ResponseEntity<List<Project>> getProjectsCanEdit(@RequestParam long userId) {
+        List<Project> projects = projectService.getAllUserCanEdit(userId );
+        if(projects != null){
+            return ResponseEntity.ok(projects);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PostMapping("/projects")
     public ResponseEntity<ResponseMessage> addProject(@RequestBody Project project, @RequestParam long userId) {
         long ret = projectService.addProject(project, userId);
@@ -54,8 +64,8 @@ public class ProjectController {
 
     @JsonView(Views.Default.class)
     @GetMapping("/projects/{id}")
-    public ResponseEntity<Project> getProject(@RequestParam long projectId) {
-        Project project = projectService.getProjectById(projectId);
+    public ResponseEntity<Project> getProject(@PathVariable Long id) {
+        Project project = projectService.getProjectById(id);
         if(project != null){
             return ResponseEntity.ok(project);
         } else {
@@ -67,11 +77,11 @@ public class ProjectController {
     public ResponseEntity<ResponseMessage> updateProject(@PathVariable Long id, @RequestBody Project project, @RequestParam long userId){
         int ret = projectService.updateProject(id, project, userId);
         if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " is updated"));
+            return ResponseEntity.ok(new ResponseMessage("Project id: " + id + " is updated"));
         } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
         }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Role id: " + id + " does not exist"));
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project id: " + id + " does not exist"));
         }
     }
 
@@ -79,11 +89,11 @@ public class ProjectController {
     public ResponseEntity<ResponseMessage> removeRole(@PathVariable Long id, @RequestParam long userId) {
         int ret = projectService.removeProject(id, userId);
         if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Role removed."));
+            return ResponseEntity.ok(new ResponseMessage("Project removed."));
         } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this role."));
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
         }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Role could not be removed."));
+            return ResponseEntity.badRequest().body(new ResponseMessage("Project could not be removed."));
         }
     }
 

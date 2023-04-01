@@ -374,4 +374,14 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
         }
     }
+
+    @PutMapping("/processes/{id}/newConfiguration")
+    public ResponseEntity<ResponseMessage> newConfig(@PathVariable Long id, @RequestParam long projectId, @RequestParam long userId){
+        Process ret = processService.createNewConfiguration(userId, id, projectId);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Configuration created, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
+        }
+    }
 }

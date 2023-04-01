@@ -269,4 +269,14 @@ public class RoleController {
         }
     }
 
+    @PutMapping("/roles/{id}/newConfiguration")
+    public ResponseEntity<ResponseMessage> newConfig(@PathVariable Long id, @RequestParam long projectId, @RequestParam long userId){
+        Role ret = roleService.createNewConfiguration(userId, id, projectId);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Configuration created, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
+        }
+    }
+
 }

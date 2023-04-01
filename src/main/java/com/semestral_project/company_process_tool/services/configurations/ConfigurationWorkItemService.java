@@ -4,11 +4,8 @@ import com.semestral_project.company_process_tool.entities.Project;
 import com.semestral_project.company_process_tool.entities.State;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.WorkItem;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotState;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
-import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +41,11 @@ public class ConfigurationWorkItemService {
         workItem.setTemplate(true);
 
         workItem.setOwner(project.getProjectOwner());
-        workItem.setOwner(user);
+        if(project == null){
+            workItem.setOwner(user);
+        } else {
+            workItem.setOwner(project.getProjectOwner());
+        }
 
         workItem = workItemRepository.save(workItem);
 

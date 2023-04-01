@@ -488,14 +488,17 @@ public class WorkItemService {
         }
     }
 
-    public WorkItem createNewConfiguration(long userId, WorkItem workItem, long projectId) {
-        workItem = getWorkItemById(workItem.getId());
+    public WorkItem createNewConfiguration(long userId, long workItemId, long projectId) {
+        WorkItem workItem = getWorkItemById(workItemId);
         if(workItem == null){
             return null;
         }
         User user = userService.getUserById(userId);
         if(user == null){
             return null;
+        }
+        if(projectId == -1){
+            return configurationWorkItemService.createNewConfiguration(workItem, new ConfigurationHelper(),  user, null);
         }
         Project project = projectService.getProjectById(projectId);
         if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){

@@ -425,4 +425,14 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Task not reverted"));
         }
     }
+
+    @PutMapping("/tasks/{id}/newConfiguration")
+    public ResponseEntity<ResponseMessage> newConfig(@PathVariable Long id, @RequestParam long projectId, @RequestParam long userId){
+        Task ret = taskService.createNewConfiguration(userId, id, projectId);
+        if(ret != null){
+            return ResponseEntity.ok(new ResponseMessage("Configuration created, new id is " + ret.getId()));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
+        }
+    }
 }

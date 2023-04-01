@@ -714,8 +714,8 @@ public class TaskService {
         }
     }
 
-    public Task createNewConfiguration(long userId, Task task, long projectId) {
-        task = getTaskById(task.getId());
+    public Task createNewConfiguration(long userId, long taskId, long projectId) {
+        Task task = getTaskById(taskId);
         if(task == null){
             return null;
         }
@@ -723,8 +723,11 @@ public class TaskService {
         if(user == null){
             return null;
         }
+        if(projectId == -1){
+            return configurationTaskService.createNewConfiguration(task, new ConfigurationHelper(), null, user, null);
+        }
         Project project = projectService.getProjectById(projectId);
-        if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){
+        if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)) {
             return configurationTaskService.createNewConfiguration(task, new ConfigurationHelper(), null, user, project);
         }
         return null;

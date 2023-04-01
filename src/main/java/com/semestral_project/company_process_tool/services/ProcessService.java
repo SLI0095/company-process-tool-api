@@ -334,7 +334,7 @@ public class ProcessService {
         }
         mainProcess = fillProcess(mainProcess, process);
         processRepository.save(mainProcess);
-        bpmnParser.updateProcessInAllWorkflows(process, true, null);
+        bpmnParser.updateProcessInAllWorkflows(mainProcess, true, null);
         return 1;
     }
 
@@ -665,8 +665,8 @@ public class ProcessService {
         return 1;
     }
 
-    public Process createNewConfiguration(long userId, Process process, long projectId) {
-        process = getProcessById(process.getId());
+    public Process createNewConfiguration(long userId, long processId, long projectId) {
+        Process process = getProcessById(processId);
         if(process == null){
             return null;
         }
@@ -674,8 +674,10 @@ public class ProcessService {
         if(user == null){
             return null;
         }
+        if(projectId == -1){
+            return configurationProcessService.createNewConfiguration(process, new ConfigurationHelper(), null, user, null);
+        }
         Project project = projectService.getProjectById(projectId);
-        //TODO check if user can edit project and project exists
         if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){
             return configurationProcessService.createNewConfiguration(process, new ConfigurationHelper(), null, user, project);
         }

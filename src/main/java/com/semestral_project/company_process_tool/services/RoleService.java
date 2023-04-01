@@ -69,7 +69,6 @@ public class RoleService {
         if(owner == null){
             return -1;
         }
-        //TODO check for project
         if(role.getProject() != null){
             Project project = projectService.getProjectById(role.getProject().getId());
             if(project == null) {
@@ -421,14 +420,17 @@ public class RoleService {
         return snapshotRoleService.revertRoleFromSnapshot(snapshot,new SnapshotsHelper());
     }
 
-    public Role createNewConfiguration(long userId, Role role, long projectId) {
-        role = getRoleById(role.getId());
+    public Role createNewConfiguration(long userId, long roleId, long projectId) {
+        Role role = getRoleById(roleId);
         if(role == null){
             return null;
         }
         User user = userService.getUserById(userId);
         if(user == null){
             return null;
+        }
+        if(projectId == -1){
+            return configurationRoleService.createNewConfiguration(role, new ConfigurationHelper(), user, null);
         }
         Project project = projectService.getProjectById(projectId);
         if(project != null && ItemUsersUtil.getAllUsersCanEdit(project).contains(user)){

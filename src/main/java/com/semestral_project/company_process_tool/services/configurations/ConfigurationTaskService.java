@@ -1,13 +1,11 @@
 package com.semestral_project.company_process_tool.services.configurations;
 
 import com.semestral_project.company_process_tool.entities.*;
-import com.semestral_project.company_process_tool.entities.snapshots.*;
 import com.semestral_project.company_process_tool.repositories.RasciRepository;
 import com.semestral_project.company_process_tool.repositories.TaskRepository;
 import com.semestral_project.company_process_tool.repositories.TaskStepRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.services.BPMNparser;
-import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
 import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +45,11 @@ public class ConfigurationTaskService {
         task.setTemplate(true);
 
         task.setProject(project);
-        task.setOwner(project.getProjectOwner());
-
+        if(project == null){
+            task.setOwner(user);
+        } else {
+            task.setOwner(project.getProjectOwner());
+        }
         task = taskRepository.save(task);
 
         //All inputs

@@ -2,16 +2,12 @@ package com.semestral_project.company_process_tool.services.configurations;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcess;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotProcessMetric;
-import com.semestral_project.company_process_tool.entities.snapshots.SnapshotTask;
 import com.semestral_project.company_process_tool.repositories.BPMNfileRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessMetricRepository;
 import com.semestral_project.company_process_tool.repositories.ProcessRepository;
 import com.semestral_project.company_process_tool.repositories.TaskRepository;
 import com.semestral_project.company_process_tool.services.BPMNparser;
-import com.semestral_project.company_process_tool.services.snaphsots.SnapshotsHelper;
+import com.semestral_project.company_process_tool.services.ProcessService;
 import com.semestral_project.company_process_tool.utils.BPMNSnapshotUtil;
 import com.semestral_project.company_process_tool.utils.CompanyProcessToolConst;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +31,9 @@ public class ConfigurationProcessService {
     @Autowired
     BPMNparser bpmNparser;
 
+    @Autowired
+    ProcessService processService;
+
     public Process createNewConfiguration(Process defaultProcess, ConfigurationHelper helper, BPMNSnapshotUtil snapshotWorkflow, User user, Project project){
         if(helper == null){
             helper = new ConfigurationHelper();
@@ -55,8 +54,11 @@ public class ConfigurationProcessService {
         process.setTemplate(true);
 
         process.setProject(project);
-        process.setOwner(project.getProjectOwner());
-
+        if(project == null){
+            process.setOwner(user);
+        } else {
+            process.setOwner(project.getProjectOwner());
+        }
         process = processRepository.save(process);
 
         BPMNSnapshotUtil snapshotBPMN = new BPMNSnapshotUtil(null);
@@ -81,6 +83,7 @@ public class ConfigurationProcessService {
                 }
                 var partOf = task.getPartOfProcess();
                 if(!partOf.contains(process)){
+//                    processService.addElementToProcess(process.getId(),task);
                     partOf.add(process);
                     task.setPartOfProcess(partOf);
                     taskRepository.save(task);
@@ -94,13 +97,14 @@ public class ConfigurationProcessService {
                 }
                 var partOf = subProcess.getPartOfProcess();
                 if(!partOf.contains(process)){
+//                    processService.addElementToProcess(process.getId(),subProcess);
                     partOf.add(process);
                     subProcess.setPartOfProcess(partOf);
                     subProcess = processRepository.save(subProcess);
 
                     //Change old id in workflow
                     if(snapshotBPMN.toString() != null){
-                        String content = snapshotWorkflow.toString();
+                        String content = snapshotBPMN.toString();
                         String originalId = CompanyProcessToolConst.ELEMENT_ + defaultElement.getId() + "_";
                         String newId = CompanyProcessToolConst.ELEMENT_ + subProcess.getId() + "_";
                         content = bpmNparser.replaceIdInSnapshotWorkflow(content, originalId, newId);
