@@ -151,20 +151,6 @@ public class ProcessController {
         long ret = processService.addProcess(process, userId);
         if(ret != -1){
             return ResponseEntity.ok(new ResponseMessage("Process added"));
-//        } else if(ret == 3) {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
-        }else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
-        }
-    }
-
-    @PostMapping("/processes/newVersion")
-    public ResponseEntity<ResponseMessage> newVersion(@RequestBody Process process, @RequestParam long userId, @RequestParam long oldProcess){
-        long ret = processService.newVersionOfProcess(process,oldProcess, userId);
-        if(ret != -1){
-            return ResponseEntity.ok(new ResponseMessage("Process added"));
-//        } else if(ret == 3) {
-//            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit project."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process could not be added."));
         }
@@ -216,22 +202,6 @@ public class ProcessController {
             return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process"));
         } else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-        }
-    }
-
-    @PutMapping("/processes/{id}/restoreBPMN")
-    public ResponseEntity<ResponseMessage> restoreBPMN(@PathVariable Long id, @RequestBody HistoryBPMN bpmn, @RequestParam long userId){
-
-        int ret = processService.restoreWorkflow(id, bpmn, userId);
-        if(ret == 1){
-            return ResponseEntity.ok(new ResponseMessage("Process id: " + id + " is updated. Revert successful."));
-        }else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this process"));
-        } else if(ret == 2) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("Process id: " + id + " does not exist"));
-        }
-        else {
-            return ResponseEntity.badRequest().body(new ResponseMessage("This version of BPMN can not be reverted"));
         }
     }
 

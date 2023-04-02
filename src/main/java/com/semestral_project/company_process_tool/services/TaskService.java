@@ -48,6 +48,8 @@ public class TaskService {
     ProjectService projectService;
     @Autowired
     ConfigurationTaskService configurationTaskService;
+    @Autowired
+    RoleRepository roleRepository;
 
     public Task fillTask(Task oldTask, Task updatedTask){
         oldTask.setName(updatedTask.getName());
@@ -289,15 +291,13 @@ public class TaskService {
         if (!bpmNparser.removeTaskFromAllWorkflows(task)) {
             return 3;
         }
-        var list = task.getMandatoryInputs();
-        for (WorkItem w : list) {
-            var list2 = w.getAsMandatoryInput();
-            list2.remove(task);
-            w.setAsMandatoryInput(list2);
+        for (WorkItem w : task.getMandatoryInputs()) {
+            var list = w.getAsMandatoryInput();
+            list.remove(task);
+            w.setAsMandatoryInput(list);
             workItemRepository.save(w);
         }
-        list = task.getOutputs();
-        for (WorkItem w : list) {
+        for (WorkItem w : task.getOutputs()) {
             var list2 = w.getAsOutput();
             list2.remove(task);
             w.setAsOutput(list2);
@@ -305,6 +305,23 @@ public class TaskService {
         }
         for(SnapshotElement snapshot : task.getSnapshots()){
             snapshot.setOriginalElement(null);
+        }
+        for(WorkItem w : task.getUsableWorkItems()){
+            var list = w.getCanBeUsedIn();
+            list.remove(task);
+            w.setCanBeUsedIn(list);
+            workItemRepository.save(w);
+        }
+        for(Role r : task.getUsableRoles()){
+            var list = r.getCanBeUsedIn();
+            list.remove(task);
+            r.setCanBeUsedIn(list);
+            roleRepository.save(r);
+        }
+        for(Item i : task.getConfigurations()){
+            Task t = (Task) i;
+            t.setCreatedFrom(null);
+            taskRepository.save(t);
         }
         taskRepository.deleteById(id);
         return 1;

@@ -53,6 +53,7 @@ public class ConfigurationProcessService {
         process.setKeyConsiderations(defaultProcess.getKeyConsiderations());
         process.setTemplate(true);
 
+        process.setCreatedFrom(defaultProcess);
         process.setProject(project);
         if(project == null){
             process.setOwner(user);

@@ -42,10 +42,6 @@ public class Process extends Element{
     private BPMNfile workflow;
 
     @JsonView(Views.Basic.class)
-    @OneToMany(mappedBy ="process", cascade = CascadeType.DETACH, orphanRemoval = true)
-    private List<HistoryBPMN> historyWorkflow = new ArrayList<>();
-
-    @JsonView(Views.Basic.class)
     @OneToMany(mappedBy = "process", cascade = CascadeType.REMOVE)
     private List<ProcessMetric> metrics = new ArrayList<>();
 
@@ -124,14 +120,6 @@ public class Process extends Element{
 
     public void setElements(List<Element> elements) {
         this.elements = elements;
-    }
-
-    public List<HistoryBPMN> getHistoryWorkflow() {
-        return historyWorkflow;
-    }
-
-    public void setHistoryWorkflow(List<HistoryBPMN> historyWorkflow) {
-        this.historyWorkflow = historyWorkflow;
     }
 
     public List<ProcessMetric> getMetrics() {

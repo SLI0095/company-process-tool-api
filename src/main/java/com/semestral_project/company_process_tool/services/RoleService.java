@@ -2,6 +2,7 @@ package com.semestral_project.company_process_tool.services;
 
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
+import com.semestral_project.company_process_tool.entities.snapshots.SnapshotElement;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotRole;
 import com.semestral_project.company_process_tool.repositories.RoleRepository;
 import com.semestral_project.company_process_tool.services.configurations.ConfigurationHelper;
@@ -232,6 +233,14 @@ public class RoleService {
         User editor = userService.getUserById(whoEdits);
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)){
             return 3; //cannot edit
+        }
+        for(SnapshotRole snapshot : role.getSnapshots()){
+            snapshot.setOriginalRole(null);
+        }
+        for(Item i : role.getConfigurations()){
+            Role r = (Role) i;
+            r.setCreatedFrom(null);
+            roleRepository.save(r);
         }
         roleRepository.delete(role);
         return 1;

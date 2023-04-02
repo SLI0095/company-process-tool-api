@@ -43,8 +43,6 @@ public class BPMNparser {
     @Autowired
     BPMNfileRepository bpmNfileRepository;
     @Autowired
-    HistoryBPMNRepository historyBPMNRepository;
-    @Autowired
     TaskService taskService;
     @Autowired
     ProcessService processService;
@@ -81,14 +79,6 @@ public class BPMNparser {
         file = bpmNfileRepository.save(file);
         process.setWorkflow(file);
         processRepository.save(process);
-        if(bpmn_to_delete != null){
-            var bpmnHistory = new HistoryBPMN();
-            bpmnHistory.setBpmnContent(bpmn_to_delete.getBpmnContent());
-            bpmnHistory.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            bpmnHistory.setProcess(process);
-            historyBPMNRepository.save(bpmnHistory);
-            bpmNfileRepository.delete(bpmn_to_delete);
-        }
         this.updateProcesses(bpmnContent, process);
         this.updateTasks(bpmnContent, process);
         this.updateWorkItems(bpmnContent);
@@ -359,10 +349,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -401,7 +387,6 @@ public class BPMNparser {
                     String newXML = DocumentToString(doc);
                     workflow.setBpmnContent(newXML);
                     bpmNfileRepository.save(workflow);
-                    historyBPMNRepository.save(historyBPMN);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -557,10 +542,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -608,7 +589,6 @@ public class BPMNparser {
                     String newXML = DocumentToString(doc);
                     workflow.setBpmnContent(newXML);
                     bpmNfileRepository.save(workflow);
-                    historyBPMNRepository.save(historyBPMN);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -682,10 +662,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -724,7 +700,6 @@ public class BPMNparser {
                     String newXML = DocumentToString(doc);
                     workflow.setBpmnContent(newXML);
                     bpmNfileRepository.save(workflow);
-                    historyBPMNRepository.save(historyBPMN);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -741,12 +716,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            //create new history of BPMN
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -850,7 +819,6 @@ public class BPMNparser {
             }
             if(save){
                 bpmNfileRepository.save(workflow);
-                historyBPMNRepository.save(historyBPMN);
             }
         }
         return true;
@@ -864,11 +832,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            //create new history of BPMN
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -1004,7 +967,6 @@ public class BPMNparser {
             }
             if(save){
                 bpmNfileRepository.save(workflow);
-                historyBPMNRepository.save(historyBPMN);
             }
         }
         return true;
@@ -1018,11 +980,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            //create new history of BPMN
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -1098,7 +1055,6 @@ public class BPMNparser {
                     String newXML = DocumentToString(doc);
                     workflow.setBpmnContent(newXML);
                     bpmNfileRepository.save(workflow);
-                    historyBPMNRepository.save(historyBPMN);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1116,11 +1072,6 @@ public class BPMNparser {
                 continue;
             }
             String XMLFile = workflow.getBpmnContent();
-            //create new history of BPMN
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now());
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -1196,7 +1147,6 @@ public class BPMNparser {
                     String newXML = DocumentToString(doc);
                     workflow.setBpmnContent(newXML);
                     bpmNfileRepository.save(workflow);
-                    historyBPMNRepository.save(historyBPMN);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1214,11 +1164,6 @@ public class BPMNparser {
             }
             boolean save = false;
             String XMLFile = workflow.getBpmnContent();
-            //create new history of BPMN
-            var historyBPMN = new HistoryBPMN();
-            historyBPMN.setProcess(workflow.getProcess());
-            historyBPMN.setBpmnContent(XMLFile);
-            historyBPMN.setChangeDate(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
@@ -1341,7 +1286,6 @@ public class BPMNparser {
             }
             if(save) {
                 bpmNfileRepository.save(workflow);
-                historyBPMNRepository.save(historyBPMN);
             }
         }
         return true;

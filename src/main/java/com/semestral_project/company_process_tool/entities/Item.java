@@ -1,5 +1,6 @@
 package com.semestral_project.company_process_tool.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.utils.Views;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -61,6 +62,14 @@ public class Item {
 
     @JsonView(Views.Basic.class)
     private boolean isTemplate = false;
+
+    @JsonIgnore
+    @ManyToOne
+    private Item createdFrom = null;
+
+    @JsonView(Views.Basic.class)
+    @OneToMany(mappedBy = "createdFrom")
+    private List<Item> configurations = new ArrayList<>();
 
     public Item() {
     }
@@ -159,5 +168,21 @@ public class Item {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Item getCreatedFrom() {
+        return createdFrom;
+    }
+
+    public void setCreatedFrom(Item createdFrom) {
+        this.createdFrom = createdFrom;
+    }
+
+    public List<Item> getConfigurations() {
+        return configurations;
+    }
+
+    public void setConfigurations(List<Item> configurations) {
+        this.configurations = configurations;
     }
 }

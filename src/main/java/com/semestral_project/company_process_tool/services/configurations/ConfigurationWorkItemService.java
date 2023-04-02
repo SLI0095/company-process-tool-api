@@ -39,8 +39,9 @@ public class ConfigurationWorkItemService {
         workItem.setUrlAddress(defaultWorkItem.getUrlAddress());
         workItem.setTemplateText(defaultWorkItem.getTemplateText());
         workItem.setTemplate(true);
+        workItem.setCreatedFrom(defaultWorkItem);
 
-        workItem.setOwner(project.getProjectOwner());
+        workItem.setProject(project);
         if(project == null){
             workItem.setOwner(user);
         } else {

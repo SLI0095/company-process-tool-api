@@ -43,6 +43,7 @@ public class ConfigurationTaskService {
         task.setKeyConsiderations(defaultTask.getKeyConsiderations());
         task.setTaskType(defaultTask.getTaskType());
         task.setTemplate(true);
+        task.setCreatedFrom(defaultTask);
 
         task.setProject(project);
         if(project == null){

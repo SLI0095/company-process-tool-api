@@ -1,11 +1,9 @@
 package com.semestral_project.company_process_tool.services;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.semestral_project.company_process_tool.entities.*;
 import com.semestral_project.company_process_tool.entities.Process;
 import com.semestral_project.company_process_tool.entities.snapshots.SnapshotWorkItem;
 import com.semestral_project.company_process_tool.repositories.StateRepository;
-import com.semestral_project.company_process_tool.repositories.UserRepository;
 import com.semestral_project.company_process_tool.repositories.WorkItemRepository;
 import com.semestral_project.company_process_tool.services.configurations.ConfigurationHelper;
 import com.semestral_project.company_process_tool.services.configurations.ConfigurationWorkItemService;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,6 +103,11 @@ public class WorkItemService {
        }
         for(SnapshotWorkItem snapshot : workItem.getSnapshots()){
             snapshot.setOriginalWorkItem(null);
+        }
+        for(Item i : workItem.getConfigurations()){
+            WorkItem w = (WorkItem) i;
+            w.setCreatedFrom(null);
+            workItemRepository.save(w);
         }
         workItemRepository.deleteById(id);
         return true;

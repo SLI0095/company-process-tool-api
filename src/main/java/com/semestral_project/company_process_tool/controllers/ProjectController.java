@@ -97,6 +97,17 @@ public class ProjectController {
         }
     }
 
+    @JsonView(Views.Default.class)
+    @PutMapping("/projects/{id}/canAccess")
+    public ResponseEntity<ResponseMessage> canAccess(@PathVariable Long id,  @RequestParam long userId) {
+        boolean ret = projectService.canAccessProject(id, userId);
+        if(ret){
+            return ResponseEntity.ok(new ResponseMessage("Can access"));
+        } else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Cannot access"));
+        }
+    }
+
     @PutMapping("/projects/{id}/addAccess")
     public ResponseEntity<ResponseMessage> addAccess(@PathVariable Long id, @RequestBody UserType getAccess, @RequestParam long userId) {
 

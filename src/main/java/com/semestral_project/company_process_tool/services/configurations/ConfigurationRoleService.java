@@ -26,6 +26,7 @@ public class ConfigurationRoleService {
         role.setChangeDescription(defaultRole.getChangeDescription());
         role.setVersion(defaultRole.getVersion());
         role.setTemplate(true);
+        role.setCreatedFrom(defaultRole);
 
         role.setProject(project);
         if (project == null){

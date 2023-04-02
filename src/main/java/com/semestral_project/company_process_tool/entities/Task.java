@@ -105,14 +105,6 @@ public class Task extends Element{
         this.mandatoryInputs = mandatoryInputs;
     }
 
-//    public List<WorkItem> getOptionalInputs() {
-//        return optionalInputs;
-//    }
-//
-//    public void setOptionalInputs(List<WorkItem> optionalInputs) {
-//        this.optionalInputs = optionalInputs;
-//    }
-
     public List<WorkItem> getOutputs() {
         return outputs;
     }
@@ -127,5 +119,21 @@ public class Task extends Element{
 
     public void setTaskType(String taskType) {
         this.taskType = taskType;
+    }
+
+    public List<Role> getUsableRoles() {
+        return usableRoles;
+    }
+
+    public void setUsableRoles(List<Role> usableRoles) {
+        this.usableRoles = usableRoles;
+    }
+
+    public List<WorkItem> getUsableWorkItems() {
+        return usableWorkItems;
+    }
+
+    public void setUsableWorkItems(List<WorkItem> usableWorkItems) {
+        this.usableWorkItems = usableWorkItems;
     }
 }

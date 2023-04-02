@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipOutputStream;
@@ -32,8 +31,6 @@ public class ProcessService {
     BPMNparser bpmnParser;
     @Autowired
     ProcessMetricRepository processMetricRepository;
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     TaskService taskService;
     @Autowired
@@ -52,6 +49,8 @@ public class ProcessService {
     ConfigurationProcessService configurationProcessService;
     @Autowired
     ProjectService projectService;
+    @Autowired
+    WorkItemRepository workItemRepository;
 
     public Process fillProcess(Process oldProcess, Process updatedProcess){
         oldProcess.setName(updatedProcess.getName());
@@ -309,8 +308,7 @@ public class ProcessService {
         if (!bpmnParser.removeProcessFromAllWorkflows(process)){
             return 3;
         }
-        var elements = process.getElements();
-        for(Element e : elements){
+        for(Element e : process.getElements()){
             var list = e.getPartOfProcess();
             list.remove(process);
             e.setPartOfProcess(list);
@@ -318,6 +316,23 @@ public class ProcessService {
         }
         for(SnapshotElement snapshot : process.getSnapshots()){
             snapshot.setOriginalElement(null);
+        }
+        for(Element e : process.getUsableElements()){
+            var list = e.getCanBeUsedIn();
+            list.remove(process);
+            e.setCanBeUsedIn(list);
+            elementRepository.save(e);
+        }
+        for(WorkItem w : process.getUsableWorkItems()){
+            var list = w.getCanBeUsedInProcesses();
+            list.remove(process);
+            w.setCanBeUsedInProcesses(list);
+            workItemRepository.save(w);
+        }
+        for(Item i : process.getConfigurations()){
+            Process p = (Process) i;
+            p.setCreatedFrom(null);
+            processRepository.save(p);
         }
         processRepository.delete(process);
         return 1;
@@ -404,46 +419,6 @@ public class ProcessService {
         }
         bpmnParser.saveBPMN(bpmn, process, editor);
         return 1;
-    }
-
-    public int restoreWorkflow(long id, HistoryBPMN bpmn, long whoEdits){
-        Process process = getProcessById(id);
-        if(process == null){
-            return 2; //process not found
-        }
-        User editor = userService.getUserById(whoEdits);
-        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
-            return 3; //cannot edit
-        }
-        if (!bpmnParser.canRestoreBPMN(bpmn.getBpmnContent())) {
-            return 3;
-        }
-
-        BPMNfile file = new BPMNfile();
-        file.setProcess(process);
-        file.setBpmnContent(bpmn.getBpmnContent());
-        bpmnParser.saveBPMN(file, process, editor);
-        return 1;
-    }
-
-
-    @Deprecated
-    public long newVersionOfProcess(Process newProcess, long oldProcess, long userId){
-        if(userRepository.existsById(userId)) {
-            User user = userRepository.findById(userId).get();
-            var list = newProcess.getCanEdit();
-            list.add(user);
-            newProcess.setCanEdit(list);
-            newProcess = processRepository.save(newProcess);
-
-            Process old = processRepository.findById(oldProcess).get();
-            if(old.getWorkflow() != null){
-                BPMNfile newFile = new BPMNfile();
-                newFile.setBpmnContent(old.getWorkflow().getBpmnContent());
-                bpmnParser.saveBPMN(newFile, newProcess, user);
-            }
-            return newProcess.getId();
-        }else return -1;
     }
 
     public List<Process> getAllUserCanView(long userId, Long projectId){

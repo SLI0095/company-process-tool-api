@@ -52,6 +52,18 @@ public class ProjectService {
         return projectData.orElse(null);
     }
 
+    public boolean canAccessProject(long id, long userId){
+        Project p = getProjectById(id);
+        if(p == null){
+            return false;
+        }
+        User user = userService.getUserById(userId);
+        if(user == null) {
+            return false;
+        }
+        return ItemUsersUtil.getAllUsersCanView(p).contains(user);
+    }
+
     public List<Project> getAllUserCanView(long userId){
         User user = userService.getUserById(userId);
         if(user == null){

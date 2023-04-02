@@ -22,18 +22,6 @@ public class Element extends Item{
             inverseJoinColumns = {@JoinColumn(name = "process_id")})
     private List<Process> partOfProcess = new ArrayList<>();
 
-//    @ManyToMany
-//    @JoinTable(name = "element_user_access",
-//            joinColumns = {@JoinColumn(name = "element_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-//    private List<User> hasAccess = new ArrayList<>();
-//
-//    @ManyToMany
-//    @JoinTable(name = "element_user_edit",
-//            joinColumns = {@JoinColumn(name = "element_id")},
-//            inverseJoinColumns = {@JoinColumn(name = "user_id")})
-//    private List<User> canEdit = new ArrayList<>();
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "element_process_usage",
@@ -55,23 +43,6 @@ public class Element extends Item{
     public void setPartOfProcess(List<Process> partOfProcess) {
         this.partOfProcess = partOfProcess;
     }
-
-//    public List<User> getHasAccess() {
-//        return hasAccess;
-//    }
-//
-//    public void setHasAccess(List<User> hasAccess) {
-//        this.hasAccess = hasAccess;
-//    }
-//
-//    public List<User> getCanEdit() {
-//        return canEdit;
-//    }
-//
-//    public void setCanEdit(List<User> canEdit) {
-//        this.canEdit = canEdit;
-//    }
-
 
     public List<Process> getCanBeUsedIn() {
         return canBeUsedIn;
