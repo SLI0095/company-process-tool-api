@@ -658,4 +658,25 @@ public class ProcessService {
         }
         return null;
     }
+
+    public int changeOwner(long id, long editorId, long newOwnerId){
+        Process process = getProcessById(id);
+        if(process == null){
+            return 2;
+        }
+        User editor = userService.getUserById(editorId);
+        if(editor == null){
+            return 3;
+        }
+        User newOwner = userService.getUserById(newOwnerId);
+        if(newOwner == null){
+            return 3;
+        }
+        if(process.getOwner().getId() != editor.getId()){
+            return 4; //MUST BE OWNER TO CHANGE OWNER
+        }
+        process.setOwner(newOwner);
+        processRepository.save(process);
+        return 1;
+    }
 }

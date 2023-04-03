@@ -749,4 +749,25 @@ public class TaskService {
         }
         return null;
     }
+
+    public int changeOwner(long id, long editorId, long newOwnerId){
+        Task task = getTaskById(id);
+        if(task == null){
+            return 2;
+        }
+        User editor = userService.getUserById(editorId);
+        if(editor == null){
+            return 3;
+        }
+        User newOwner = userService.getUserById(newOwnerId);
+        if(newOwner == null){
+            return 3;
+        }
+        if(task.getOwner().getId() != editor.getId()){
+            return 4; //MUST BE OWNER TO CHANGE OWNER
+        }
+        task.setOwner(newOwner);
+        taskRepository.save(task);
+        return 1;
+    }
 }

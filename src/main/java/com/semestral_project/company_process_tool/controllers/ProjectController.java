@@ -91,7 +91,7 @@ public class ProjectController {
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Project removed."));
         } else if(ret == 3) {
-            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot edit this project."));
+            return ResponseEntity.badRequest().body(new ResponseMessage("User cannot delete this project."));
         }else {
             return ResponseEntity.badRequest().body(new ResponseMessage("Project could not be removed."));
         }

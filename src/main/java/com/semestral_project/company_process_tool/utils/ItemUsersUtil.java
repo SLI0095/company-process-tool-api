@@ -1,6 +1,7 @@
 package com.semestral_project.company_process_tool.utils;
 
 import com.semestral_project.company_process_tool.entities.*;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;

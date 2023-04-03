@@ -37,7 +37,7 @@ public class Project {
     private List<UserType> canEdit = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE)
     private List<Item> projectItems = new ArrayList<>();
 
     @JsonView(Views.Default.class)

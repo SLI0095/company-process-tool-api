@@ -198,7 +198,15 @@ public class ProjectService {
     }
 
     public int removeProject(Long id, long userId) {
-        //TODO add body, remove project only owner and also remove all items with this project
+        Project mainProject = getProjectById(id);
+        if (mainProject == null){
+            return  2;
+        }
+        User editor = userService.getUserById(userId);
+        if(editor == null || mainProject.getProjectOwner().getId() != editor.getId()){
+            return 3;
+        }
+        projectRepository.delete(mainProject);
         return 1;
     }
 }

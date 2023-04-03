@@ -447,4 +447,25 @@ public class RoleService {
         }
         return null;
     }
+
+    public int changeOwner(long id, long editorId, long newOwnerId){
+        Role role = getRoleById(id);
+        if(role == null){
+            return 2;
+        }
+        User editor = userService.getUserById(editorId);
+        if(editor == null){
+            return 3;
+        }
+        User newOwner = userService.getUserById(newOwnerId);
+        if(newOwner == null){
+            return 3;
+        }
+        if(role.getOwner().getId() != editor.getId()){
+            return 4; //MUST BE OWNER TO CHANGE OWNER
+        }
+        role.setOwner(newOwner);
+        roleRepository.save(role);
+        return 1;
+    }
 }

@@ -508,4 +508,25 @@ public class WorkItemService {
         }
         return null;
     }
+
+    public int changeOwner(long id, long editorId, long newOwnerId){
+        WorkItem workItem = getWorkItemById(id);
+        if(workItem == null){
+            return 2;
+        }
+        User editor = userService.getUserById(editorId);
+        if(editor == null){
+            return 3;
+        }
+        User newOwner = userService.getUserById(newOwnerId);
+        if(newOwner == null){
+            return 3;
+        }
+        if(workItem.getOwner().getId() != editor.getId()){
+            return 4; //MUST BE OWNER TO CHANGE OWNER
+        }
+        workItem.setOwner(newOwner);
+        workItemRepository.save(workItem);
+        return 1;
+    }
 }

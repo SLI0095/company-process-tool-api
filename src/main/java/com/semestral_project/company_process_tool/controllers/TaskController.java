@@ -435,4 +435,18 @@ public class TaskController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
         }
     }
+
+    @PutMapping("/tasks/{id}/changeOwner")
+    public ResponseEntity<ResponseMessage> changeUser(@PathVariable Long id, @RequestParam long userId, @RequestParam long newOwnerId){
+        int status = taskService.changeOwner(id, userId, newOwnerId);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Owner changed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User not found."));
+        } else if(status == 4){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User is not owner."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Task id: " + id + " does not exist"));
+        }
+    }
 }

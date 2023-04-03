@@ -323,4 +323,18 @@ public class WorkItemController {
             return ResponseEntity.badRequest().body(new ResponseMessage("Configuration not created"));
         }
     }
+
+    @PutMapping("/workItems/{id}/changeOwner")
+    public ResponseEntity<ResponseMessage> changeUser(@PathVariable Long id, @RequestParam long userId, @RequestParam long newOwnerId){
+        int status = workItemService.changeOwner(id, userId, newOwnerId);
+        if(status == 1){
+            return ResponseEntity.ok(new ResponseMessage("Owner changed."));
+        } else if(status == 3){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User not found."));
+        } else if(status == 4){
+            return ResponseEntity.badRequest().body(new ResponseMessage("User is not owner."));
+        }else {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Work item id: " + id + " does not exist"));
+        }
+    }
 }
