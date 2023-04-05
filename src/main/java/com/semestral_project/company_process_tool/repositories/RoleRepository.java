@@ -77,7 +77,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
 //            "AND (:user = r.owner OR (type(ce) = User AND ce = :user) " +
 //            "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) ")
 //    List<Role> findUsableInTaskForUserCanEdit(@Param("id") Long id, @Param("user") User user, @Param("project") Project project);
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.canEdit ce  " +
             "left join r.canBeUsedIn AS t " +
             "WHERE (r.isTemplate = true OR :id = t.id) " +
@@ -86,7 +86,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "AND r.project = null")
     List<Role> findUsableInTaskForUserCanEditInDefault(@Param("id") Long id, @Param("user") User user);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.project.canEdit ce  " +
             "left join r.canBeUsedIn AS t " +
             "WHERE (r.isTemplate = true OR :id = t.id) " +
@@ -95,7 +95,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "AND r.project = :project")
     List<Role> findUsableInTaskForUserCanEdit(@Param("id") Long id, @Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.canEdit ce  " +
             "left JOIN r.hasAccess ha " +
             "WHERE r.isTemplate = :isTemplate AND (:user = r.owner OR (type(ce) = User AND ce = :user) " +
@@ -104,7 +104,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "AND r.project = null")
     List<Role> findByIsTemplateUserCanViewInDefault(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.canEdit ce  " +
             "left JOIN r.hasAccess ha " +
             "WHERE (:user = r.owner OR (type(ce) = User AND ce = :user) " +
@@ -113,7 +113,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "AND r.project = null")
     List<Role> findAllCanUserViewInDefault(@Param("user") User user);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.canEdit ce  " +
             "WHERE (:user = r.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
@@ -121,7 +121,7 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
     List<Role> findAllCanUserEditInDefault(@Param("user") User user);
 
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.project.canEdit ce  " +
             "left JOIN r.project.hasAccess ha " +
             "WHERE (:user = r.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -130,14 +130,14 @@ public interface RoleRepository extends CrudRepository<Role, Long> {
             "AND r.project = :project")
     List<Role> findAllCanUserView(@Param("user") User user,  @Param("project")Project project);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.project.canEdit ce  " +
             "WHERE (:user = r.project.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
             "AND r.project = :project")
     List<Role> findAllCanUserEdit(@Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT r FROM Role r " +
+    @Query("SELECT distinct r FROM Role r " +
             "left JOIN r.project.canEdit ce  " +
             "left JOIN r.project.hasAccess ha " +
             "WHERE r.isTemplate = :isTemplate AND (:user = r.project.projectOwner OR (type(ce) = User AND ce = :user) " +

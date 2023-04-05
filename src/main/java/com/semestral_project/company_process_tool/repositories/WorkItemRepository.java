@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.canEdit ce  " +
             "left JOIN w.hasAccess ha " +
             "WHERE w.isTemplate = :isTemplate AND (:user = w.owner OR (type(ce) = User AND ce = :user) " +
@@ -20,7 +20,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = null")
     List<WorkItem> findByIsTemplateUserCanViewInDefault(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.canEdit ce  " +
             "left JOIN w.hasAccess ha " +
             "WHERE (:user = w.owner OR (type(ce) = User AND ce = :user) " +
@@ -29,7 +29,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = null")
     List<WorkItem> findAllCanUserViewInDefault(@Param("user") User user);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.canEdit ce  " +
             "WHERE (:user = w.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
@@ -37,7 +37,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
     List<WorkItem> findAllCanUserEditInDefault(@Param("user") User user);
 
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.canEdit ce  " +
             "left join w.canBeUsedIn AS t " +
             "WHERE (w.isTemplate = true OR :id = t.id) " +
@@ -46,7 +46,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = null")
     List<WorkItem> findUsableInTaskForUserCanEditInDefault(@Param("id") Long id, @Param("user") User user);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.canEdit ce  " +
             "left join w.canBeUsedInProcesses AS p " +
             "WHERE (w.isTemplate = true OR :id = p.id) " +
@@ -55,7 +55,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = null")
     List<WorkItem> findUsableInProcessForUserCanEditInDefault(@Param("id") Long id, @Param("user") User user);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.project.canEdit ce  " +
             "left JOIN w.project.hasAccess ha " +
             "WHERE w.isTemplate = :isTemplate AND (:user = w.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -64,7 +64,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = :project")
     List<WorkItem> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.project.canEdit ce  " +
             "left JOIN w.project.hasAccess ha " +
             "WHERE (:user = w.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -73,7 +73,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = :project")
     List<WorkItem> findAllCanUserView(@Param("user") User user,  @Param("project") Project project);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.project.canEdit ce  " +
             "WHERE (:user = w.project.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
@@ -81,7 +81,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
     List<WorkItem> findAllCanUserEdit(@Param("user") User user,  @Param("project") Project project);
 
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.project.canEdit ce  " +
             "left join w.canBeUsedIn AS t " +
             "WHERE (w.isTemplate = true OR :id = t.id) " +
@@ -90,7 +90,7 @@ public interface WorkItemRepository extends CrudRepository<WorkItem, Long> {
             "AND w.project = :project")
     List<WorkItem> findUsableInTaskForUserCanEdit(@Param("id") Long id, @Param("user") User user,  @Param("project") Project project);
 
-    @Query("SELECT w FROM WorkItem w " +
+    @Query("SELECT distinct w FROM WorkItem w " +
             "left JOIN w.project.canEdit ce  " +
             "left join w.canBeUsedInProcesses AS p " +
             "WHERE (w.isTemplate = true OR :id = p.id) " +

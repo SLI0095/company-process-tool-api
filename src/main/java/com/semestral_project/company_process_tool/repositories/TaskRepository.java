@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
-        @Query("SELECT t FROM Task t " +
+        @Query("SELECT distinct t FROM Task t " +
                 "left JOIN t.canEdit ce  " +
                 "left JOIN t.hasAccess ha " +
                 "WHERE t.isTemplate = :isTemplate AND (:user = t.owner OR (type(ce) = User AND ce = :user) " +
@@ -20,7 +20,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
                 "AND t.project = null")
     List<Task> findByIsTemplateUserCanViewInDefault(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
 
-    @Query("SELECT t FROM Task t " +
+    @Query("SELECT distinct t FROM Task t " +
             "left JOIN t.canEdit ce  " +
             "left JOIN t.hasAccess ha " +
             "WHERE (:user = t.owner OR (type(ce) = User AND ce = :user) " +
@@ -29,14 +29,14 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "AND t.project = null")
     List<Task> findAllCanUserViewInDefault(@Param("user") User user);
 
-    @Query("SELECT t FROM Task t " +
+    @Query("SELECT distinct t FROM Task t " +
             "left JOIN t.canEdit ce  " +
             "WHERE (:user = t.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
             "AND t.project = null")
     List<Task> findAllCanUserEditInDefault(@Param("user") User user);
 
-    @Query("SELECT t FROM Task t " +
+    @Query("SELECT distinct t FROM Task t " +
             "left JOIN t.project.canEdit ce  " +
             "left JOIN t.project.hasAccess ha " +
             "WHERE t.isTemplate = :isTemplate AND (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -45,7 +45,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "AND t.project = :project")
     List<Task> findByIsTemplateUserCanView(@Param("isTemplate") boolean isTemplate, @Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT t FROM Task t " +
+    @Query("SELECT distinct t FROM Task t " +
             "left JOIN t.project.canEdit ce  " +
             "left JOIN t.project. hasAccess ha " +
             "WHERE (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -54,7 +54,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "AND t.project = :project")
     List<Task> findAllCanUserView(@Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT t FROM Task t " +
+    @Query("SELECT distinct t FROM Task t " +
             "left JOIN t.project.canEdit ce  " +
             "WHERE (:user = t.project.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +

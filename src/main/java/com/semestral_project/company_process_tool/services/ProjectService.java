@@ -80,6 +80,30 @@ public class ProjectService {
         return projectRepository.findAllCanUserEdit(user);
     }
 
+    public List<Project> getUserProjects(long userId){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        return projectRepository.findUsersProjects(user);
+    }
+
+    public List<Project> getUserProjectsOnlyAccess(long userId){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        return projectRepository.findAllUserHasOnlyAccess(user);
+    }
+
+    public List<Project> getUserProjectsOnlyEdit(long userId){
+        User user = userService.getUserById(userId);
+        if(user == null){
+            return new ArrayList<>();
+        }
+        return projectRepository.findAllUserCanOnlyEdit(user);
+    }
+
     public int addAccess(long projectId, long whoEdits, UserType getAccess){
         Project project = getProjectById(projectId);
         if(project == null){

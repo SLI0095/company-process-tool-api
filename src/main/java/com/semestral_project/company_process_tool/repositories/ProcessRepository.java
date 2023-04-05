@@ -13,20 +13,7 @@ import java.util.List;
 
 @Repository
 public interface ProcessRepository extends CrudRepository<Process, Long> {
-
-    @Query("SELECT p FROM Process p WHERE (?1 MEMBER p.canEdit OR ?1 MEMBER p.hasAccess)")
-    List<Process> findAllTemplatesProcessesForUser(User user);
-
-    @Query("SELECT p FROM Process p WHERE p.isTemplate = :isTemplate")
-    List<Process> findByIsTemplate(@Param("isTemplate") boolean isTemplate);
-
-    @Query("SELECT p FROM Process p WHERE (?1 MEMBER p.canEdit)")
-    List<Process> findAllTemplatesProcessesForUserCanEdit(User user);
-
-
-
-
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.canEdit ce  " +
             "left JOIN p.hasAccess ha " +
             "WHERE p.isTemplate = :isTemplate AND (:user = p.owner OR (type(ce) = User AND ce = :user) " +
@@ -35,7 +22,7 @@ public interface ProcessRepository extends CrudRepository<Process, Long> {
             "AND p.project = null")
     List<Process> findByIsTemplateUserCanViewInDefault(@Param("isTemplate") boolean isTemplate, @Param("user") User user);
 
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.canEdit ce  " +
             "left JOIN p.hasAccess ha " +
             "WHERE (:user = p.owner OR (type(ce) = User AND ce = :user) " +
@@ -44,7 +31,7 @@ public interface ProcessRepository extends CrudRepository<Process, Long> {
             "AND p.project = null")
     List<Process> findAllCanUserViewInDefault(@Param("user") User user);
 
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.canEdit ce  " +
             "WHERE (:user = p.owner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
@@ -52,7 +39,7 @@ public interface ProcessRepository extends CrudRepository<Process, Long> {
     List<Process> findAllCanUserEditInDefault(@Param("user") User user);
 
 
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.project.canEdit ce  " +
             "left JOIN p.project.hasAccess ha " +
             "WHERE (:user = p.project.projectOwner OR (type(ce) = User AND ce = :user) " +
@@ -61,14 +48,14 @@ public interface ProcessRepository extends CrudRepository<Process, Long> {
             "AND p.project = :project")
     List<Process> findAllCanUserView(@Param("user") User user,  @Param("project")Project project);
 
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.project.canEdit ce  " +
             "WHERE (:user = p.project.projectOwner OR (type(ce) = User AND ce = :user) " +
             "OR (type(ce) = UserGroup AND (:user MEMBER ce.users OR :user = ce.creator))) " +
             "AND p.project = :project")
     List<Process> findAllCanUserEdit(@Param("user") User user, @Param("project") Project project);
 
-    @Query("SELECT p FROM Process p " +
+    @Query("SELECT distinct p FROM Process p " +
             "left JOIN p.project.canEdit ce  " +
             "left JOIN p.project.hasAccess ha " +
             "WHERE p.isTemplate = :isTemplate AND (:user = p.project.projectOwner OR (type(ce) = User AND ce = :user) " +

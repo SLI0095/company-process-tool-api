@@ -12,18 +12,7 @@ import java.util.List;
 @Repository
 public interface ElementRepository extends CrudRepository<Element, Long> {
 
-    @Query("SELECT e FROM Element e WHERE (?1 MEMBER e.canEdit OR ?1 MEMBER e.hasAccess)")
-    List<Element> findAllElementsTemplateForUser(User user);
-
-    @Query("SELECT e FROM Element e WHERE (?1 MEMBER e.canEdit)")
-    List<Element> findAllElementsTemplateForUserCanEdit(User user);
-
-    @Query("SELECT e FROM Element e " +
-            "LEFT JOIN e.canBeUsedIn AS elem " +
-            "WHERE e.isTemplate = true OR :id = elem.id")
-    List<Element> usableInProcessForUser(@Param("id") Long id);
-
-    @Query("SELECT e FROM Element e " +
+    @Query("SELECT distinct e FROM Element e " +
             "left JOIN e.project.canEdit ce  " +
             "left join e.canBeUsedIn AS p " +
             "WHERE (e.isTemplate = true OR :id = p.id) " +
@@ -32,7 +21,7 @@ public interface ElementRepository extends CrudRepository<Element, Long> {
             "AND e.project = :project")
     List<Element> findUsableInProcessForUserCanEdit(@Param("id") Long id, @Param("user") User user,  @Param("project") Project project);
 
-    @Query("SELECT e FROM Element e " +
+    @Query("SELECT distinct e FROM Element e " +
             "left JOIN e.canEdit ce  " +
             "left join e.canBeUsedIn AS p " +
             "WHERE (e.isTemplate = true OR :id = p.id) " +

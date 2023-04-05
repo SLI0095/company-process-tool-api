@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.semestral_project.company_process_tool.entities.User;
 import com.semestral_project.company_process_tool.entities.UserGroup;
 import com.semestral_project.company_process_tool.entities.UserType;
+import com.semestral_project.company_process_tool.services.ProjectService;
 import com.semestral_project.company_process_tool.services.UserGroupService;
 import com.semestral_project.company_process_tool.services.UserService;
 import com.semestral_project.company_process_tool.services.UserTypeService;
@@ -60,7 +61,7 @@ public class UserController {
     @JsonView(Views.Projects.class)
     @GetMapping("/users/{id}/projects")
     public ResponseEntity<User> getUserWithProjects(@PathVariable long id) {
-        User user = userService.getUserById(id);
+        User user = userService.getUserByIdWithProjects(id);
         if(user != null) {
             return ResponseEntity.ok(user);
         } else {

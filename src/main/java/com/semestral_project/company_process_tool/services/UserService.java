@@ -19,6 +19,9 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    ProjectService projectService;
+
     public int registerUser(User user){
         if(userRepository.findByUsername(user.getUsername()).isPresent())
         {
@@ -66,6 +69,17 @@ public class UserService {
     public User getUserById(long id){
         Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
+    }
+
+    public User getUserByIdWithProjects(long id){
+        Optional<User> userData = userRepository.findById(id);
+        User user = userData.orElse(null);
+        if(user == null){
+            return null;
+        }
+        user.setCanEditProjects(projectService.getUserProjectsOnlyEdit(id));
+        user.setHasAccessProjects(projectService.getUserProjectsOnlyAccess(id));
+        return user;
     }
 
 }
