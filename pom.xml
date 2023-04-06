@@ -8,14 +8,14 @@
         <version>2.3.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.semestral_project</groupId>
-    <artifactId>company_process_tool</artifactId>
+    <groupId>cz.sli0095</groupId>
+    <artifactId>promod</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Company Process Tool</name>
-    <description>Semestral project</description>
+    <name>ProMod</name>
+    <description>Diploma project - process modeling tool</description>
 
     <properties>
-        <java.version>15</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.22</version>
+            <version>8.0.32</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -41,6 +41,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
