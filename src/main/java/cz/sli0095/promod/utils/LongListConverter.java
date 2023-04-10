@@ -5,7 +5,6 @@ package cz.sli0095.promod.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.AttributeConverter;
-import javax.persistence.Convert;
 import javax.persistence.Converter;
 import java.util.ArrayList;
 import java.util.List;

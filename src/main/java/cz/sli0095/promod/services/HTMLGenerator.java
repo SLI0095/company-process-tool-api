@@ -80,15 +80,30 @@ public class HTMLGenerator {
     }
 
     private void copyCss(String fromPath, String toPath){
-        File from = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(fromPath)).getFile());
-        File to = new File(toPath);
         try {
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fromPath);
+            File from = prepareFileFromStream(inputStream);
+            File to = new File(toPath);
+
             to.getParentFile().mkdirs();
             to.createNewFile();
             copy(from,to);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private File prepareFileFromStream(InputStream stream) throws IOException {
+        File tempFile = File.createTempFile("temp", ".css");
+        tempFile.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = stream.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        }
+        return tempFile;
     }
 
     private static void copy(File src, File dest) throws IOException{
