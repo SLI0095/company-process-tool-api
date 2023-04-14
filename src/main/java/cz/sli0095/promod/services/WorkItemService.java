@@ -84,6 +84,18 @@ public class WorkItemService {
         if(owner == null){
             return -1;
         }
+        if(workItem.getProject() != null){
+            Project project = projectService.getProjectById(workItem.getProject().getId());
+            if(project == null) {
+                return -1;
+            }
+            if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
+                return -1;
+            }
+            workItem.setOwner(project.getProjectOwner());
+        } else {
+            workItem.setOwner(owner);
+        }
         workItem.setOwner(owner);
         workItem = workItemRepository.save(workItem);
         return workItem.getId();

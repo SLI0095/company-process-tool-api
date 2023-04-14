@@ -108,7 +108,7 @@ public class ProcessService {
                 return -1;
             }
             if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
-                return -2;
+                return -1;
             }
             process.setOwner(project.getProjectOwner());
         } else {
@@ -416,8 +416,16 @@ public class ProcessService {
             return 2; //process not found
         }
         User editor = userService.getUserById(whoEdits);
-        if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
-            return 5; //cannot edit
+        if(process.getProject() != null) {
+            Project project = projectService.getProjectById(process.getProject().getId());
+            if (project == null) {
+                return 5;
+            }
+            if (!ItemUsersUtil.getAllUsersCanEdit(project).contains(editor)) {
+                return 3;
+            }
+        }else if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
+            return 3; //cannot edit
         }
         bpmnParser.saveBPMN(bpmn, process, editor);
         return 1;

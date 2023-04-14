@@ -74,7 +74,7 @@ public class RoleService {
                 return -1;
             }
             if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
-                return -2;
+                return -1;
             }
             role.setOwner(project.getProjectOwner());
         } else {

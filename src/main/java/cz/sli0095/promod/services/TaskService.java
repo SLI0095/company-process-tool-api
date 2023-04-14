@@ -86,6 +86,18 @@ public class TaskService {
         if(owner == null){
             return -1;
         }
+        if(task.getProject() != null){
+            Project project = projectService.getProjectById(task.getProject().getId());
+            if(project == null) {
+                return -1;
+            }
+            if(!ItemUsersUtil.getAllUsersCanEdit(project).contains(owner)){
+                return -1;
+            }
+            task.setOwner(project.getProjectOwner());
+        } else {
+            task.setOwner(owner);
+        }
         task.setOwner(owner);
         task = taskRepository.save(task);
         return task.getId();
