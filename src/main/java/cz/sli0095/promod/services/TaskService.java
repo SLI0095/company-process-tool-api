@@ -2,6 +2,7 @@ package cz.sli0095.promod.services;
 
 import cz.sli0095.promod.entities.Process;
 import cz.sli0095.promod.entities.snapshots.SnapshotElement;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotTask;
 import cz.sli0095.promod.repositories.*;
 import cz.sli0095.promod.services.configurations.ConfigurationHelper;
@@ -684,7 +685,7 @@ public class TaskService {
     }
 
 
-    public int createSnapshot(Long id, long userId, String description) {
+    public int createSnapshot(Long id, long userId, SnapshotItem detail) {
         Task task = getTaskById(id);
         if(task == null){
             return 2;
@@ -693,7 +694,7 @@ public class TaskService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(task).contains(editor)) {
             return 3;
         }
-        snapshotTaskService.createSnapshot(task, description, new SnapshotsHelper());
+        snapshotTaskService.createSnapshot(task, detail, new SnapshotsHelper());
         return 1;
     }
 

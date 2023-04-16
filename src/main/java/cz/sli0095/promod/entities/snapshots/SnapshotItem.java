@@ -31,6 +31,9 @@ public class SnapshotItem {
     @JsonView(Views.Basic.class)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate snapshotDate;
+
+    @JsonView(Views.Basic.class)
+    private String snapshotName;
     @JsonView(Views.Basic.class)
     @Column(columnDefinition="LONGTEXT")
     private String snapshotDescription;
@@ -108,5 +111,13 @@ public class SnapshotItem {
 
     public void setOriginalId(Long originalId) {
         this.originalId = originalId;
+    }
+
+    public String getSnapshotName() {
+        return snapshotName;
+    }
+
+    public void setSnapshotName(String snapshotName) {
+        this.snapshotName = snapshotName;
     }
 }

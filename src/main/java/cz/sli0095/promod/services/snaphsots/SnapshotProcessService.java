@@ -53,7 +53,7 @@ public class SnapshotProcessService {
     ElementRepository elementRepository;
 
     //@Transactional
-    public SnapshotProcess createSnapshot(Process original, String snapshotDescription, SnapshotsHelper helper){
+    public SnapshotProcess createSnapshot(Process original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -71,7 +71,8 @@ public class SnapshotProcessService {
         snapshot.setHowToStaff(original.getHowToStaff());
         snapshot.setKeyConsiderations(original.getKeyConsiderations());
 
-        snapshot.setSnapshotDescription(snapshotDescription);
+        snapshot.setSnapshotName(snapshotDetail.getSnapshotName());
+        snapshot.setSnapshotDescription(snapshotDetail.getSnapshotDescription());
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalElement(original);
         snapshot.setOriginalId(original.getId());
@@ -99,7 +100,7 @@ public class SnapshotProcessService {
             if(element instanceof Task){
                 SnapshotTask snapshotTask = (SnapshotTask) helper.getExistingSnapshotElement(element.getId());
                 if(snapshotTask == null){
-                    snapshotTask = snapshotTaskService.createSnapshot((Task)element, snapshotDescription, helper);
+                    snapshotTask = snapshotTaskService.createSnapshot((Task)element, snapshotDetail, helper);
                 }
                 var partOf = snapshotTask.getPartOfProcess();
                 if(!partOf.contains(snapshot)){
@@ -112,7 +113,7 @@ public class SnapshotProcessService {
             } else {
                 SnapshotProcess snapshotProcess = (SnapshotProcess) helper.getExistingSnapshotElement(element.getId());
                 if(snapshotProcess == null){
-                    snapshotProcess = this.createSnapshot((Process)element, snapshotDescription, helper);
+                    snapshotProcess = this.createSnapshot((Process)element, snapshotDetail, helper);
                 }
                 var partOf = snapshotProcess.getPartOfProcess();
                 if(!partOf.contains(snapshot)){

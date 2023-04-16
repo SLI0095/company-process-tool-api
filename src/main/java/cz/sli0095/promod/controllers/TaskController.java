@@ -3,6 +3,7 @@ package cz.sli0095.promod.controllers;
 import cz.sli0095.promod.entities.*;
 import com.fasterxml.jackson.annotation.JsonView;
 import cz.sli0095.promod.entities.Process;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotTask;
 import cz.sli0095.promod.services.TaskService;
 import cz.sli0095.promod.utils.ResponseMessage;
@@ -334,8 +335,8 @@ public class TaskController {
         }
     }
     @PutMapping("/tasks/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
-        int ret = taskService.createSnapshot(id, userId, description);
+    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody SnapshotItem detail, @RequestParam long userId){
+        int ret = taskService.createSnapshot(id, userId, detail);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Task id: " + id + " created snapshot"));
         } else if(ret == 3) {

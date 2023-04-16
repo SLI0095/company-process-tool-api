@@ -2,6 +2,7 @@ package cz.sli0095.promod.services;
 
 import cz.sli0095.promod.entities.Process;
 import cz.sli0095.promod.entities.snapshots.SnapshotElement;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotProcess;
 import cz.sli0095.promod.repositories.ElementRepository;
 import cz.sli0095.promod.repositories.ProcessMetricRepository;
@@ -580,7 +581,7 @@ public class ProcessService {
         return 1;
     }
 
-    public int createSnapshot(Long id, long userId, String description) {
+    public int createSnapshot(Long id, long userId, SnapshotItem detail) {
         Process process = getProcessById(id);
         if(process == null){
             return 2;
@@ -589,7 +590,7 @@ public class ProcessService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(process).contains(editor)){
             return 3;
         }
-        snapshotProcessService.createSnapshot(process, description, new SnapshotsHelper());
+        snapshotProcessService.createSnapshot(process, detail, new SnapshotsHelper());
         return 1;
     }
 

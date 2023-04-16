@@ -2,6 +2,7 @@ package cz.sli0095.promod.controllers;
 
 import cz.sli0095.promod.entities.Process;
 import com.fasterxml.jackson.annotation.JsonView;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotWorkItem;
 import cz.sli0095.promod.services.WorkItemService;
 import cz.sli0095.promod.utils.ResponseMessage;
@@ -282,8 +283,8 @@ public class WorkItemController {
     }
 
     @PutMapping("/workItems/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
-        int ret = workItemService.createSnapshot(id, userId, description);
+    public ResponseEntity<ResponseMessage> createSnapshot(@PathVariable Long id, @RequestBody SnapshotItem detail, @RequestParam long userId){
+        int ret = workItemService.createSnapshot(id, userId, detail);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Work item id: " + id + " created snapshot"));
         } else if(ret == 3) {

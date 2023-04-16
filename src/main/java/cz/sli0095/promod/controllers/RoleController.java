@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import cz.sli0095.promod.entities.Role;
 import cz.sli0095.promod.entities.Task;
 import cz.sli0095.promod.entities.UserType;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotRole;
 import cz.sli0095.promod.services.RoleService;
 import cz.sli0095.promod.utils.ResponseMessage;
@@ -237,8 +238,8 @@ public class RoleController {
     }
 
     @PutMapping("/roles/{id}/createSnapshot")
-    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody String description, @RequestParam long userId){
-        int ret = roleService.createSnapshot(id, userId, description);
+    public ResponseEntity<ResponseMessage> createSnaphsot(@PathVariable Long id, @RequestBody SnapshotItem detail, @RequestParam long userId){
+        int ret = roleService.createSnapshot(id, userId, detail);
         if(ret == 1){
             return ResponseEntity.ok(new ResponseMessage("Role id: " + id + " created snapshot"));
         } else if(ret == 3) {

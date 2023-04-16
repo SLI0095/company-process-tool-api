@@ -1,5 +1,6 @@
 package cz.sli0095.promod.services;
 
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotRole;
 import cz.sli0095.promod.repositories.RoleRepository;
 import cz.sli0095.promod.services.configurations.ConfigurationHelper;
@@ -351,7 +352,7 @@ public class RoleService {
         return 1;
     }
 
-    public int createSnapshot(Long id, long userId, String description) {
+    public int createSnapshot(Long id, long userId, SnapshotItem detail) {
         Role role = getRoleById(id);
         if(role == null){
             return 2;
@@ -360,7 +361,7 @@ public class RoleService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(role).contains(editor)) {
             return 3;
         }
-        snapshotRoleService.createSnapshotRole(role,description, new SnapshotsHelper());
+        snapshotRoleService.createSnapshotRole(role, detail, new SnapshotsHelper());
         return 1;
     }
 

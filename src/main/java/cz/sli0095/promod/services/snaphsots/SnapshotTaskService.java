@@ -51,7 +51,7 @@ public class SnapshotTaskService {
     TaskService taskService;
 
     //@Transactional
-    public SnapshotTask createSnapshot(Task original, String snapshotDescription, SnapshotsHelper helper){
+    public SnapshotTask createSnapshot(Task original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -66,8 +66,9 @@ public class SnapshotTaskService {
         snapshot.setKeyConsiderations(original.getKeyConsiderations());
         snapshot.setTaskType(original.getTaskType());
 
+        snapshot.setSnapshotName(snapshotDetail.getSnapshotName());
         snapshot.setOriginalElement(original);
-        snapshot.setSnapshotDescription(snapshotDescription);
+        snapshot.setSnapshotDescription(snapshotDetail.getSnapshotDescription());
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalId(original.getId());
 
@@ -78,7 +79,7 @@ public class SnapshotTaskService {
             //Check if was not snapshot already created during snapshotting
             SnapshotWorkItem snapshotWorkItem = helper.getExistingSnapshotWorkItem(workItem.getId());
             if(snapshotWorkItem == null){
-                snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDescription, helper);
+                snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDetail, helper);
             }
             var list = snapshotWorkItem.getAsMandatoryInput();
             list.add(snapshot);
@@ -90,7 +91,7 @@ public class SnapshotTaskService {
         for(WorkItem workItem : original.getOutputs()){
             SnapshotWorkItem snapshotWorkItem = helper.getExistingSnapshotWorkItem(workItem.getId());
             if(snapshotWorkItem == null){
-                snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDescription, helper);
+                snapshotWorkItem = snapshotWorkItemService.createSnapshot(workItem,snapshotDetail, helper);
             }
             var list = snapshotWorkItem.getAsOutput();
             list.add(snapshot);
@@ -110,7 +111,7 @@ public class SnapshotTaskService {
             Role role = rasci.getRole();
             SnapshotRole snapshotRole = helper.getExistingSnapshotRole(role.getId());
             if(snapshotRole == null){
-                snapshotRole = snapshotRoleService.createSnapshotRole(role, snapshotDescription, helper);
+                snapshotRole = snapshotRoleService.createSnapshotRole(role, snapshotDetail, helper);
             }
             SnapshotRasci snapshotRasci = new SnapshotRasci();
             snapshotRasci.setType(rasci.getType());

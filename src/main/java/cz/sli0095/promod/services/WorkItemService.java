@@ -1,6 +1,7 @@
 package cz.sli0095.promod.services;
 
 import cz.sli0095.promod.entities.Process;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.entities.snapshots.SnapshotWorkItem;
 import cz.sli0095.promod.services.configurations.ConfigurationHelper;
 import cz.sli0095.promod.services.configurations.ConfigurationWorkItemService;
@@ -435,7 +436,7 @@ public class WorkItemService {
         return  5;
     }
 
-    public int createSnapshot(Long id, long userId, String description) {
+    public int createSnapshot(Long id, long userId, SnapshotItem detail) {
         WorkItem workItem = getWorkItemById(id);
         if(workItem == null){
             return 2;
@@ -444,7 +445,7 @@ public class WorkItemService {
         if(editor == null || !ItemUsersUtil.getAllUsersCanEdit(workItem).contains(editor)) {
             return 3;
         }
-        snapshotWorkItemService.createSnapshot(workItem, description, new SnapshotsHelper());
+        snapshotWorkItemService.createSnapshot(workItem, detail, new SnapshotsHelper());
         return 1;
     }
 

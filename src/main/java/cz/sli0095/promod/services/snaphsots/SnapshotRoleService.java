@@ -2,6 +2,7 @@ package cz.sli0095.promod.services.snaphsots;
 
 import cz.sli0095.promod.entities.Role;
 import cz.sli0095.promod.entities.User;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.repositories.snapshots.SnapshotRoleRepository;
 import cz.sli0095.promod.entities.snapshots.SnapshotRole;
 import cz.sli0095.promod.repositories.RoleRepository;
@@ -23,7 +24,7 @@ public class SnapshotRoleService {
     RoleService roleService;
 
     //@Transactional
-    public SnapshotRole createSnapshotRole(Role original, String snapshotDescription, SnapshotsHelper helper){
+    public SnapshotRole createSnapshotRole(Role original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -37,7 +38,8 @@ public class SnapshotRoleService {
         snapshot.setChangeDescription(original.getChangeDescription());
         snapshot.setVersion(original.getVersion());
 
-        snapshot.setSnapshotDescription(snapshotDescription);
+        snapshot.setSnapshotName(snapshotDetail.getSnapshotName());
+        snapshot.setSnapshotDescription(snapshotDetail.getSnapshotDescription());
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalRole(original);
         snapshot.setOriginalId(original.getId());

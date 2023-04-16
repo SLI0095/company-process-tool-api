@@ -2,6 +2,7 @@ package cz.sli0095.promod.services.snaphsots;
 
 import cz.sli0095.promod.entities.State;
 import cz.sli0095.promod.entities.WorkItem;
+import cz.sli0095.promod.entities.snapshots.SnapshotItem;
 import cz.sli0095.promod.repositories.snapshots.SnapshotStateRepository;
 import cz.sli0095.promod.repositories.snapshots.SnapshotWorkItemRepository;
 import cz.sli0095.promod.entities.User;
@@ -34,7 +35,7 @@ public class SnapshotWorkItemService {
     BPMNparser bpmNparser;
 
     //@Transactional
-    public SnapshotWorkItem createSnapshot(WorkItem original, String snapshotDescription, SnapshotsHelper helper){
+    public SnapshotWorkItem createSnapshot(WorkItem original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
         }
@@ -55,7 +56,8 @@ public class SnapshotWorkItemService {
         snapshot.setUrlAddress(original.getUrlAddress());
         snapshot.setTemplateText(original.getTemplateText());
 
-        snapshot.setSnapshotDescription(snapshotDescription);
+        snapshot.setSnapshotName(snapshotDetail.getSnapshotName());
+        snapshot.setSnapshotDescription(snapshotDetail.getSnapshotDescription());
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setOriginalWorkItem(original);
         snapshot.setOriginalId(original.getId());
