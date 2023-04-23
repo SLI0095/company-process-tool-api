@@ -149,7 +149,7 @@ public class ProcessService {
             if(e.getClass() == Task.class){
                 taskService.addAccess(e.getId(), editor.getId(), getAccess);
             } else {
-                this.addAccess(e.getId(), editor.getId(), getAccess); //
+                this.addAccess(e.getId(), editor.getId(), getAccess);
             }
         }
         return  1; //OK

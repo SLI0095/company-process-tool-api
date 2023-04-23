@@ -60,10 +60,4 @@ public class Rasci {
         this.type = type;
     }
 
-    //    public boolean responsible;
-//    public boolean accountable;
-//    public boolean support;
-//    public boolean consulted;
-//    public boolean informed;
-
 }

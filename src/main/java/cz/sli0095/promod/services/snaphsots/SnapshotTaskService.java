@@ -50,7 +50,6 @@ public class SnapshotTaskService {
     @Autowired
     TaskService taskService;
 
-    //@Transactional
     public SnapshotTask createSnapshot(Task original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -124,7 +123,6 @@ public class SnapshotTaskService {
         return snapshot;
     }
 
-    //@Transactional
     public Task restoreFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -223,7 +221,6 @@ public class SnapshotTaskService {
         return taskData.orElse(null);
     }
 
-    //@Transactional
     public Task revertExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -247,7 +244,7 @@ public class SnapshotTaskService {
         //All inputs
 
         // check if work item from snapshot exists - then just revert values based on snapshot - then check if is already as input - if not add
-        // if work it does not exist then recreate the new one - in this case always add as input
+        // if work item does not exist then recreate the new one - in this case always add as input
         // then remove inputs that are not in snapshot
         // PLUS check helper for recreated and reverted work items first
         // if some input is removed need to remove link in workflows - only when not getting any workflow
@@ -364,7 +361,6 @@ public class SnapshotTaskService {
         return task;
     }
 
-   // @Transactional
     public Task revertNonExistingFromSnapshot(SnapshotTask snapshotTask, SnapshotsHelper helper, BPMNSnapshotUtil workflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -391,7 +387,7 @@ public class SnapshotTaskService {
         //All inputs
 
         // check if work item from snapshot exists - then just revert values based on snapshot - then check if is already as input - if not add
-        // if work it does not exist then recreate the new one - in this case always add as input
+        // if work item does not exist then recreate the new one - in this case always add as input
         // then remove inputs that are not in snapshot
         // PLUS check helper for recreated and reverted work items first
         // if some input is removed need to remove link in workflows - only when not getting any workflow

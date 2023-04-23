@@ -23,7 +23,6 @@ public class SnapshotRoleService {
     @Autowired
     RoleService roleService;
 
-    //@Transactional
     public SnapshotRole createSnapshotRole(Role original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -49,7 +48,6 @@ public class SnapshotRoleService {
         return snapshot;
     }
 
-   // @Transactional
     public Role restoreRoleFromSnapshot(SnapshotRole snapshot, SnapshotsHelper helper, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -76,8 +74,6 @@ public class SnapshotRoleService {
         return roleData.orElse(null);
     }
 
-
-    //@Transactional
     public Role revertRoleFromSnapshot(SnapshotRole snapshotRole, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();

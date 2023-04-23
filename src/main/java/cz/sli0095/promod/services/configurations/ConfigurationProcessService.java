@@ -84,7 +84,6 @@ public class ConfigurationProcessService {
                 }
                 var partOf = task.getPartOfProcess();
                 if(!partOf.contains(process)){
-//                    processService.addElementToProcess(process.getId(),task);
                     partOf.add(process);
                     task.setPartOfProcess(partOf);
                     taskRepository.save(task);
@@ -98,7 +97,6 @@ public class ConfigurationProcessService {
                 }
                 var partOf = subProcess.getPartOfProcess();
                 if(!partOf.contains(process)){
-//                    processService.addElementToProcess(process.getId(),subProcess);
                     partOf.add(process);
                     subProcess.setPartOfProcess(partOf);
                     subProcess = processRepository.save(subProcess);

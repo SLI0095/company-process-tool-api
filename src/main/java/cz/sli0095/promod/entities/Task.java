@@ -28,9 +28,6 @@ public class Task extends Element{
     @ManyToMany(mappedBy = "asMandatoryInput")
     private List<WorkItem> mandatoryInputs = new ArrayList<>();
 
-//    @ManyToMany(mappedBy = "asOptionalInput")
-//    private List<WorkItem> optionalInputs = new ArrayList<>();
-
     @JsonView(Views.Basic.class)
     @ManyToMany(mappedBy = "asOutput")
     private List<WorkItem> outputs = new ArrayList<>();

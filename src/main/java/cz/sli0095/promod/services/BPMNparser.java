@@ -82,7 +82,6 @@ public class BPMNparser {
         this.updateWorkItems(bpmnContent);
     }
 
-    //@Transactional
     private String newWorkItems(String inputXML, Process process, User editor){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -139,7 +138,6 @@ public class BPMNparser {
         }
     }
 
-    //@Transactional
     private String newProcesses(String inputXML, Process process, User editor){
         String returnXML = inputXML;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -263,7 +261,6 @@ public class BPMNparser {
         return returnXML;
     }
 
-    //@Transactional
     private void updateProcesses(String inputXML, Process process){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -494,7 +491,6 @@ public class BPMNparser {
         }
     }
 
-    //@Transactional
     private void updateTasks(String inputXML, Process process){
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);

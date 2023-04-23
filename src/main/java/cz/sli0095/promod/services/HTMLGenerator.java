@@ -467,31 +467,6 @@ public class HTMLGenerator {
         return returnString.toString();
     }
 
-    private String taskGuidance(Task task){
-        StringBuilder returnString = new StringBuilder();
-        returnString.append("<div class='taskGuidance'>");
-        returnString.append("<h3>Task guidance work items</h3>");
-        if(task.getGuidanceWorkItems().size() == 0){
-            returnString.append("<p class='null'>-</p>");
-        } else {
-            returnString.append("<dl>");
-            for(WorkItem workItem : task.getGuidanceWorkItems()){
-                if(!workItemsToGenerate.contains(workItem)){
-                    workItemsToGenerate.add(workItem);
-                }
-                returnString.append("<dt><a href='#workItem_").append(workItem.getId()).append("'>").append(workItem.getName()).append("</a></dt>");
-                if(workItem.getBriefDescription() == null){
-                    returnString.append("<dd>-</dd>");
-                } else {
-                    returnString.append("<dd>").append(workItem.getBriefDescription()).append("</dd>");
-                }
-            }
-            returnString.append("</dl>");
-        }
-        returnString.append("</div>");
-        return returnString.toString();
-    }
-
     private String rolePart(Role role){
         return "<div id='role_" + role.getId() + "' >" +
                 "<h2 class='roleName'>" + role.getName() + "</h2>" +

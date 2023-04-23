@@ -52,7 +52,6 @@ public class SnapshotProcessService {
     @Autowired
     ElementRepository elementRepository;
 
-    //@Transactional
     public SnapshotProcess createSnapshot(Process original, SnapshotItem snapshotDetail, SnapshotsHelper helper){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -131,7 +130,6 @@ public class SnapshotProcessService {
         return snapshot;
     }
 
-    //@Transactional
     public Process restoreFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, BPMNSnapshotUtil snapshotWorkflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
@@ -167,7 +165,6 @@ public class SnapshotProcessService {
             processMetricRepository.save(metric);
         }
 
-        //TODO add to usable in when restoring
         var order = new ArrayList<>(snapshotProcess.getElementsOrder());
         for(SnapshotElement snapshotElement : snapshotProcess.getElements()){
             if(snapshotElement instanceof SnapshotTask){
@@ -225,9 +222,6 @@ public class SnapshotProcessService {
         return processData.orElse(null);
     }
 
-
-
-    //@Transactional
     public Process revertFromSnapshot(SnapshotProcess snapshotProcess, SnapshotsHelper helper, BPMNSnapshotUtil snapshotWorkflow, User user){
         if(helper == null){
             helper = new SnapshotsHelper();
